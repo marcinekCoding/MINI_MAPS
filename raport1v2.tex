@@ -178,6 +178,99 @@ Podstawą projektowania naszych map będą ogólnodostępne w Internecie plany e
 \subsection{Mapa przed i po wektoryzacji}
 Poniżej przedstawiono plany ewakuacyjne przed i po procesie wektoryzacji dla każdego piętra Wydziału MiNI.
 
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{parter.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{MINImapsGraf_6x1.png}
+    \end{minipage}
+    \caption{Parter: plan ewakuacyjny przed wektoryzacją (po lewej) oraz plan po wektoryzacji (po prawej).}
+    \label{fig:wektoryzacja-parter}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{1pietro.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{MINImapsGraf_5x1.png}
+    \end{minipage}
+    \caption{Piętro 1: plan ewakuacyjny przed wektoryzacją (po lewej) oraz plan po wektoryzacji (po prawej).}
+    \label{fig:wektoryzacja-p1}
+\end{figure}
+\clearpage
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{2pietro.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{MINImapsGraf_4x1.png}
+    \end{minipage}
+    \caption{Piętro 2: plan ewakuacyjny przed wektoryzacją (po lewej) oraz plan po wektoryzacji (po prawej).}
+    \label{fig:wektoryzacja-p2}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{3pietro.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{MINImapsGraf_3x1.png}
+    \end{minipage}
+    \caption{Piętro 3: plan ewakuacyjny przed wektoryzacją (po lewej) oraz plan po wektoryzacji (po prawej).}
+    \label{fig:wektoryzacja-p3}
+\end{figure}
+\clearpage
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{4pietro.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{MINImapsGraf_2x1.png}
+    \end{minipage}
+    \caption{Piętro 4: plan ewakuacyjny przed wektoryzacją (po lewej) oraz plan po wektoryzacji (po prawej).}
+    \label{fig:wektoryzacja-p4}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{5pietro.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{MINImapsGraf_1x1.png}
+    \end{minipage}
+    \caption{Piętro 5: plan ewakuacyjny przed wektoryzacją (po lewej) oraz plan po wektoryzacji (po prawej).}
+    \label{fig:wektoryzacja-p5}
+\end{figure}
+\clearpage
+
 \subsection{Wnioski}
 Już podczas wstępnej analizy otrzymanych planów można zauważyć pierwsze problemy, jakie mogą wynikać z użytych przez nas metod. Nawet na niedużej skali jednego piętra liczba węzłów (zielonych kropek na rysunku) rośnie bardzo szybko, co znacząco zwiększa zasoby potrzebne przy obliczaniu optymalnych tras. W kontekście samego Wydziału MiNI nie jest to problem wymagający większej uwagi, jednak przy wykładniczym wzroście złożoności problemu wraz z dodawaniem kolejnych budynków może to mieć znaczący wpływ na odczucia z użytkowania aplikacji. W związku z tym w kolejnych etapach pracy nad projektem będzie to jeden z głównych tematów, na których będziemy się skupiać, jednak na ten moment nie jest to priorytet.
 
@@ -202,11 +295,12 @@ Poniżej przedstawiono wyniki przeprowadzonego badania w tabeli wraz z błędem 
 \centering
 \caption{Wyniki badań w obrębie jednego piętra -- Tabela 1}
 \label{tab:wyniki-jedno-pietro}
-\footnotesize
-\setlength{\tabcolsep}{2.5pt}
+\scriptsize
+\setlength{\tabcolsep}{1.5pt}
 \renewcommand{\arraystretch}{1.2}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|>{\centering\arraybackslash}m{3.7cm}|c|cccccccccc|c|c|}
+\setlength{\arrayrulewidth}{0.5pt}
+\setlength{\doublerulesep}{0pt}
+\begin{tabular}{|>{\centering\arraybackslash}m{3.1cm}|c|cccccccccc|c|c|}
 \hline
 \textbf{Trasa} & \textbf{\shortstack{Odległość\\{[m]}}} & \textbf{P1 [s]} & \textbf{P2 [s]} & \textbf{P3 [s]} & \textbf{P4 [s]} & \textbf{P5 [s]} & \textbf{P6 [s]} & \textbf{P7 [s]} & \textbf{P8 [s]} & \textbf{P9 [s]} & \textbf{P10 [s]} & \textbf{\shortstack{Średni\\czas [s]}} & \textbf{\shortstack{Błąd\\bezwzgl. [s]}} \\
 \hline
@@ -228,10 +322,72 @@ Winda p.4 --\\Pokój rozmów & 4 & 3,79 & 3,99 & 3,81 & \textcolor{red}{3,59} & 
 \hline
 Billard --\\Drzwi WRS MiNI & 38 & 29,57 & 28,81 & 26,95 & 29,28 & 28,46 & 29,27 & 31,13 & \textcolor{red}{26,83} & \textcolor{red}{32,46} & 30,82 & 29,29 & $\pm$2,93 \\
 \hline
-\end{tabular}%
-}
+\end{tabular}
 \renewcommand{\arraystretch}{1.0}
 \end{table}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=13.2cm,
+            height=8.4cm,
+            xlabel={Odległość trasy [m]},
+            ylabel={Czas przejścia [s]},
+            xmin=0, xmax=45,
+            ymin=0, ymax=40,
+            grid=major,
+            major grid style={dashed, gray!30},
+            minor tick num=1,
+            legend style={at={(0.03,0.97)}, anchor=north west, font=\footnotesize, fill=white, draw=gray!40},
+            title={Pomiary czasu przejścia względem odległości (bez wartości skrajnych)}
+        ]
+            % Punkty pomiarowe po odrzuceniu wartości minimalnej i maksymalnej (zaznaczonych na czerwono w tabeli).
+            \addplot[
+                only marks,
+                mark=*,
+                mark size=1.6pt,
+                color=blue!70!black
+            ] coordinates {
+                (22,17.19) (22,17.92) (22,18.36) (22,16.10) (22,16.14) (22,17.78) (22,18.08) (22,15.99)
+                (42,32.29) (42,33.62) (42,33.74) (42,34.01) (42,31.91) (42,34.65) (42,32.40) (42,35.25)
+                (8,6.27) (8,6.57) (8,6.20) (8,6.02) (8,6.60) (8,6.70) (8,5.84) (8,6.05)
+                (26,20.58) (26,19.78) (26,20.75) (26,20.03) (26,22.20) (26,19.82) (26,22.20) (26,18.92)
+                (31,24.43) (31,25.24) (31,25.89) (31,25.99) (31,26.19) (31,23.29) (31,25.62) (31,26.50)
+                (21,16.33) (21,16.31) (21,15.20) (21,15.16) (21,16.26) (21,16.89) (21,17.88) (21,16.35)
+                (4,3.79) (4,3.99) (4,3.81) (4,3.89) (4,3.61) (4,3.90) (4,3.90) (4,3.71)
+                (14,11.03) (14,10.82) (14,10.96) (14,11.76) (14,10.48) (14,11.19) (14,10.89) (14,10.48)
+                (38,29.57) (38,28.81) (38,26.95) (38,29.28) (38,28.46) (38,29.27) (38,31.13) (38,30.82)
+            };
+            \addlegendentry{Punkty pomiarowe (bez min/max)}
+
+            \addplot[
+                blue!80!black,
+                thick,
+                domain=0:45
+            ] {0.7837093*x + 0.2017649};
+            \addlegendentry{Linia trendu (regresja liniowa)}
+
+            \addplot[
+                red!80!black,
+                dashed,
+                thick,
+                domain=0:45
+            ] {0.70524795*x + 0.1843246};
+            \addlegendentry{Trend minimalny}
+
+            \addplot[
+                red!80!black,
+                dashed,
+                thick,
+                domain=0:45
+            ] {0.86217065*x + 0.21920521};
+            \addlegendentry{Trend maksymalny}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Zależność czasu przejścia od odległości na jednym piętrze. Na wykresie uwzględniono wszystkie punkty poza skrajnymi (oznaczonymi na czerwono w Tabeli 1) oraz linie trendu: średnią, minimalną i maksymalną.}
+    \label{fig:regresja-jedno-pietro}
+\end{figure}
 
 \subsection{Analiza wyników}
 Celem pierwszej próby badawczej było ustalenie średniej prędkości, z jaką student porusza się w obrębie jednego piętra. Przy użyciu narzędzi regresji liniowej dla wielu wyników ustaliliśmy, że średnia prędkość studenta na wydziale wynosi ok.:
@@ -240,8 +396,16 @@ Celem pierwszej próby badawczej było ustalenie średniej prędkości, z jaką 
 \end{equation}
 Wartość ta została przyjęta w modelu jako domyślna prędkość ruchu użytkownika na odcinkach poziomych.
 
+Dodatkowo analiza wykresu z Rysunku \ref{fig:regresja-jedno-pietro} pokazuje, że zależność czasu od odległości jest bardzo bliska liniowej w całym badanym zakresie. Punkty pomiarowe (po odrzuceniu skrajnych wartości oznaczonych wcześniej na czerwono) układają się wzdłuż prostej trendu bez widocznych odchyleń systematycznych dla krótkich i długich tras, co potwierdza, że przy ruchu po jednym piętrze najistotniejszym czynnikiem jest dystans.
+
+W modelu uwzględniono trzy linie trendu: linię średnią, linię minimalną oraz linię maksymalną. Linia średnia reprezentuje typowy czas przejścia, natomiast linie minimalna i maksymalna wyznaczają praktyczny przedział zmienności wyników obserwowanych w pomiarach terenowych. Takie podejście pozwala nie tylko oszacować pojedynczą wartość ETA, ale też zbudować wiarygodny zakres czasowy przejścia dla użytkowników o różnym tempie ruchu i przy różnym chwilowym natężeniu ruchu na korytarzu.
+
 \subsection{Wnioski i zastosowanie}
-Wyniki otrzymane podczas próby badawczej stanowią podstawę budowy algorytmu liczącego czas trasy z punktu A do punktu B. Wyznaczony podczas badania czas będzie rozkładany na wektory łączące dane węzły. Wstępne założenia i wyniki wskazują, że średni czas przejścia pomiędzy dwoma węzłami na tym samym piętrze jest liniowo zależny jedynie od sumy odległości. Sytuację znacząco komplikują schody i winda, gdzie wybór pomiędzy jednym a drugim środkiem przemieszczania znacząco wpływa na cały czas.
+Wyniki otrzymane podczas próby badawczej stanowią podstawę budowy algorytmu liczącego czas trasy z punktu A do punktu B. Wyznaczony podczas badania czas będzie rozkładany na wektory łączące dane węzły. Wstępne założenia i wyniki wskazują, że średni czas przejścia pomiędzy dwoma węzłami na tym samym piętrze jest liniowo zależny od sumy odległości.
+
+W kontekście MINI Maps oznacza to, że dla każdej krawędzi grafu można przypisać wagę czasową wyznaczaną na podstawie regresji liniowej, a następnie sumować ją wzdłuż całej trasy. W trybie podstawowym aplikacja może korzystać z linii średniej (najbardziej prawdopodobny czas), a w trybie rozszerzonym prezentować także zakres ,,optymistyczny--pesymistyczny'' wynikający z linii minimalnej i maksymalnej. Dzięki temu użytkownik otrzymuje nie tylko jedno ETA, ale też realną informację o możliwym rozrzucie czasu dojścia.
+
+Tak przygotowany model poprawia jakość nawigacji szczególnie podczas krótkich przerw między zajęciami, kiedy nawet niewielkie odchylenia czasu mają znaczenie praktyczne. Jednocześnie sytuację nadal komplikują schody i winda, gdzie wybór pomiędzy jednym a drugim środkiem przemieszczania istotnie wpływa na całkowity czas przejścia i wymaga osobnego modelowania dla ruchu między piętrami.
 
 \section{Analiza czasu przemieszczania między piętrami}
 
