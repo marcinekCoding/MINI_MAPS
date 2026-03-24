@@ -1,0 +1,162 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+
+\pgfplotsset{compat=1.18} 
+
+\begin{document}
+
+\setcounter{section}{3}
+\section{Analiza czasu przemieszczania między \mbox{piętrami}}
+
+\subsection{Cel i metodologia pomiarów}
+W wielopiętrowym gmachu Wydziału MiNI jednym z największych wyzwań dla studentów jest szybkie przemieszczanie się między kondygnacjami, szczególnie podczas krótkich 15-minutowych przerw. Aby nasza aplikacja mogła rzetelnie wyznaczać najszybsze trasy, nie mogliśmy polegać na samych domysłach czy planach architektonicznych. Konieczne było zebranie rzeczywistych danych. W tym celu przeprowadziliśmy pomiary terenowe, badając realny czas podróży windą oraz klatkami schodowymi.
+
+\subsection{Pomiary windy: przejazd z poziomu 0 na 5 piętro}
+Na początku skupiliśmy się wyłącznie na windzie i wykonaliśmy serię niezależnych pomiarów pełnego przejazdu na dystansie od poziomu 0 do 5 piętra (bez doliczania czasu oczekiwania na przyjazd kabiny). Uzyskane czasy przedstawiono poniżej:
+\begin{itemize}
+    \item Pomiar 1: 39 s
+    \item Pomiar 2: 41 s
+    \item Pomiar 3: 40 s
+    \item Pomiar 4: 42 s
+    \item Pomiar 5: 38 s
+    \item Pomiar 6: 40 s
+\end{itemize}
+
+Średni czas przejazdu z sześciu prób wyniósł dokładnie \textbf{40 sekund}. Rozrzut wyników (38--42 s) jest niewielki, więc do dalszego modelowania przyjęliśmy wartość 40 s jako reprezentatywną dla przejazdu 0 $\rightarrow$ 5.
+
+\begin{figure}[htpb]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=12cm, height=7cm,
+            ybar,
+            bar width=12pt,
+            xlabel={Numer pomiaru},
+            ylabel={Czas przejazdu [sekundy]},
+            xmin=0.5, xmax=6.5,
+            ymin=35, ymax=44,
+            xtick={1,2,3,4,5,6},
+            grid=major,
+            major grid style={dashed, gray!30},
+            title={Czas przejazdu windy na trasie 0 $\rightarrow$ 5}
+        ]
+        \addplot[fill=blue!45] coordinates {
+            (1,39) (2,41) (3,40) (4,42) (5,38) (6,40)
+        };
+        \addplot[red, thick, domain=0.5:6.5] {40};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Wyniki serii pomiarów czasu przejazdu windy z poziomu 0 na 5 piętro. Czerwona linia oznacza średnią równą 40 s.}
+    \label{fig:pomiary-windy-0-5}
+\end{figure}
+
+\subsection{Wnioski z pomiarów windy}
+Seria pomiarów pokazała, że całkowity czas przejazdu windy na dystansie 0 $\rightarrow$ 5 (łącznie z wejściem i wyjściem) jest stabilny i wynosi około 40 s. Ponieważ z obserwacji terenowych wynika, że sam narzut wejścia/wyjścia to ok. 20 s, czas ruchu kabiny wynosi ok. 20 s na 5 pięter, czyli \textbf{4 sekundy na jedno piętro}.
+
+\subsection{Zebranie danych surowych}
+Do modelu porównawczego zebraliśmy następujące dane:
+\begin{itemize}
+    \item \textbf{Całkowity czas przejazdu windą (z poziomu 0 na 5 piętro):} 40 sekund.
+    \item \textbf{Średni czas narzutu dla windy (wsiadanie i wysiadanie):} 20 sekund.
+    \item \textbf{Czas wejścia po schodach (1 piętro):} około 12 sekund (zakładając typowe studenckie tempo).
+\end{itemize}
+
+\subsection{Przetwarzanie danych: Uproszczony model czasowy}
+Aby nasza aplikacja mogła dynamicznie porównywać oba warianty tras, musieliśmy przekształcić zebrane dane w prosty model. 
+
+W pierwszej kolejności rozdzieliliśmy czas całkowity windy na część stałą i część zależną od liczby pięter. Skoro pełny przejazd 0 $\rightarrow$ 5 trwa 40 s, a 20 s stanowi narzut wejścia/wyjścia, to na sam ruch kabiny pozostaje 20 s. Oznacza to \textbf{4 sekundy na jedno piętro}.
+
+Na tej podstawie możemy zestawić przewidywany czas podróży obu metod w zależności od liczby pięter:
+\begin{itemize}
+    \item \textbf{Całkowity czas dla windy} to 20 sekund stałego narzutu wejścia/wyjścia plus 4 sekundy za każde pokonywane piętro.
+    \item \textbf{Całkowity czas dla schodów} to po prostu 12 sekund pomnożone przez liczbę pięter.
+\end{itemize}
+
+\subsection{Analiza wyników: Gdzie jest punkt opłacalności?}
+Po przyjęciu modelu opartego na rzeczywistym czasie przejazdu (40 s na dystansie 0 $\rightarrow$ 5, łącznie z wejściem i wyjściem), porównaliśmy oba warianty dla faktycznego zakresu budynku, czyli od 1 do 5 pięter:
+
+\begin{itemize}
+    \item \textbf{Pokonanie 1 piętra:} Winda to ok. 24 sekundy, schody to 12 sekund. (Szybsze są schody).
+    \item \textbf{Pokonanie 2 pięter:} Winda to ok. 28 sekund, schody to 24 sekundy. (Nadal szybsze są schody).
+    \item \textbf{Pokonanie 3 pięter:} Winda to ok. 32 sekundy, schody to 36 sekund. (Szybsza jest winda).
+    \item \textbf{Pokonanie 5 pięter:} Winda to ok. 40 sekund, schody to 60 sekund. (Wyraźnie szybsza jest winda).
+\end{itemize}
+
+\subsection{Wnioski dla algorytmu nawigacji}
+Powyższe zestawienie dostarcza nam gotowego rozwiązania, które zostanie bezpośrednio zaimplementowane w kodzie aplikacji MiniMaps. 
+
+Otrzymaliśmy wynik: dla 1--2 pięter \textbf{szybsze są schody}, a od 3 pięter \textbf{szybsza jest winda}. 
+
+Dzięki takiemu rozwiązaniu system ograniczy liczbę nietrafionych podpowiedzi i będzie lepiej odzwierciedlał realne warunki poruszania się po wydziale. Oczywiście w ustawieniach aplikacji może pozostać opcja preferowania schodów (np. z powodów zdrowotnych, sportowych lub przy dużym obciążeniu windy).
+
+\subsection{Weryfikacja matematyczna i wizualizacja modelu}
+
+Aby poprzeć powyższe obserwacje twardymi dowodami, przekształciliśmy zebrane czasy w prosty model matematyczny. Pozwala on aplikacji na płynne przeliczanie opłacalności trasy. 
+
+Czas przemieszczania się klatką schodową ($T_s$) w funkcji pokonywanych pięter ($n$) jest funkcją liniową rosnącą w tempie 12 sekund na kondygnację:
+\begin{equation}
+    T_s(n) = 12n
+\end{equation}
+
+Z kolei całkowity czas podróży windą ($T_w$) to suma stałego narzutu 20 s (wejście i wyjście) oraz czasu przejazdu 4 s na każde pokonywane piętro:
+\begin{equation}
+    T_w(n) = 20 + 4n
+\end{equation}
+
+Sprawdzamy teraz punkt przecięcia obu funkcji:
+\begin{equation}
+    12n = 20 + 4n \implies 8n = 20 \implies n = 2{,}5
+\end{equation}
+
+Przecięcie występuje przy $n=2{,}5$, co oznacza, że dla 1--2 pięter korzystniejsze czasowo są schody, a od 3 pięter korzystniejsza staje się winda. Pełne zestawienie dla zakresu 1--5 pięter ilustruje poniższy wykres (Rysunek \ref{fig:wykres_windy}).
+
+\begin{figure}[htpb]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=12cm, height=8cm,
+            xlabel={Liczba pięter do pokonania ($n$)},
+            ylabel={Szacowany czas [sekundy]},
+            xmin=1, xmax=5,
+            ymin=0, ymax=65,
+            xtick={1,2,3,4,5},
+            legend pos=north west,
+            grid=major,
+            major grid style={dashed, gray!30},
+            title={Winda czy schody? Analiza opłacalności czasu transportu}
+        ]
+        
+        % Linia dla windy
+        \addplot[
+            color=blue,
+            mark=square*,
+            line width=1.5pt
+        ] coordinates {
+            (1, 24) (2, 28) (3, 32) (4, 36) (5, 40)
+        };
+        \addlegendentry{Winda (20 s narzutu + 4 s/piętro)}
+        
+        % Linia dla schodów
+        \addplot[
+            color=red,
+            mark=*,
+            line width=1.5pt
+        ] coordinates {
+            (1, 12) (2, 24) (3, 36) (4, 48) (5, 60)
+        };
+        \addlegendentry{Schody}
+
+        % Punkt przecięcia obu modeli
+        \node[label={270:{Punkt opłacalności (2,5 piętra)}},circle,fill,inner sep=2pt, color=black] at (axis cs:2.5,30) {};
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Zależność szacowanego czasu dotarcia na zajęcia od wybranego środka transportu pionowego w zakresie 1--5 pięter. Wykres pokazuje, że przy uwzględnieniu 20 s narzutu wejścia/wyjścia schody są szybsze dla 1--2 pięter, natomiast od 3 pięter szybsza staje się winda.}
+    \label{fig:wykres_windy}
+\end{figure}
+
+\end{document}

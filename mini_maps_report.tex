@@ -186,6 +186,10 @@ Poniżej przedstawiono wyniki przeprowadzonego badania w tabeli wraz z błędem 
 
 \subsection{Analiza wyników}
 Celem pierwszej próby badawczej było ustalenie średniej prędkości, z jaką student porusza się w obrębie jednego piętra. Przy użyciu narzędzi regresji liniowej dla wielu wyników ustaliliśmy, że średnia prędkość studenta na wydziale wynosi ok.:
+\begin{equation}
+    v_{\text{sr}} \approx 1{,}3\ \text{m/s} \quad (\approx 4{,}7\ \text{km/h})
+\end{equation}
+Wartość ta została przyjęta w modelu jako domyślna prędkość ruchu użytkownika na odcinkach poziomych.
 
 \subsection{Wnioski i zastosowanie}
 Wyniki otrzymane podczas próby badawczej stanowią podstawę budowy algorytmu liczącego czas trasy z punktu A do punktu B. Wyznaczony podczas badania czas będzie rozkładany na wektory łączące dane węzły. Wstępne założenia i wyniki wskazują, że średni czas przejścia pomiędzy dwoma węzłami na tym samym piętrze jest liniowo zależny jedynie od sumy odległości. Sytuację znacząco komplikują schody i winda, gdzie wybór pomiędzy jednym a drugim środkiem przemieszczania znacząco wpływa na cały czas.
