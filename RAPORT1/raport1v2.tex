@@ -78,13 +78,13 @@
 
 \section{Wstęp, motywacja i opis raportu}
 
-Celem naszego projektu jest stworzenie kompleksowej mapy kampusu Politechniki Warszawskiej na wzór popularnych Google Maps. Naszą motywacją są osobiste przeżycia z pierwszych tygodni jako studentów PW, jak i późniejszych prób odnalezienia się na nieznanych nam wydziałach, np. podczas zajęć z Języków Obcych. Nasz pierwszy raport skupia się na rozwijaniu aplikacji w obrębie terenu Wydziału Matematyki i Nauk Informacyjnych i analizie danych, które udało nam się zebrać w trakcie jego realizacji. Raport ten może wydawać sie dość chaotyczny, jedank wszystkie zebrane w trakcie jego trwania dane są podstawą do późniejszej implementacji wszystkich założonych przez nas funkcjonalności.
+Celem naszego projektu jest stworzenie kompleksowej mapy kampusu Politechniki Warszawskiej na wzór popularnych Google Maps. Naszą motywacją są osobiste przeżycia z pierwszych tygodni jako studentów PW, jak i późniejszych prób odnalezienia się na nieznanych nam wydziałach, np. podczas zajęć z Języków Obcych. Nasz pierwszy raport skupia się na rozwijaniu aplikacji w obrębie terenu Wydziału Matematyki i Nauk Informacyjnych i analizie danych, które udało nam się zebrać w trakcie jego realizacji. Raport ten może wydawać się dość chaotyczny, jednak wszystkie zebrane w trakcie jego trwania dane są podstawą do późniejszej implementacji wszystkich założonych przez nas funkcjonalności.
 
 \section{Analiza potrzeb użytkowników i identyfikacja problemów}
 
 \subsection{Metodologia badania pilotażowego}
 
-Aby projektowana aplikacja odpowiadała na rzeczywiste problemy studentów Wydziału MiNI, logikę nawigacyjną oparto na planach ewakuacyjnych budynku, które zostały uzupełnione i zweryfikowane danymi z badania pilotażowego przeprowadzonego na grupie docelowej ($N = 100$ studentów pierwszego roku). Głównym celem zwiadu badawczego była identyfikacja tzw. krytycznych węzłów nawigacyjnych, czyli miejsc, w których architektura gmachu najczęściej wprowadza użytkowników w błąd oraz miejsc które studecni najczęściej odwiedzają w trakcie ich dnia na uczelni, poza salami dydaktycznymi.
+Aby projektowana aplikacja odpowiadała na rzeczywiste problemy studentów Wydziału MiNI, logikę nawigacyjną oparto na planach ewakuacyjnych budynku, które zostały uzupełnione i zweryfikowane danymi z badania pilotażowego przeprowadzonego na grupie docelowej ($N = 100$ studentów pierwszego roku). Głównym celem zwiadu badawczego była identyfikacja tzw. krytycznych węzłów nawigacyjnych, czyli miejsc, w których architektura gmachu najczęściej wprowadza użytkowników w błąd oraz miejsc, które studenci najczęściej odwiedzają w trakcie ich dnia na uczelni, poza salami dydaktycznymi.
 
 \subsection{Wyniki: Krytyczne węzły nawigacyjne (\textit{ang. pain points - punkty problemowe})}
 
@@ -133,7 +133,7 @@ Zgromadzone dane ilościowe zostały poddane agregacji i przedstawione na poniż
             y dir=reverse,
             xlabel={Odsetek studentów (\%)},
             ylabel={Miejsce},
-            symbolic y coords={Strefa Jet Brains, Billard, WRS MiNI, Stołówka, Pokój cichej nauki, Inne},
+            symbolic y coords={Strefa Jet Brains, Bilard, WRS MiNI, Stołówka, Pokój cichej nauki, Inne},
             ytick=data,
             yticklabel style={text width=4.2cm, align=right},
             nodes near coords,
@@ -142,13 +142,13 @@ Zgromadzone dane ilościowe zostały poddane agregacji i przedstawione na poniż
             width=12cm,
             height=8cm,
             xmin=0, xmax=45,
-            title={Wyniki ankiety: Najczęsciej na wydziale odwiedzasz?},
+            title={Wyniki ankiety: Najczęściej na wydziale odwiedzasz?},
             grid=major,
             major grid style={dotted, gray}
         ]
         \addplot[fill=blue!65!black, draw=black] coordinates {
             (38,Strefa Jet Brains)
-            (22,Billard)
+            (22,Bilard)
             (17,WRS MiNI)
             (10,Stołówka)
             (8,Pokój cichej nauki)
@@ -168,7 +168,7 @@ Druga ankieta (Rysunek \ref{fig:miejsca-poza-salami}) pokazuje, że życie stude
 
 Wniosek dla naszego projektu jest prosty -- zwykła, płaska mapa z zaznaczoną trasą to za mało. Skoro sam układ korytarzy potrafi zmylić, nasza aplikacja musi być o krok przed użytkownikiem. Jeśli student wyznacza trasę do tej nieszczęsnej sali 313, algorytm nie powinien tylko rysować suchej wektorowej kreski na ekranie.
 
-System musi natychmiast wyłapać, że węzeł docelowy posiada wysoką ,,wagę trudności'' i dorzucić dodatkową podpowiedź. Może to być zdjęcie kłopotliwego rozwidlenia wyświetlane w interfejsie wariantu trasy, albo szybki komunikat tekstowy w stylu: ,,za automatami z kawą skręć w lewo''. Jednocześnie wyniki drugiej ankiety pokazują, że użytkownicy regularnie poruszają się także do miejsc pozadydaktycznych, takich jak strefa Jet Brains czy billard, więc te punkty również muszą być traktowane jako cele pierwszej kategorii. Krótko mówiąc: nasza nawigacja ma nie tylko łatać błędy w UX (\textit{ang. User Experience - doświadczenie użytkownika}) samego budynku, ale też wspierać codzienne przemieszczanie się między salami i najczęściej odwiedzanymi strefami życia studenckiego.
+System musi natychmiast wyłapać, że węzeł docelowy posiada wysoką ,,wagę trudności'' i dorzucić dodatkową podpowiedź. Może to być zdjęcie kłopotliwego rozwidlenia wyświetlane w interfejsie wariantu trasy, albo szybki komunikat tekstowy w stylu: ,,za automatami z kawą skręć w lewo''. Jednocześnie wyniki drugiej ankiety pokazują, że użytkownicy regularnie poruszają się także do miejsc pozadydaktycznych, takich jak strefa Jet Brains czy bilard, więc te punkty również muszą być traktowane jako cele pierwszej kategorii. Krótko mówiąc: nasza nawigacja ma nie tylko łatać błędy w UX (\textit{ang. User Experience - doświadczenie użytkownika}) samego budynku, ale też wspierać codzienne przemieszczanie się między salami i najczęściej odwiedzanymi strefami życia studenckiego.
 
 \section{Podstawy projektowania aplikacji}
 
@@ -286,7 +286,7 @@ W ramach dalszego rozwoju projektu kluczowym wyzwaniem technologicznym będzie i
 \section{Analiza przemieszczania się w obrębie jednego piętra}
 
 \subsection{Cel i metodologia pomiarów}
-W celu wyznaczenia jak najdokładniejszego ETA (\textit{ang. Estimated Time of Arrival - oczekiwany czas dotarcia do celu}) dla przeciętnego studenta, zebraliśmy grupę 10 osób reprezentujących społeczność Politechniki Warszawskiej. Wśród osób badanych było 5 kobiet oraz 5 mężczyzn z 1,2 i 3 roku studiów inżynierskich. Każda z badanych osób została poproszona o przejście 9 różnych dróg, osobno w jedną i w drugą stronę, swoim zwykłym tempem i zmierzenie czasu, jaki był im na to potrzebny. Trasy były wybierane w taki sposób, aby każda była innej długości i odzwierciedlała codzienne drogi jakimi porszuają się studenci w trakcie dnia. Wszystkie trasy były w obrębie jednego piętra. Dane te zostały zebrane, a następnie dokonaliśmy obróbki w następujący sposób: odrzucono najniższy i najwyższy wynik jako możliwe odchylenia standardowe, a następnie policzono średni wynik. Jako względny błąd pomiarowy przyjęto $\pm 10\%$; wynika to z wielu możliwych czynników, jakie wpływają na ostateczny wynik. Podczas późniejszego wywiadu z badanymi za główny powód odchyleń wskazano znaczącą ilość osób przebywających na terenie.
+W celu wyznaczenia jak najdokładniejszego ETA (\textit{ang. Estimated Time of Arrival - oczekiwany czas dotarcia do celu}) dla przeciętnego studenta, zebraliśmy grupę 10 osób reprezentujących społeczność Politechniki Warszawskiej. Wśród osób badanych było 5 kobiet oraz 5 mężczyzn z 1,2 i 3 roku studiów inżynierskich. Każda z badanych osób została poproszona o przejście 9 różnych dróg, osobno w jedną i w drugą stronę, swoim zwykłym tempem i zmierzenie czasu, jaki był im na to potrzebny. Trasy były wybierane w taki sposób, aby każda była innej długości i odzwierciedlała codzienne drogi, jakimi poruszają się studenci w trakcie dnia. Wszystkie trasy były w obrębie jednego piętra. Dane te zostały zebrane, a następnie dokonaliśmy obróbki w następujący sposób: odrzucono najniższy i najwyższy wynik jako możliwe odchylenia standardowe, a następnie policzono średni wynik. Jako względny błąd pomiarowy przyjęto $\pm 10\%$; wynika to z wielu możliwych czynników, jakie wpływają na ostateczny wynik. Podczas późniejszego wywiadu z badanymi za główny powód odchyleń wskazano znaczącą ilość osób przebywających na terenie.
 
 \subsection{Wyniki pomiarów}
 Poniżej przedstawiono wyniki przeprowadzonego badania w tabeli wraz z błędem bezwzględnym dla każdej trasy oraz jej średnią długością. Wartości odległości wyznaczyłyśmy samodzielnie, korzystając z dostępnych metod pomiarowych w terenie. W każdym wierszu na czerwono zaznaczono wartość minimalną i maksymalną, a średni czas obliczono po odrzuceniu tych dwóch skrajnych wyników.
@@ -320,7 +320,7 @@ Winda p.4 --\\Pokój rozmów & 4 & 3,79 & 3,99 & 3,81 & \textcolor{red}{3,59} & 
 \hline
 316 -- 313 & 14 & 11,03 & 10,82 & 10,96 & 11,76 & 10,48 & \textcolor{red}{10,34} & 11,19 & 10,89 & \textcolor{red}{11,86} & 10,48 & 10,95 & $\pm$1,09 \\
 \hline
-Billard --\\Drzwi WRS MiNI & 38 & 29,57 & 28,81 & 26,95 & 29,28 & 28,46 & 29,27 & 31,13 & \textcolor{red}{26,83} & \textcolor{red}{32,46} & 30,82 & 29,29 & $\pm$2,93 \\
+Bilard --\\Drzwi WRS MiNI & 38 & 29,57 & 28,81 & 26,95 & 29,28 & 28,46 & 29,27 & 31,13 & \textcolor{red}{26,83} & \textcolor{red}{32,46} & 30,82 & 29,29 & $\pm$2,93 \\
 \hline
 \end{tabular}
 \renewcommand{\arraystretch}{1.0}
@@ -571,7 +571,7 @@ Przecięcie występuje przy $n=2{,}5$, co oznacza, że dla 1--2 pięter korzystn
 
 \section{Podsumowanie i dalszy rozwój}
 
-Pierwsze wyniki badań są obiecujące i pokazują, że istnieje realne zapotrzebowanie na aplikacje pomagającą studentom odnaleźć się na kampusie PW. Zebrane w trakcie pomiarów dane będą podstawą działania algorytmów znajdowania tras i wyznaczania czasu potrzebnego studentom na przemieszczenie się pomiędzy salami, a wyniki ankiet jasno wskazują kierunek w jakim aplikacja powinna się rozwijać. Niestety jednak wstępna wektoryzacja planów ewakuacyjnych i problem lokalizacji użytkownika na zamkniętym obszarze ukazują już na tak wczesnym etapie problemy konstrukcyjne, nad których rozwiązaniem będą skupiać się kolejne raporty. Plan na dalszy rozwój obejmuje m.in. opracowanie działającego prototypu map na MiNI, rozwinięcie działania na inne wydziały oraz połączenie z już istniejącymi aplikacjami, tzn. Google Maps oraz Apple Maps, aby móc nawigować do budynków PW poza Kampusem, np. domów studenckich bądź miejsc spotkań na zajęcia z WF-u.
+Pierwsze wyniki badań są obiecujące i pokazują, że istnieje realne zapotrzebowanie na aplikację pomagającą studentom odnaleźć się na kampusie PW. Zebrane w trakcie pomiarów dane będą podstawą działania algorytmów znajdowania tras i wyznaczania czasu potrzebnego studentom na przemieszczenie się pomiędzy salami, a wyniki ankiet jasno wskazują kierunek, w jakim aplikacja powinna się rozwijać. Niestety jednak wstępna wektoryzacja planów ewakuacyjnych i problem lokalizacji użytkownika na zamkniętym obszarze ukazują już na tak wczesnym etapie problemy konstrukcyjne, nad których rozwiązaniem będą skupiać się kolejne raporty. Plan na dalszy rozwój obejmuje m.in. opracowanie działającego prototypu map na MiNI, rozwinięcie działania na inne wydziały oraz połączenie z już istniejącymi aplikacjami, tzn. Google Maps oraz Apple Maps, aby móc nawigować do budynków PW poza Kampusem, np. domów studenckich bądź miejsc spotkań na zajęcia z WF-u.
 
 \section{Podział prac w zespole}
 
