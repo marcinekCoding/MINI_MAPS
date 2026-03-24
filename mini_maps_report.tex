@@ -10,8 +10,10 @@
 \usepackage{amsmath}
 \usepackage{pgfplots}
 \usepackage{float}
+\usepackage{fancyhdr}
 \pgfplotsset{compat=1.18}
 \geometry{margin=2.5cm}
+\setlength{\headheight}{17pt}
 
 \begin{document}
 
@@ -55,12 +57,22 @@
     Maks Młynarczyk\par}
 
     \vspace{0.45cm}
-    {\large \today\par}
+    {\large 21 marca 2026\par}
 \end{titlepage}
 
 % Contents page
 \tableofcontents
 \clearpage
+
+% Header and footer style (excluding title page)
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize Podstawy Teorii Informacji}
+\rhead{\footnotesize ETAP I}
+\lfoot{\footnotesize Wydział Matematyki i Nauk Informacyjnych}
+\rfoot{\footnotesize \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
 
 \section{Wstęp, motywacja i plan na dalszy rozwój}
 
@@ -240,6 +252,24 @@ Na początku skupiliśmy się wyłącznie na windzie i wykonaliśmy serię nieza
 
 \subsection{Wnioski z pomiarów windy}
 Seria pomiarów pokazała, że całkowity czas przejazdu windy na dystansie 0 $\rightarrow$ 5 (łącznie z wejściem i wyjściem) jest stabilny i wynosi około 40 s. Ponieważ z obserwacji terenowych wynika, że sam narzut wejścia/wyjścia to ok. 20 s, czas ruchu kabiny wynosi ok. 20 s na 5 pięter, czyli \textbf{4 sekundy na jedno piętro}.
+
+\subsection{Dokumentacja fotograficzna punktów pomiarowych}
+Aby uwiarygodnić zebrane dane i pokazać kontekst przestrzenny pomiarów, do raportu dołączono dokumentację fotograficzną dwóch kluczowych punktów komunikacji pionowej na Wydziale MiNI: głównej klatki schodowej oraz windy. Zdjęcia przedstawiają rzeczywiste miejsca, w których wykonywano pomiary czasów przejścia i przejazdu.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{/Users/marcinpawlak/.cursor/projects/Users-marcinpawlak-Documents-STUDIA-SEM-2-minimaps/assets/IMG_4345-1c295508-a341-4225-95ec-721e864afc77.png}
+        \caption*{(a) Główna klatka schodowa -- punkt odniesienia dla pomiarów ruchu pieszego.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{/Users/marcinpawlak/.cursor/projects/Users-marcinpawlak-Documents-STUDIA-SEM-2-minimaps/assets/IMG_4344-d5bd4d73-9aaf-4d81-bc1d-c2ea0667129e.png}
+        \caption*{(b) Winda osobowa -- punkt pomiaru czasu przejazdu i narzutu wejścia/wyjścia.}
+    \end{minipage}
+\end{figure}
 
 \subsection{Zebranie danych surowych}
 Do modelu porównawczego zebraliśmy następujące dane:
