@@ -1,7 +1,8 @@
 # Fdb version 4
-["pdflatex"] 1776114474.8977 "c:/Users/goran/Documents/MINI_MAPS/raport2/raport2_from_raport1v2.tex" "raport2_from_raport1v2.pdf" "raport2_from_raport1v2" 1776114476.73808 0
+["pdflatex"] 1776114910.71665 "c:/Users/goran/Documents/MINI_MAPS/raport2/raport2_from_raport1v2.tex" "raport2_from_raport1v2.pdf" "raport2_from_raport1v2" 1776114912.60732 2
+  "/Users/marcinpawlak/.cursor/projects/Users-marcinpawlak-Documents-STUDIA-SEM-2-minimaps/assets/logo_MINI_big-5f89496c-f82a-435b-8820-91ad95cd2a18.png" 0 -1 0 ""
   "architektura.jpg" 1776113463 995101 e215e306c09f49543191cf6e4033bce7 ""
-  "c:/Users/goran/Documents/MINI_MAPS/raport2/raport2_from_raport1v2.tex" 1776114472 16239 1c75da8f3a0a20c793d35fcaa4db685c ""
+  "c:/Users/goran/Documents/MINI_MAPS/raport2/raport2_from_raport1v2.tex" 1776114906 16238 9be0060092ba55ed3e2a025d43febe74 ""
   "c:/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1774297818 2375 baa924870cfb487815765f9094cf3728 ""
   "c:/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc" 1774297818 3031 6c4d3515bf7115d8518af1c9ab97ca44 ""
   "c:/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1774296851 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -212,10 +213,10 @@
   "c:/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1774300546 5619402 045890036aad9b52b154ef5568e59d3a ""
   "c:/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1774300698 3636417 b4870c978c72172a44f8b8bf1443a012 ""
   "c:/texlive/2026/texmf.cnf" 1774300514 713 e69b156964470283e0530f5060668171 ""
-  "raport2_from_raport1v2.aux" 1776114476 1919 24e39bede75d855e91dede8ac047dc83 "pdflatex"
-  "raport2_from_raport1v2.out" 1776114476 2384 ba47dfe2b1fa91451a236a614385b16b "pdflatex"
-  "raport2_from_raport1v2.tex" 1776114472 16239 1c75da8f3a0a20c793d35fcaa4db685c ""
-  "raport2_from_raport1v2.toc" 1776114476 962 3cbae3859be1fd8f5b9d0ed49864560d "pdflatex"
+  "raport2_from_raport1v2.aux" 1776114912 1920 198125a96813b1c4ee2fe6f9e5833e19 "pdflatex"
+  "raport2_from_raport1v2.out" 1776114912 2384 ba47dfe2b1fa91451a236a614385b16b "pdflatex"
+  "raport2_from_raport1v2.tex" 1776114906 16238 9be0060092ba55ed3e2a025d43febe74 ""
+  "raport2_from_raport1v2.toc" 1776114912 962 3cbae3859be1fd8f5b9d0ed49864560d "pdflatex"
   (generated)
   "raport2_from_raport1v2.aux"
   "raport2_from_raport1v2.log"
