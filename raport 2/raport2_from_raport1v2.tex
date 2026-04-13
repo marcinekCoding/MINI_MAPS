@@ -1,0 +1,87 @@
+\documentclass[14pt,a4paper]{extarticle}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\pgfplotsset{compat=1.18}
+\geometry{margin=2.5cm}
+\setlength{\headheight}{17pt}
+
+\begin{document}
+
+% Front page
+\begin{titlepage}
+    \thispagestyle{empty}
+    \centering
+
+    \vspace*{1.1cm}
+    %\includegraphics[width=0.82\textwidth]{/Users/marcinpawlak/.cursor/projects/Users-marcinpawlak-Documents-STUDIA-SEM-2-minimaps/assets/logo_MINI_big-5f89496c-f82a-435b-8820-91ad95cd2a18.png}\par
+
+    \vspace{1.7cm}
+    {\fontsize{20}{24}\selectfont\textsc{Podstawy Teorii Informacji}\par}
+
+    \vspace{1.0cm}
+    {\Large Laboratorium 1\par}
+
+    \vspace{0.25cm}
+    {\large Raport projektowy MiniMaps\par}
+
+    \vspace{1.1cm}
+    \rule{0.9\textwidth}{0.5pt}
+    \vspace{0.55cm}
+
+    {\LARGE\bfseries
+    MiniMaps - Raport 1
+    \par}
+
+    \vspace{0.55cm}
+    \rule{0.9\textwidth}{0.5pt}
+
+    \vfill
+    {\Large \textbf{Autorzy}\par}
+    \vspace{0.25cm}
+    {\large
+    Goran Pangełow\par
+    Marcin Pawlak\par
+    Mikołaj Pesta\par
+    Ignacy Drężek\par
+    Iga Oleksiewicz\par
+    Maks Młynarczyk\par}
+
+    \vspace{0.45cm}
+    {\large 21 marca 2026\par}
+\end{titlepage}
+
+% Contents page
+\tableofcontents
+\clearpage
+
+% Header and footer style (excluding title page)
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize Podstawy Teorii Informacji}
+\rhead{\footnotesize ETAP I}
+\lfoot{\footnotesize Wydział Matematyki i Nauk Informacyjnych}
+\rfoot{\footnotesize \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\section{Sprostowanie Raportu 1 i redefinicja celów badawczych}
+\subsection{Analiza Raportu 1}
+W związku z konstruktywną krytyką i niezwykle cennymi uwagami uzyskanymi po ocenie pierwszego raportu, nasz zespół projektowy po głębokiej ewaluacji naszych dotychczasowych prac podjął decyzje o całkowitej zmianie naszej koncepcji, zachowując cel jakim jest ułatwienie codziennego życia studentów na naszym wydziale. Analiza uwag Profesora doprowadziła nas do wniosku, że pierwotne założenia projektu -- oparte na problemach nawigacyjnych, poszukiwaniu sal czy wektoryzacji planów ewakuacyjnych -- choć interesujące z punktu widzenia architektonicznego i algorytmicznego, nie są możliwe do pełnego zrealizowania i wyczerpania tematów przewidzianych na PTI. Skupienie się na geometrii gmachu sprawiło, że w Raporcie 1 pominęliśmy kluczowe aspekty tego zadania czyli dynamikę przepływu danych, ich wiarygodność i pełną analizę nadmiarowości. Zgadzamy się z opinią, że problem odnajdywania sal jest barierą chwilową, z którą przeciętny student radzi sobie w pierwszych tygodniach nauki, a analiza dylematu ,,schody czy winda'' posiada zbyt małą skalowalność, by oprzeć na niej złożony system informacyjny. Biorąc pod uwagę sugestie, by poszukać problemów bliższych codziennym aktywnościom społeczności akademickiej oraz skupić się na unikatowości naszego wydziału, podjęliśmy decyzję o całkowitej redefinicji tematu badawczego. W niniejszym, drugim etapie projektu, przenosimy punkt ciężkości ze środowiska statycznego na w pełni dynamiczne. Naszym nowym obszarem badawczym staje się modelowanie, ekstrakcja i optymalizacja przepływu informacji o dostępności miejsc użytku rekreacyjnego, na przykładzie wydziałowych pomieszczeń socjalnych i stref relaksu.
+\subsection{Nowa koncepcja}
+Wybór tego zagadnienia stanowi bezpośrednią odpowiedź na realne potrzeby studentów. Wydział MiNI, charakteryzujący się wysokim natężeniem ruchu w przerwach między blokami zajęciowymi, regularnie boryka się z problemem lokalnego przeludnienia stref wypoczynkowych. Z punktu widzenia studenta, decyzja o udaniu się np. do pokoju cichej nauki, które znajdują się na 4 piętrze, jest często bardzo niepewna i obarczona wysokim prawdopodobieństwem tzw. pustego przebiegu. Zaistnienie takiej sytuacji, czyli wędrówki do pomieszczenia, w którym brakuje wolnych miejsc siedzących, generuje stratę czasu, energii i frustrację. Zjawisko to możemy traktować jako klasyczny problem deficytu informacyjnego. W takim ujęciu, dostarczona w odpowiednim czasie i formie informacja o aktualnym obłożeniu pomieszczenia nabiera ogromnej wartości pragmatycznej. W niniejszym raporcie, zgodnie z sugestiami Profesora, przyjmujemy podejście dedukcyjne -- od ogółu do szczegółu. Zgodnie z założeniami ćwiczenia 2 będziemy traktować badane strefy jako źródła sygnału, a studentów jako jego odbiorców i dążymy do stworzenia optymalnego modelu redukcji niepewności. W poniższych rozdziałach dokonujemy rygorystycznego przeglądu literatury i istniejących na rynku rozwiązań z zakresu systemów Smart Building i Occupancy Sensing. Następnie analizujemy pozyskiwane dane informacyjne na trzech poziomach, to jest syntaktycznym, semantycznym i pragmatycznym oraz badamy możliwości ich kompresji w taki sposób, aby ewentualny efekt końcowy (np. ekrany informacyjne na korytarzach wydziału) dostarczał jak najwięcej informacji w przejrzysty sposób.
+\subsection{Wkład Raportu 1 w rozwój nowego projektu}
+Całkowita zmiana koncepcji, już po zakończeniu etapu pierwszego, pociąga za sobą jednak pewne problemy. Brak zgromadzonych pierwszych danych i obserwacji na nowy temat wstrzymywałby nas od kolejnych kroków. W związku z tym postanowiliśmy rozpocząć wszystko od zera i dla dalszych badań przeprowadziliśmy ponownie akwizycje i analizę próbkowania danych oraz weryfikacje ich jakości. Będą one wykorzystywane w niniejszym, jaki i przyszłych raportach, jednak stosując się do zasad klarowanie postawionych przez Profesora w trakcie trwania laboratoriów, nie ma możliwości ponownego napisania naszego poprzedniego sprawozdania, więc postanowiliśmy, że nie będziemy ich jawnie przedstawiać. Pomimo to poprzedni raport wniósł wiele kluczowych spostrzeżeń do naszego projektu i ukazał wady naszego podejścia do rozwiązywania zawiłych zagadnień. Najważniejsze wnioski jakie udało nam się wyciągnąć to przede wszystkim problem niejasno postawionych celów i zbytnie skupienie się na wzniosłych, ale nie możliwych do zrealizowania celach. Dodatkowo w trakcie zbierania danych i przeprowadzania eksperymentu udało nam się zdobyć cenne doświadczenie, które znacząco wpływa na jakość naszych przyszłych prac. W związku z wyżej wymienionymi, pomimo fiaska naszego pierwotnego pomysłu, raport 1 ma kluczowy wkład w dalszy rozwój naszych badań i był on nieocenioną nauką, której efekty będą jasno widoczne w trakcie trwania dalszych prac na PTI.
+
+\end{document}
