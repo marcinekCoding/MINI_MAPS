@@ -1,7 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1776115739.27461 "c:/Users/goran/Documents/MINI_MAPS/raport2/raport2_from_raport1v2.tex" "raport2_from_raport1v2.pdf" "raport2_from_raport1v2" 1776115741.29601 0
+["pdflatex"] 1776115923.38529 "c:/Users/goran/Documents/MINI_MAPS/raport2/raport2_from_raport1v2.tex" "raport2_from_raport1v2.pdf" "raport2_from_raport1v2" 1776115925.39622 0
   "architektura.jpg" 1776113463 995101 e215e306c09f49543191cf6e4033bce7 ""
-  "c:/Users/goran/Documents/MINI_MAPS/raport2/raport2_from_raport1v2.tex" 1776115738 16102 0e84e21b3290af734e04ef98450d2bae ""
+  "c:/Users/goran/Documents/MINI_MAPS/raport2/raport2_from_raport1v2.tex" 1776115920 16102 0e84e21b3290af734e04ef98450d2bae ""
   "c:/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1774297818 2375 baa924870cfb487815765f9094cf3728 ""
   "c:/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc" 1774297818 3031 6c4d3515bf7115d8518af1c9ab97ca44 ""
   "c:/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1774296851 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -213,10 +213,10 @@
   "c:/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1774300698 3636417 b4870c978c72172a44f8b8bf1443a012 ""
   "c:/texlive/2026/texmf.cnf" 1774300514 713 e69b156964470283e0530f5060668171 ""
   "logo_mini.png" 1776115687 25952 f7be66bce8a0b29a63914a37714b4acd ""
-  "raport2_from_raport1v2.aux" 1776115741 1919 24e39bede75d855e91dede8ac047dc83 "pdflatex"
-  "raport2_from_raport1v2.out" 1776115741 2384 ba47dfe2b1fa91451a236a614385b16b "pdflatex"
-  "raport2_from_raport1v2.tex" 1776115738 16102 0e84e21b3290af734e04ef98450d2bae ""
-  "raport2_from_raport1v2.toc" 1776115741 962 3cbae3859be1fd8f5b9d0ed49864560d "pdflatex"
+  "raport2_from_raport1v2.aux" 1776115925 1919 24e39bede75d855e91dede8ac047dc83 "pdflatex"
+  "raport2_from_raport1v2.out" 1776115925 2384 ba47dfe2b1fa91451a236a614385b16b "pdflatex"
+  "raport2_from_raport1v2.tex" 1776115920 16102 0e84e21b3290af734e04ef98450d2bae ""
+  "raport2_from_raport1v2.toc" 1776115925 962 3cbae3859be1fd8f5b9d0ed49864560d "pdflatex"
   (generated)
   "raport2_from_raport1v2.aux"
   "raport2_from_raport1v2.log"
