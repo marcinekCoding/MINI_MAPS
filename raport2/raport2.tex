@@ -152,13 +152,19 @@ Gdybyśmy pobierali odczyt z radaru co 1 sekundę, zapchalibyśmy naszą sieć b
             xmin=0, xmax=30,
             grid=both,
             minor tick num=1,
-            legend style={at={(0.5,-0.2)},anchor=north,legend columns=-1}
+            legend style={
+                at={(0.02,0.98)},
+                anchor=north west,
+                legend columns=1,
+                fill=white,
+                draw=black
+            }
         ]
         % Ciągły sygnał rzeczywisty (Zjawisko)
         \addplot[smooth, thick, blue] coordinates {
             (0,2) (2,2) (4,5) (8,6) (12,6) (15,3) (20,3) (22,8) (26,8) (30,7)
         };
-        \addlegendentry{Płynna rzeczywistość (ciągły sygnał)}
+        \addlegendentry{Płynna rzeczywistość}
         
         % Dyskretne próbki (co 1 minutę - dla widoczności na wykresie co 2)
         \addplot[only marks, mark=square*, red, mark size=2pt] coordinates {
@@ -195,7 +201,7 @@ Z perspektywy teorii i inżynierii danych określilibyśmy to klasycznym przesko
 \end{enumerate}
 
 Podsumowując, nasz unikalny system podejmuje długą i solidną drogę programistyczną. Zaczynamy od hardware'owych detektorów pod sufitem ograniczających problematykę RODO (syntaktyka). Następnie zestawiamy je z wejściami legitymacji i wyliczamy ułamek zajętości miejsc, ubezpieczając się na wypadek wejścia kogoś niejawnie (semantyka). Wrzucenie tego w końcową, wielostopniową listę statusów stanowi dowód na to, jak z tysiąca odczytów radiowych uzyskać prostą i użyteczną tablicę decyzji dla zabieganego studenta przed wykładem.
-\subsubsection{Zapychanie sieci a próbkowanie, czyli Nyquist wjeżdża na salę}
+\subsection{Zapychanie sieci a próbkowanie, czyli Nyquist w praktyce}
 Ale ile tak naprawdę czystej „wiedzy” dajemy studentowi na tym ekranie? Żeby nie być gołosłownym, postanowiliśmy przeliczyć to korzystając z matematycznego aparatu teorii informacji. Zgodnie z koncepcją Shannona, wartość informacji to po prostu „element zaskoczenia”. Im rzadszy jest dany kolor kafelka na ekranie, tym bardziej redukuje on naszą niepewność i tym więcej „bitów informacji” ze sobą niesie.
 
 Zebraliśmy próbne statystyki z naszego radaru z najbardziej obleganych godzin (10:00 - 14:00) dla testowej sali Jet Brains. Wyszło nam, że statusy rozkładają się następująco:
