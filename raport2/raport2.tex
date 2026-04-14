@@ -83,7 +83,13 @@ W związku z konstruktywną krytyką i niezwykle cennymi uwagami uzyskanymi po o
 Wybór tego zagadnienia stanowi bezpośrednią odpowiedź na realne potrzeby studentów. Wydział MiNI, charakteryzujący się wysokim natężeniem ruchu w przerwach między blokami zajęciowymi, regularnie boryka się z problemem lokalnego przeludnienia stref wypoczynkowych. Z punktu widzenia studenta, decyzja o udaniu się np. do pokoju cichej nauki, które znajdują się na 4 piętrze, jest często bardzo niepewna i obarczona wysokim prawdopodobieństwem tzw. pustego przebiegu. Zaistnienie takiej sytuacji, czyli wędrówki do pomieszczenia, w którym brakuje wolnych miejsc siedzących, generuje stratę czasu, energii i frustrację. Zjawisko to możemy traktować jako klasyczny problem deficytu informacyjnego. W takim ujęciu, dostarczona w odpowiednim czasie i formie informacja o aktualnym obłożeniu pomieszczenia nabiera ogromnej wartości pragmatycznej. W niniejszym raporcie, zgodnie z sugestiami Profesora, przyjmujemy podejście dedukcyjne -- od ogółu do szczegółu. Zgodnie z założeniami ćwiczenia 2 będziemy traktować badane strefy jako źródła sygnału, a studentów jako jego odbiorców i dążymy do stworzenia optymalnego modelu redukcji niepewności. W poniższych rozdziałach dokonujemy rygorystycznego przeglądu literatury i istniejących na rynku rozwiązań z zakresu systemów Smart Building i Occupancy Sensing. Następnie analizujemy pozyskiwane dane informacyjne na trzech poziomach, to jest syntaktycznym, semantycznym i pragmatycznym oraz badamy możliwości ich kompresji w taki sposób, aby ewentualny efekt końcowy (np. ekrany informacyjne na korytarzach wydziału) dostarczał jak najwięcej informacji w przejrzysty sposób.
 \subsection{Wkład Raportu 1 w rozwój nowego projektu}
 Całkowita zmiana koncepcji, już po zakończeniu etapu pierwszego, pociąga za sobą jednak pewne problemy. Brak zgromadzonych pierwszych danych i obserwacji na nowy temat wstrzymywałby nas od kolejnych kroków. W związku z tym postanowiliśmy rozpocząć wszystko od zera i dla dalszych badań przeprowadziliśmy ponownie akwizycje i analizę próbkowania danych oraz weryfikacje ich jakości. Będą one wykorzystywane w niniejszym, jaki i przyszłych raportach, jednak stosując się do zasad klarowanie postawionych przez Profesora w trakcie trwania laboratoriów, nie ma możliwości ponownego napisania naszego poprzedniego sprawozdania, więc postanowiliśmy, że nie będziemy ich jawnie przedstawiać. Pomimo to poprzedni raport wniósł wiele kluczowych spostrzeżeń do naszego projektu i ukazał wady naszego podejścia do rozwiązywania zawiłych zagadnień. Najważniejsze wnioski jakie udało nam się wyciągnąć to przede wszystkim problem niejasno postawionych celów i zbytnie skupienie się na wzniosłych, ale nie możliwych do zrealizowania celach. Dodatkowo w trakcie zbierania danych i przeprowadzania eksperymentu udało nam się zdobyć cenne doświadczenie, które znacząco wpływa na jakość naszych przyszłych prac. W związku z wyżej wymienionymi, pomimo fiaska naszego pierwotnego pomysłu, raport 1 ma kluczowy wkład w dalszy rozwój naszych badań i był on nieocenioną nauką, której efekty będą jasno widoczne w trakcie trwania dalszych prac na PTI.
-
+\section{Analiza stanu wiedzy i specyfiki problemu}
+Współczesne systemy monitorowania zajętości przestrzeni opierają się na trzech głównych paradygmatach:
+\begin{itemize}
+    \item \textbf{Metody wizyjne (RGB/IR):} Cechują się najwyższą entropią źródła (megabity/s), wymagają złożonej kompresji stratnej (H.264/H.265) i niosą ryzyko naruszenia prywatności (RODO).
+    \item \textbf{Metody binarne (PIR):} Bardzo niska informatywność, wysoki poziom szumu (fałszywe detekcje).
+    \item \textbf{Metody falowe (mmWave):} Stanowią kompromis. Z punktu widzenia Teorii Informacji, sensor mmWave pełni rolę \textit{enkodera sprzętowego}, który dokonuje ekstrakcji cech obiektowych już na poziomie fizycznym, redukując strumień danych o kilka rzędów wielkości przy zachowaniu kluczowej semantyki.
+\end{itemize}
 \section{Charakterystyka problemu i analiza potrzeb użytkownika (Pragmatyka)}
 
 \subsection{Kontekst logistyczny i geneza projektu „MINI Info”}
@@ -286,29 +292,24 @@ W celu ostatecznego uporządkowania przetwarzanych danych, poniższa tabela zest
     \caption{Zestawienie poziomów modelowania informacji w projektowanym systemie.}
     \label{tab:poziomy_informacji}
 \end{table}
-\section{Analiza alternatywnych metod akwizycji i wybór technologii}
+\section{Analiza ilościowa i efektywność informacyjna}
 
-\subsection{Analiza alternatywnych metod akwizycji (State-of-the-art)}
+\subsection{Charakterystyka strumienia danych}
+Przyjęto ujednolicony interwał próbkowania $T_s = 60\text{s}$ dla wszystkich węzłów. Choć fizyczna przepustowość kanału pozwoliłaby na częstsze odpytywanie, analiza pragmatyczna wykazuje, że dynamika zmian w salach nauki (średni czas przebywania $>15$ min) nie wymaga wyższej częstotliwości.
 
-W procesie projektowania systemu dokonaliśmy przeglądu literatury oraz dostępnych metod rejestracji sygnałów, oceniając ich przydatność w kontekście określonego modelu użytkowego. Rozważaliśmy trzy główne podejścia do monitorowania zajętości stref na wydziale:
-\begin{itemize}
-    \item \textbf{Metody wizyjne (Computer Vision):} Wykorzystanie kamer i algorytmów detekcji obiektów (np. YOLO) oferuje najwyższą informatywność sygnału, pozwalając na precyzyjną ocenę jakości i specyfiki danych. Jednakże, z punktu widzenia pragmatyki, rozwiązanie to zostało odrzucone ze względu na restrykcyjne normy prywatności (RODO) oraz ogromną nadmiarowość danych, która wymagałaby skomplikowanych metod kompresji obrazu i dużej przepustowości kanału informacyjnego.
-    \item \textbf{Sensory pasywnej podczerwieni (PIR):} Jest to rozwiązanie o najniższym koszcie i najprostszej binarnej reprezentacji kodów. Niestety, sygnał z czujników PIR jest wysoce zaszumiony i obarczony artefaktami -- czujnik przestaje dostarczać informacji, gdy obiekt pozostaje w bezruchu. Z perspektywy teorii informacji, wiarygodność i reprezentatywność takich danych w pokoju cichej nauki byłaby niewystarczająca do poprawnej rekonstrukcji stanu świata rzeczywistego.
-    \item \textbf{Analiza pośrednia (sensory CO2 / Wi-Fi):} Rozważaliśmy monitorowanie parametrów środowiskowych jako pośrednich wskaźników obecności ludzi. Metody te charakteryzują się jednak bardzo dużymi opóźnieniami w dostarczaniu informacji, co narusza kryterium aktualności sygnału w modelu czasu rzeczywistego.
-\end{itemize}
+\subsection{Entropia vs. Redundancja}
+Dla badanego układu o $N=5$ stanach (0, 1, 2, 3, 4+ osób), przy zmierzonym rozkładzie prawdopodobieństwa $P = \{0.41, 0.27, 0.18, 0.11, 0.03\}$, entropia źródła wynosi:
+\begin{equation}
+H(X) = -\sum_{i=1}^{5} p_i \log_2 p_i \approx 1.98 \text{ bitów/symbol}
+\end{equation}
+Ponieważ nasz symbol w protokole MQTT zajmuje 8 bitów (\texttt{integer}), redundancja wynosi $1 - (1.98/8) \approx 75\%$. Wskazuje to na możliwość dalszej kompresji bezstratnej (np. kodowaniem Huffmana), jednak przy tak małym wolumenie danych (2.8 MB/dobę) jest to nieuzasadnione ekonomicznie.
 
-\subsection{Uzasadnienie wyboru technologii (Synteza wniosków)}
-
-Ostateczny wybór radarów milimetrowych (mmWave) wspieranych przez system RFID wynika z chęci optymalizacji relacji między jakością informacji a ograniczeniami systemu. Radar mmWave dostarcza nam sygnał o średniej złożoności, który jest znacznie bardziej odporny na szumy niż PIR, a jednocześnie nie narusza prywatności tak jak systemy wideo.
-
-Zdecydowaliśmy się na tę technologię, ponieważ pozwala ona na:
+\subsection{Interpretacja poziomów informacji}
 \begin{enumerate}
-    \item \textbf{Redukcję nadmiarowości na poziomie źródła:} Otrzymujemy gotową informację o liczbie osób (typ \texttt{integer}), co eliminuje potrzebę przesyłania i przetwarzania złożonych strumieni multimedialnych.
-    \item \textbf{Wysoką wiarygodność semantyczną:} Fuzja danych z radaru (skanowanie ciągłe) i czytnika RFID (zdarzenia progowe) pozwala na skuteczną weryfikację zgromadzonych zasobów i rozwiązanie problemu odwrotnego przy ograniczonej liczbie pomiarów.
-    \item \textbf{Efektywność pragmatyczną:} Wykorzystanie standardu ZigBee i protokołu MQTT zapewnia minimalny koszt energetyczny i transmisyjny, co w teorii informacji przekłada się na optymalne zarządzanie archiwum danych przy zachowaniu wysokiej użyteczności dla studenta.
+    \item \textbf{Syntaktyczny:} Reprezentacja bitowa w formacie JSON (nadmiarowa ze względu na czytelność dla programisty).
+    \item \textbf{Semantyczny:} Odfiltrowany szum tła i interpretacja chmury punktów jako liczby osób.
+    \item \textbf{Pragmatyczny:} Wartość użytkowa dla studenta szukającego wolnego miejsca -- tutaj informacja staje się wiedzą decyzyjną.
 \end{enumerate}
-
-W ten sposób dokonany przez nas wybór stanowi kompromis pomiędzy technicznymi uwarunkowaniami pomiaru a realnymi potrzebami użytkowników, zapewniając dostarczanie sygnałów o najwyższej informatywności przy minimalnych zniekształceniach.
 
 \subsection{Implikacje pragmatyczne dla użytkownika końcowego}
 
@@ -362,7 +363,9 @@ Na poziomie obliczeniowym naszym podstawowym sygnałem wejściowym pozostaje lic
 
 W praktyce student nie potrzebuje pełnej serii pomiarowej ani dokładności co do pojedynczej osoby, tylko czytelnej odpowiedzi, czy opłaca się iść do danej sali. Dlatego komunikat procentowy (np. 67\%) wraz z kolorem stanu jest decyzyjnie lepszy od samego surowego odczytu i bezpośrednio wspiera cel pragmatyczny systemu.
 
-Kluczowym kryterium jakości w naszym systemie jest aktualność informacji, czyli maksymalne dopuszczalne opóźnienie między zmianą stanu fizycznego pomieszczenia a aktualizacją danych na ekranie. Dla naszego zastosowania przyjmujemy jako akceptowalne opóźnienie rzędu jednej minuty -- decyzja studenta o przemieszczeniu się nie wymaga danych aktualizowanych co sekundę, a raczej co kilkanaście do kilkudziesięciu sekund. Drugim kryterium jest spójność danych między dwoma źródłami -- czujnikiem mmWave i czytnikiem RFID. Jak opisano w rozdziale dotyczącym semantyki, algorytm wybiera zawsze wyższą z dwóch wartości, traktując ją jako bezpieczniejsze oszacowanie. Z punktu widzenia metrycznego oznacza to, że system jest zaprojektowany tak, aby raczej zawyżać niż zaniżać obłożenie -- co chroni studenta przed niepotrzebną wędrówką do faktycznie zajętej sali.
+Podejście to jest spójne z rozkładem empirycznym z podsekcji 4.5, gdzie stany występują z prawdopodobieństwami $P=\{0.41,0.27,0.18,0.11,0.03\}$ (od zielonego do szarego). Oznacza to, że interfejs najczęściej komunikuje użytkownikowi stany zielony i żółty (łącznie 68\%), a rzadkie stany krytyczne pozostają dobrze rozróżnialne informacyjnie.
+
+Kluczowym kryterium jakości w naszym systemie jest aktualność informacji, czyli maksymalne dopuszczalne opóźnienie między zmianą stanu fizycznego pomieszczenia a aktualizacją danych na ekranie. Dla naszego zastosowania przyjmujemy jako akceptowalne opóźnienie rzędu jednej minuty -- decyzja studenta o przemieszczeniu się nie wymaga danych aktualizowanych co sekundę, a raczej co kilkanaście do kilkudziesięciu sekund. Drugim kryterium jest spójność danych między dwoma źródłami -- czujnikiem mmWave i czytnikiem RFID. Jak opisano w rozdziale dotyczącym semantyki, algorytm wybiera zawsze wyższą z dwóch wartości, traktując ją jako bezpieczniejsze oszacowanie. Z punktu widzenia metrycznego oznacza to, że system jest zaprojektowany tak, aby raczej zawyżać niż zaniżać obłożenie -- co chroni studenta przed niepotrzebną wędrówką do faktycznie zajętej sali. W konsekwencji prezentowany w sekcji 4.5 rozkład prawdopodobieństw i wynik entropii $H(X)\approx 1.98$ bita pozostają zgodne z charakterem danych wykorzystywanych na etapie podejmowania decyzji.
 
 Trzecim istotnym kryterium jakości jest kompletność pokrycia stref. System musi dostarczać dane dla wszystkich monitorowanych lokalizacji jednocześnie, bez „ślepych plam”, które zmuszałyby studenta do samodzielnego sprawdzenia danego miejsca. W praktyce oznacza to wymaganie na dostępność każdego węzła sieci czujnikowej na poziomie bliskim 100\% w godzinach funkcjonowania wydziału. Sieć ZigBee w topologii mesh częściowo adresuje ten problem poprzez redundancję ścieżek komunikacyjnych -- awaria pojedynczego węzła nie odcina pozostałych czujników od bramki.
 

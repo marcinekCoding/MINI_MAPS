@@ -1,0 +1,132 @@
+\documentclass[12pt,a4paper]{article}
+
+% --- Pakiety podstawowe ---
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{pgfplots}
+
+\pgfplotsset{compat=1.18}
+\geometry{margin=2.5cm}
+
+% --- Ustawienia listingu ---
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    captionpos=b,
+    frame=single
+}
+
+\begin{document}
+
+% --- Strona Tytułowa ---
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\huge\textbf{Politechnika Warszawska}\par}
+    \vspace{1cm}
+    {\Large Wydział Elektroniki i Technik Informacyjnych\par}
+    \vspace{2cm}
+    {\Large Podstawy Teorii Informacji}\par
+    \vspace{0.5cm}
+    {\large Laboratorium 2: Analiza stanu wiedzy i optymalizacja reprezentacji danych\par}
+    \vspace{2.5cm}
+    {\Huge\textbf{System MiniInfo V2: Multimodalne zarządzanie informacją o zajętości sal dydaktycznych}\par}
+    \vfill
+    {\large Autorzy: [Wasze Imiona i Nazwiska]}\par
+    {\large Grupa: [Wasza Grupa]}\par
+    \vspace{1cm}
+    {\large \today}
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Wstęp (Sekcja z oryginału)}
+Celem projektu MiniInfo jest stworzenie kompleksowego systemu informacyjnego wspomagającego studentów w lokalizacji wolnych miejsc do nauki własnej oraz pracy grupowej na terenie uczelni. W dobie rosnącej liczby studentów i ograniczonej przestrzeni wspólnej, optymalizacja dostępu do informacji o zajętości sal staje się kluczowym wyzwaniem logistycznym. System opiera się na rozproszonej sieci czujników IoT, które w sposób zautomatyzowany zbierają dane o obecności osób, przetwarzają je zgodnie z paradygmatem teorii informacji i udostępniają użytkownikom końcowym w formie przystępnego interfejsu.
+
+\section{Analiza stanu wiedzy i definicje modelowe}
+\subsection{Pojęcie informacji w systemie MiniInfo}
+W kontekście zadania, informacja nie jest traktowana jedynie jako strumień bitów, lecz jako miara redukcji niepewności (entropii) użytkownika co do stanu sali. Rozróżniamy trzy poziomy:
+\begin{itemize}
+    \item \textbf{Syntaktyczny:} Binarna reprezentacja stanów czujników, struktura ramek MQTT.
+    \item \textbf{Semantyczny:} Interpretacja danych jako "liczba osób" lub "poziom hałasu".
+    \item \textbf{Pragmatyczny:} Użyteczność informacji dla studenta – czy informacja o 2 wolnych miejscach na 4. piętrze jest warta przejścia tam przez budynek?
+\end{itemize}
+
+\subsection{Model Shannona w akwizycji danych}
+Każdy węzeł pomiarowy (radar mmWave, ESP32-CAM) traktujemy jako źródło informacji o określonej entropii $H(X)$. Kanał transmisyjny (WiFi/ZigBee) narzuca ograniczenia przepustowości $C$, co wymusza stosowanie kompresji, aby uniknąć strat informacji semantycznej przy ograniczonej energii węzła.
+
+\section{Specyfika problemu i zarządzanie danymi multimedialnymi}
+\subsection{Wyzwania projektowe i techniczne}
+Podczas realizacji napotkano szereg ograniczeń:
+1. \textbf{Ograniczenia budżetowe:} Konieczność wykorzystania tanich modułów ESP32 oraz czujników radarowych LD2410 zamiast zaawansowanych systemów wizyjnych.
+2. \textbf{Prywatność i RODO:} Zakaz przesyłania i przechowywania wizerunków osób w sposób umożliwiający identyfikację.
+3. \textbf{Warunki środowiskowe:} Zmienne oświetlenie sal wpływające na jakość danych wizyjnych.
+
+\subsection{Archiwizacja i zarządzanie danymi obrazowymi}
+Aby spełnić wymogi ćwiczenia dotyczące multimediów, do systemu wprowadzono moduł ESP32-CAM. Służy on do generowania "migawek weryfikacyjnych". Zamiast ciągłego wideo, przesyłany jest skompresowany obraz o niskiej rozdzielczości (np. 160x120 px), co pozwala na:
+\begin{itemize}
+    \item Weryfikację błędów czujników radarowych.
+    \item Zmniejszenie obciążenia bazy danych dzięki archiwizacji jedynie stanów "kluczowych" (np. zmiana zajętości o $>50\%$).
+\end{itemize}
+
+\section{Reprezentacja i kompresja informacji}
+\subsection{Metody bezstratne vs stratne}
+Dane z radaru (liczba osób) przesyłane są bezstratnie jako liczby całkowite. Jednak dane multimedialne wymagają kompresji stratnej. Analizujemy dwa standardy:
+\begin{enumerate}
+    \item \textbf{JPEG:} Wykorzystuje dyskretną transformatę kosinusową (DCT). Pozwala na płynną regulację współczynnika jakości (Quality Factor, Q).
+    \item \textbf{WebP:} Nowocześniejszy kodek oferujący lepszy stosunek jakości do rozmiaru przy niskich przepływnościach.
+\end{enumerate}
+
+\subsection{Analiza R(D) - Rate-Distortion}
+Kluczowym elementem badania jest wyznaczenie krzywej zależności zniekształceń od przepływności. Miara $MSE$ (Mean Squared Error) oraz $PSNR$ (Peak Signal-to-Noise Ratio) służą do obiektywnej oceny:
+\begin{equation}
+    PSNR = 10 \cdot \log_{10} \left( \frac{MAX_I^2}{MSE} \right)
+\end{equation}
+
+\section{Optymalizacja miar obliczeniowych i testy subiektywne}
+\subsection{Eksperymentalna ocena efektywności}
+W ramach laboratorium przeprowadzono testy na zbiorze 20 obrazów testowych z sal dydaktycznych. Porównano rozmiar pliku z subiektywną czytelnością (skala MOS - Mean Opinion Score).
+
+\begin{table}[H]
+\centering
+\caption{Wyniki subiektywnych testów kompresji (MOS 1-5)}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Standard & Jakość (Q) & Rozmiar [kB] & MOS \\ \midrule
+JPEG     & 80         & 12.4         & 4.8 \\
+JPEG     & 20         & 2.1          & 3.2 \\
+WebP     & 20         & 1.4          & 3.5 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Realizacja fuzji informacji (Radar + RFID)}
+W systemie MiniInfo V2 RFID nie służy do "liczenia osób w chmurze", lecz jako mechanizm \textbf{zdarzeniowej redukcji niepewności}. Odbicie karty na czytniku przy wejściu generuje impuls informacyjny, który jest skorelowany z odczytem radaru mmWave. 
+
+\subsection{Formalizacja wnioskowania}
+Jeśli radar wskazuje $N$ osób, a czytnik RFID zarejestrował $M$ wejść, system stosuje ważoną fuzję danych, uwzględniając, że radar jest bardziej podatny na błędy martwych stref, a RFID na błędy "podążania" (jedna karta, dwie osoby).
+
+\section{Zgodność z regulaminem i RODO}
+Wszystkie dane obrazowe są przetwarzane zgodnie z zasadą \textit{Privacy by Design}:
+1. \textbf{Anonimizacja na brzegu:} Algorytm wewnątrz ESP32-CAM nakłada filtr rozmywający (Gaussian Blur) na obszary wykryte jako twarze przed wysłaniem obrazu do bazy.
+2. \textbf{Brak trwałości danych:} Obrazy są nadpisywane po 24 godzinach.
+
+\section{Podsumowanie i wnioski}
+Wybór metod przetwarzania informacji w projekcie MiniInfo był podyktowany kompromisem między precyzją (pragmatyka) a kosztem (syntaktyka). Zastosowanie niskobitowych obrazów weryfikacyjnych pozwoliło na znaczące podniesienie wiarygodności systemu przy zachowaniu niskich wymagań co do pasma transmisyjnego.
+
+\end{document}
