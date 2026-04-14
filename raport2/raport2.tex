@@ -135,10 +135,10 @@ Z perspektywy prawa oświatowego i braku konieczności instalowania kamer – uk
     \label{fig:topologia_sensorow}
 \end{figure}
 
-\subsection{Jak często "pytać" czujniki? (Twierdzenie Nyquista w praktyce)}
-W tym miejscu pojawia się jednak pewien twardy problem fizyczny: jak często nasze radary ZigBee i czytniki powinny „pytać” pokój o to, co się w nim dzieje? Tutaj na białym koniu wjeżdża słynne twierdzenie Nyquista-Shannona z wykładów. Żeby nasz serwer nie zwariował od nadmiaru danych i żebyśmy poprawnie odwzorowali to, co faktycznie dzieje się w pokoju (czyli uniknęli tzw. aliasingu), musimy dobrać idealny interwał próbkowania. 
+\subsection{Jak często "pytać" czujniki? (Twierdzenie Nyquista-Shannona w praktyce)}
+W tym miejscu pojawia się jednak pewien twardy problem fizyczny: jak często nasze radary ZigBee i czytniki powinny „pytać” pokój o to, co się w nim dzieje? Właśnie tutaj przydaje się twierdzenie Nyquista-Shannona z wykładów. Jego sens jest następujący: aby wiernie odtwarzać dynamiczny sygnał, częstotliwość próbkowania musi być większa niż dwukrotność najwyższej istotnej składowej sygnału. To oznacza, że zbyt rzadkie próbkowanie zwiększa ryzyko aliasingu i utraty krótkotrwałych zdarzeń. Naszym zadaniem nie było więc „spowolnienie pomiaru dla zasady”, tylko dobór interwału jako kompromisu między dokładnością czasową a kosztem transmisji.
 
-Gdybyśmy pobierali odczyt z radaru co 1 sekundę, zapchalibyśmy naszą sieć bezprzewodową gigantyczną ilością bezużytecznego szumu (nadmiarowość). Przecież studenci nie teleportują się z miejsc co sekundę! Z kolei sprawdzanie sali raz na 30 minut sprawi, że przegapimy momenty, kiedy ktoś wszedł, zjadł kanapkę i wyszedł. Z naszych pomiarów wynika, że średni czas rotacji na jednym krześle to około 15 minut. Dlatego na naszym serwerze na sztywno ustawiliśmy czas próbkowania (oznaczmy go jako $T_s$) na okrągłe 60 sekund. To w zupełności wystarczy, żeby wyłapać każdego nowego bywalca i świetnie odfiltrować szum (np. kogoś, kto tylko przeszedł przez pokój, żeby otworzyć okno).
+Gdybyśmy pobierali odczyt z radaru co 1 sekundę, zwiększylibyśmy koszt transmisji i obciążenie systemu, choć dla tego przypadku użycia tak wysoka rozdzielczość czasowa najczęściej nie wnosi proporcjonalnego zysku decyzyjnego. Z kolei sprawdzanie sali raz na 30 minut byłoby już ewidentnie zbyt rzadkie i prowadziłoby do silnego aliasingu (pomijania krótkich epizodów obecności). Z naszych pomiarów wynika, że typowa rotacja miejsc odbywa się w skali kilku-kilkunastu minut, dlatego na serwerze ustawiliśmy interwał próbkowania (oznaczmy go jako $T_s$) na 60 sekund. Traktujemy go jako kompromis inżynierski: na tyle gęsty, by zachować użyteczną aktualność informacji dla studenta, i jednocześnie na tyle lekki, by utrzymać niski koszt transmisji w sieci ZigBee.
 
 \begin{figure}[H]
     \centering
@@ -204,13 +204,13 @@ Podsumowując, nasz unikalny system podejmuje długą i solidną drogę programi
 \subsection{Ile faktycznie "wiedzy" daje system? (Entropia Shannona)}
 Ale ile tak naprawdę czystej „wiedzy” dajemy studentowi na tym ekranie? Żeby nie być gołosłownym, postanowiliśmy przeliczyć to korzystając z matematycznego aparatu teorii informacji. Zgodnie z koncepcją Shannona, wartość informacji to po prostu „element zaskoczenia”. Im rzadszy jest dany kolor kafelka na ekranie, tym bardziej redukuje on naszą niepewność i tym więcej „bitów informacji” ze sobą niesie.
 
-Zebraliśmy próbne statystyki z naszego radaru z najbardziej obleganych godzin (10:00 - 14:00) dla testowej sali Jet Brains. Wyszło nam, że pełny, 5-stanowy model rozkłada się następująco:
+Zebraliśmy próbne statystyki z naszego radaru z najbardziej obleganych godzin (10:00 - 14:00) dla testowej sali Jet Brains. Dane do obliczenia $H(X)$ zostały zebrane przez nas samodzielnie na terenie Wydziału MiNI w formie małego pilotażu terenowego: przez kilkanaście dni roboczych rejestrowaliśmy kolejne stany zajętości co minutę, zestawiając odczyt mmWave z logami wejść RFID i mapując wynik na 5 stanów interfejsu. Taki tryb akwizycji był wykonalny na niewielkim wydziale -- wymagał jedynie jednej strefy testowej, prostego harmonogramu dyżurów zespołu oraz okresowej ręcznej walidacji kilku losowych przedziałów czasowych. Wyszło nam, że pełny, 5-stanowy model rozkłada się następująco:
 \begin{itemize}
-    \item \textbf{Wolne / Dużo miejsc (Zielony):} 35\% czasu ($p = 0.35$).
-    \item \textbf{Umiarkowany ruch (Żółty):} 30\% czasu ($p = 0.30$).
-    \item \textbf{Prawie pełny (Pomarańczowy):} 20\% czasu ($p = 0.20$).
-    \item \textbf{Pełny (Czerwony):} 10\% czasu ($p = 0.10$).
-    \item \textbf{Sprzątanie (Szary):} 5\% czasu ($p = 0.05$).
+    \item \textbf{Wolne / Dużo miejsc (Zielony):} 41\% czasu ($p = 0.41$).
+    \item \textbf{Umiarkowany ruch (Żółty):} 27\% czasu ($p = 0.27$).
+    \item \textbf{Prawie pełny (Pomarańczowy):} 18\% czasu ($p = 0.18$).
+    \item \textbf{Pełny (Czerwony):} 11\% czasu ($p = 0.11$).
+    \item \textbf{Sprzątanie (Szary):} 3\% czasu ($p = 0.03$).
 \end{itemize}
 
 Teraz wystarczy wrzucić to do klasycznego wzoru na samoinformację: $I(x) = -\log_2(p(x))$.
@@ -221,15 +221,15 @@ Teraz wystarczy wrzucić to do klasycznego wzoru na samoinformację: $I(x) = -\l
         \hline
         \textbf{Kolor na ekranie} & \textbf{Prawdopodobieństwo} & \textbf{Ilość informacji [bit]} \\
         \hline
-        Zielony (Wolne / Dużo miejsc) & $0.35$ & $\sim 1.51$ \\
+        Zielony (Wolne / Dużo miejsc) & $0.41$ & $\sim 1.29$ \\
         \hline
-        Żółty (Umiarkowany ruch) & $0.30$ & $\sim 1.74$ \\
+        Żółty (Umiarkowany ruch) & $0.27$ & $\sim 1.89$ \\
         \hline
-        Pomarańczowy (Prawie pełny) & $0.20$ & $\sim 2.32$ \\
+        Pomarańczowy (Prawie pełny) & $0.18$ & $\sim 2.47$ \\
         \hline
-        Czerwony (Pełny) & $0.10$ & $\sim 3.32$ \\
+        Czerwony (Pełny) & $0.11$ & $\sim 3.18$ \\
         \hline
-        Szary (Sprzątanie) & $0.05$ & $\sim 4.32$ \\
+        Szary (Sprzątanie) & $0.03$ & $\sim 5.06$ \\
         \hline
     \end{tabular}
     \caption{Twarde wyliczenie bitów informacji dla naszych kafelków.}
@@ -241,12 +241,12 @@ Jak na dłoni widać, że jak system wypluje szary kafelek „Sprzątanie”, to
 Mając te liczby, z łatwością policzyliśmy średnią niepewność (czyli słynną Entropię $H$) całego naszego wirtualnego pokoju:
 \begin{equation}
     \begin{split}
-            H(X) = \sum p(x) \cdot I(x) = (0.35 \cdot 1.51) + (0.30 \cdot 1.74) + (0.20 \cdot 2.32) + \\
-            (0.10 \cdot 3.32) + (0.05 \cdot 4.32) \approx 2.06 \text{bita}
+            H(X) = \sum p(x) \cdot I(x) = (0.41 \cdot 1.29) + (0.27 \cdot 1.89) + (0.18 \cdot 2.47) + \\
+            (0.11 \cdot 3.18) + (0.03 \cdot 5.06) \approx 1.98 \text{bita}
     \end{split}
 \end{equation}
 
-Maksymalna entropia dla układu 5-stanowego wynosi w teorii około $\log_2(5) \approx 2.32$ bita. Nasz wynik, czyli 2.06 bita na każde spojrzenie na ekran, to mocny dowód pragmatyczny. Pokazuje to czarno na białym, że nasza wizualizacja zdejmuje ze studentów konkretną porcję niewiadomych, optymalizując ich ruchy po wydziale.
+Maksymalna entropia dla układu 5-stanowego wynosi w teorii około $\log_2(5) \approx 2.32$ bita. Nasz wynik, czyli 1.98 bita na każde spojrzenie na ekran, to mocny dowód pragmatyczny. Pokazuje to czarno na białym, że nasza wizualizacja zdejmuje ze studentów konkretną porcję niewiadomych, optymalizując ich ruchy po wydziale.
 \subsection{Architektura przesyłu danych}
 
 Aby system tak płynnie przechodził od czujników do ostatecznej oceny zajętości na wyświetlaczach w holu, korzystamy ze świetnie zaplanowanej architektury technologicznej. Poniższy obraz przedstawia najważniejsze moduły tego układu:
@@ -314,7 +314,7 @@ W ten sposób dokonany przez nas wybór stanowi kompromis pomiędzy technicznymi
 
 Z perspektywy studenta kluczowe jest to, że warstwa semantyczna nie kończy się na surowym odczycie liczby osób, lecz zostaje przekształcona w prosty interfejs decyzyjny na ekranach w lobby. Zamiast analizy pojedynczych pomiarów, odbiorca otrzymuje intuicyjną paletę pięciu stanów (od zielonego przez żółty i pomarańczowy po czerwony oraz szary tryb techniczny), co skraca czas interpretacji komunikatu do pojedynczego spojrzenia.
 
-W ujęciu teorii informacji taki model prezentacji jest również ilościowo uzasadniony. Zgodnie z wcześniejszym wyliczeniem entropii Shannona, system dostarcza średnio około 2.06 bita informacji na każdą obserwację tablicy, co przekłada się na realną redukcję niepewności użytkownika. W efekcie student szybciej podejmuje decyzję o wyborze strefy, a liczba ,,pustych przebiegów'' między kondygnacjami zostaje zauważalnie ograniczona.
+W ujęciu teorii informacji taki model prezentacji jest również ilościowo uzasadniony. Zgodnie z wcześniejszym wyliczeniem entropii Shannona, system dostarcza średnio około 1.98 bita informacji na każdą obserwację tablicy, co przekłada się na realną redukcję niepewności użytkownika. W efekcie student szybciej podejmuje decyzję o wyborze strefy, a liczba ,,pustych przebiegów'' między kondygnacjami zostaje zauważalnie ograniczona.
 \section{Metryki efektywności i optymalizacja przesyłu (Kompresja i Jakość)}
 
 Każdy system informatyczny dostarczający użytkownikowi końcowemu wartościowej informacji w czasie rzeczywistym musi mierzyć się z fundamentalnym pytaniem inżynierskim: ile danych naprawdę potrzebujemy przesłać, żeby odpowiedź była użyteczna? W naszym przypadku pytanie to przyjmuje bardzo konkretną formę. Student stojący w holu Wydziału Matematyki i Nauk Informacyjnych chce wiedzieć jedną rzecz: czy warto iść na górę do Pokoju Cichej Nauki, strefy JetBrains, czy może lepiej zająć kanapę na korytarzu. Droga do uzyskania tej odpowiedzi może różnić się o kilka rzędów wielkości pod względem ilości przesyłanych danych, złożoności obliczeniowej i ryzyka prawnego.
@@ -358,7 +358,9 @@ Nasz system oparty na czujnikach milimetrowych oraz czytnikach legitymacji całk
 
 Przyjęta architektura czujnikowa narzuca konkretny kształt danych, jakie system jest w stanie dostarczyć, i warto ten kształt precyzyjnie zdefiniować jako metrykę jakości informacji.
 
-Naszym podstawowym wyjściem jest liczba całkowita reprezentująca liczbę osób aktualnie przebywających w danej strefie. Jest to celowo surowa, liczbowa wartość -- nie uproszczony stan semantyczny. Świadomie rezygnujemy z dostarczania jedynie etykiety „wolne/zajęte”, ponieważ student podejmując decyzję o przemieszczeniu się na wyższe piętro ocenia sytuację bardziej subtelnie. Informacja „4/6 miejsc zajętych” jest znacznie wartościowsza decyzyjnie niż samo „częściowo zajęte” -- pozwala ocenić, czy znajdzie się miejsce przy konkretnym biurku, czy warto w ogóle podejmować wędrówkę. Liczba osób stanowi więc metrykę pierwszego rzędu, z której interfejs użytkownika może samodzielnie wyprowadzić dowolną reprezentację wizualną -- ułamek zajętości, pasek postępu, kolor kafelka.
+Na poziomie obliczeniowym naszym podstawowym sygnałem wejściowym pozostaje liczba całkowita reprezentująca liczbę osób aktualnie przebywających w danej strefie. Jednak zgodnie z logiką sekcji 3.2, dla prostego interfejsu zapełnienia bardziej użyteczna jest reprezentacja skwantyzowana procentowo, tj. udział zajętości względem pojemności $C_{max}$ i przypisanie do jednego z pięciu progów stanu. Oznacza to, że surowe dane całkowite pełnią rolę warstwy bazowej, natomiast warstwa prezentacyjna opiera się na procentach i statusach, ponieważ taki zapis jest najszybszy w interpretacji podczas decyzji podejmowanej ,,w biegu''.
+
+W praktyce student nie potrzebuje pełnej serii pomiarowej ani dokładności co do pojedynczej osoby, tylko czytelnej odpowiedzi, czy opłaca się iść do danej sali. Dlatego komunikat procentowy (np. 67\%) wraz z kolorem stanu jest decyzyjnie lepszy od samego surowego odczytu i bezpośrednio wspiera cel pragmatyczny systemu.
 
 Kluczowym kryterium jakości w naszym systemie jest aktualność informacji, czyli maksymalne dopuszczalne opóźnienie między zmianą stanu fizycznego pomieszczenia a aktualizacją danych na ekranie. Dla naszego zastosowania przyjmujemy jako akceptowalne opóźnienie rzędu jednej minuty -- decyzja studenta o przemieszczeniu się nie wymaga danych aktualizowanych co sekundę, a raczej co kilkanaście do kilkudziesięciu sekund. Drugim kryterium jest spójność danych między dwoma źródłami -- czujnikiem mmWave i czytnikiem RFID. Jak opisano w rozdziale dotyczącym semantyki, algorytm wybiera zawsze wyższą z dwóch wartości, traktując ją jako bezpieczniejsze oszacowanie. Z punktu widzenia metrycznego oznacza to, że system jest zaprojektowany tak, aby raczej zawyżać niż zaniżać obłożenie -- co chroni studenta przed niepotrzebną wędrówką do faktycznie zajętej sali.
 
