@@ -240,7 +240,10 @@ Jak na dłoni widać, że jak system wypluje szary kafelek „Sprzątanie”, to
 
 Mając te liczby, z łatwością policzyliśmy średnią niepewność (czyli słynną Entropię $H$) całego naszego wirtualnego pokoju:
 \begin{equation}
-    H(X) = \sum p(x) \cdot I(x) = (0.35 \cdot 1.51) + (0.30 \cdot 1.74) + (0.20 \cdot 2.32) + (0.10 \cdot 3.32) + (0.05 \cdot 4.32) \approx 2.06 \text{ bit/symbol}
+    \begin{split}
+            H(X) = \sum p(x) \cdot I(x) = (0.35 \cdot 1.51) + (0.30 \cdot 1.74) + (0.20 \cdot 2.32) + \\
+            (0.10 \cdot 3.32) + (0.05 \cdot 4.32) \approx 2.06 \text{bita}
+    \end{split}
 \end{equation}
 
 Maksymalna entropia dla układu 5-stanowego wynosi w teorii około $\log_2(5) \approx 2.32$ bita. Nasz wynik, czyli 2.06 bita na każde spojrzenie na ekran, to mocny dowód pragmatyczny. Pokazuje to czarno na białym, że nasza wizualizacja zdejmuje ze studentów konkretną porcję niewiadomych, optymalizując ich ruchy po wydziale.
@@ -283,6 +286,35 @@ W celu ostatecznego uporządkowania przetwarzanych danych, poniższa tabela zest
     \caption{Zestawienie poziomów modelowania informacji w projektowanym systemie.}
     \label{tab:poziomy_informacji}
 \end{table}
+\section{Analiza alternatywnych metod akwizycji i wybór technologii}
+
+\subsection{Analiza alternatywnych metod akwizycji (State-of-the-art)}
+
+W procesie projektowania systemu dokonaliśmy przeglądu literatury oraz dostępnych metod rejestracji sygnałów, oceniając ich przydatność w kontekście określonego modelu użytkowego. Rozważaliśmy trzy główne podejścia do monitorowania zajętości stref na wydziale:
+\begin{itemize}
+    \item \textbf{Metody wizyjne (Computer Vision):} Wykorzystanie kamer i algorytmów detekcji obiektów (np. YOLO) oferuje najwyższą informatywność sygnału, pozwalając na precyzyjną ocenę jakości i specyfiki danych. Jednakże, z punktu widzenia pragmatyki, rozwiązanie to zostało odrzucone ze względu na restrykcyjne normy prywatności (RODO) oraz ogromną nadmiarowość danych, która wymagałaby skomplikowanych metod kompresji obrazu i dużej przepustowości kanału informacyjnego.
+    \item \textbf{Sensory pasywnej podczerwieni (PIR):} Jest to rozwiązanie o najniższym koszcie i najprostszej binarnej reprezentacji kodów. Niestety, sygnał z czujników PIR jest wysoce zaszumiony i obarczony artefaktami -- czujnik przestaje dostarczać informacji, gdy obiekt pozostaje w bezruchu. Z perspektywy teorii informacji, wiarygodność i reprezentatywność takich danych w pokoju cichej nauki byłaby niewystarczająca do poprawnej rekonstrukcji stanu świata rzeczywistego.
+    \item \textbf{Analiza pośrednia (sensory CO2 / Wi-Fi):} Rozważaliśmy monitorowanie parametrów środowiskowych jako pośrednich wskaźników obecności ludzi. Metody te charakteryzują się jednak bardzo dużymi opóźnieniami w dostarczaniu informacji, co narusza kryterium aktualności sygnału w modelu czasu rzeczywistego.
+\end{itemize}
+
+\subsection{Uzasadnienie wyboru technologii (Synteza wniosków)}
+
+Ostateczny wybór radarów milimetrowych (mmWave) wspieranych przez system RFID wynika z chęci optymalizacji relacji między jakością informacji a ograniczeniami systemu. Radar mmWave dostarcza nam sygnał o średniej złożoności, który jest znacznie bardziej odporny na szumy niż PIR, a jednocześnie nie narusza prywatności tak jak systemy wideo.
+
+Zdecydowaliśmy się na tę technologię, ponieważ pozwala ona na:
+\begin{enumerate}
+    \item \textbf{Redukcję nadmiarowości na poziomie źródła:} Otrzymujemy gotową informację o liczbie osób (typ \texttt{integer}), co eliminuje potrzebę przesyłania i przetwarzania złożonych strumieni multimedialnych.
+    \item \textbf{Wysoką wiarygodność semantyczną:} Fuzja danych z radaru (skanowanie ciągłe) i czytnika RFID (zdarzenia progowe) pozwala na skuteczną weryfikację zgromadzonych zasobów i rozwiązanie problemu odwrotnego przy ograniczonej liczbie pomiarów.
+    \item \textbf{Efektywność pragmatyczną:} Wykorzystanie standardu ZigBee i protokołu MQTT zapewnia minimalny koszt energetyczny i transmisyjny, co w teorii informacji przekłada się na optymalne zarządzanie archiwum danych przy zachowaniu wysokiej użyteczności dla studenta.
+\end{enumerate}
+
+W ten sposób dokonany przez nas wybór stanowi kompromis pomiędzy technicznymi uwarunkowaniami pomiaru a realnymi potrzebami użytkowników, zapewniając dostarczanie sygnałów o najwyższej informatywności przy minimalnych zniekształceniach.
+
+\subsection{Implikacje pragmatyczne dla użytkownika końcowego}
+
+Z perspektywy studenta kluczowe jest to, że warstwa semantyczna nie kończy się na surowym odczycie liczby osób, lecz zostaje przekształcona w prosty interfejs decyzyjny na ekranach w lobby. Zamiast analizy pojedynczych pomiarów, odbiorca otrzymuje intuicyjną paletę pięciu stanów (od zielonego przez żółty i pomarańczowy po czerwony oraz szary tryb techniczny), co skraca czas interpretacji komunikatu do pojedynczego spojrzenia.
+
+W ujęciu teorii informacji taki model prezentacji jest również ilościowo uzasadniony. Zgodnie z wcześniejszym wyliczeniem entropii Shannona, system dostarcza średnio około 2.06 bita informacji na każdą obserwację tablicy, co przekłada się na realną redukcję niepewności użytkownika. W efekcie student szybciej podejmuje decyzję o wyborze strefy, a liczba ,,pustych przebiegów'' między kondygnacjami zostaje zauważalnie ograniczona.
 \section{Metryki efektywności i optymalizacja przesyłu (Kompresja i Jakość)}
 
 Każdy system informatyczny dostarczający użytkownikowi końcowemu wartościowej informacji w czasie rzeczywistym musi mierzyć się z fundamentalnym pytaniem inżynierskim: ile danych naprawdę potrzebujemy przesłać, żeby odpowiedź była użyteczna? W naszym przypadku pytanie to przyjmuje bardzo konkretną formę. Student stojący w holu Wydziału Matematyki i Nauk Informacyjnych chce wiedzieć jedną rzecz: czy warto iść na górę do Pokoju Cichej Nauki, strefy JetBrains, czy może lepiej zająć kanapę na korytarzu. Droga do uzyskania tej odpowiedzi może różnić się o kilka rzędów wielkości pod względem ilości przesyłanych danych, złożoności obliczeniowej i ryzyka prawnego.
@@ -357,13 +389,4 @@ Wynikowy stan każdej strefy eksponowany jest przez REST API, z którego korzyst
     \caption{Cykl życia informacji w systemie MINI Info -- od zjawiska ciągłego po użyteczny sygnał decyzyjny.}
     \label{tab:cykl_zycia_informacji}
 \end{table}
-\section{Wnioski z analizy systemu i uzasadnienie architektury}
-
-\subsection{Uzasadnienie wyboru architektury mmWave + RFID/NFC}
-
-Zestawiając przegląd dostępnych na rynku systemów Smart Building z naszymi wyliczeniami opartymi na teorii informacji, wybór autorskiej architektury wykorzystującej zanonimizowane radary fal milimetrowych (mmWave) wsparte systemem RFID/NFC stanowi rozwiązanie optymalne. W literaturze przedmiotu oraz rozwiązaniach komercyjnych często promuje się systemy oparte na zaawansowanej analityce obrazu (np. z użyciem sieci YOLO) lub czujnikach środowiskowych takich jak mierniki stężenia CO2. Odrzucamy te metody, ponieważ kamery drastycznie obciążają sieć i budzą uzasadniony opór społeczny związany z wymogami RODO, natomiast czujniki pośrednie charakteryzują się zbyt dużym opóźnieniem w stosunku do dynamicznych przerw między zajęciami. Nasz system dokonuje redukcji złożoności już na poziomie syntaktycznym, gdzie radary sprzętowo zamieniają fizyczną obecność studentów na zwykłą liczbę całkowitą (\texttt{integer}), co gwarantuje najwyższą wiarygodność semantyczną przy minimalnym koszcie przesyłu w sieci ZigBee.
-
-\subsection{Wartość pragmatyczna i redukcja niepewności użytkownika}
-
-Wygenerowane i przefiltrowane w ten sposób dane muszą zostać zaprezentowane odbiorcy w sposób maksymalnie pragmatyczny, aby zrealizować główny cel systemu. Zamiast zmuszać studenta do analizy surowych odczytów z czujników, nasz algorytm przekształca warstwę semantyczną w prosty interfejs wyświetlany na ekranach w lobby, wykorzystujący intuicyjną paletę pięciu stanów (od zielonego do czerwonego i szarego). Jak udowodniliśmy za pomocą wzoru Shannona, takie podejście dostarcza statystycznemu odbiorcy konkretną dawkę informacji wynoszącą średnio 2.06 bita przy każdym spojrzeniu na tablicę. Dzięki temu system skutecznie i błyskawicznie redukuje niepewność użytkownika co do sensu udania się na wyższe piętra, eliminując problem pustych przebiegów i optymalizując logistykę wewnątrz gmachu Wydziału MiNI.
 \end{document}
