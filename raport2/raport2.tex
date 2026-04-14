@@ -87,8 +87,7 @@ Całkowita zmiana koncepcji, już po zakończeniu etapu pierwszego, pociąga za 
 \section{Charakterystyka problemu i analiza potrzeb użytkownika (Pragmatyka)}
 
 \subsection{Kontekst logistyczny i geneza projektu „MINI Info”}
-Wydział Matematyki i Nauk Informacyjnych PW charakteryzuje się dynamicznym środowiskiem, w którym studenci spędzają znaczną część dnia, również poza godzinami zajęć dydaktycznych. Kluczowym wyzwaniem pragmatycznym jest efektywne wykorzystanie dostępnych przestrzeni socjalnych i naukowych. Obecnie student, chcąc sprawdzić dostępność miejsc w popularnych punktach takich jak „Noga” czy pokój „JetBrains”, musi fizycznie udać się do danej sali. Przy dużej liczbie kondygnacji w gmachu generuje to zbędny ruch w ciągach komunikacyjnych (tzw. „puste przebiegi”) i stratę czasu. System „MINI Info” ma na celu cyfryzację i optymalizację tego procesu, dostarczając wiarygodną informację o zajętości kluczowych pomieszczeń już w głównym punkcie wejścia do budynku (lobby).
-
+Geneza systemu „MINI Info” jest ściśle uwarunkowana specyfiką architektoniczną gmachu Wydziału Matematyki i Nauk Informacyjnych. Wertykalny układ budynku oraz rozproszenie dedykowanych stref rekreacyjnych i naukowych na różnych kondygnacjach stanowią istotną barierę w procesie efektywnego zarządzania zasobami przestrzennymi. Dotychczasowy model eksploatacji infrastruktury opierał się na paradygmacie pasywnym, w którym przepływ osób nie był wspierany przez żadną formę dynamicznej warstwy informacyjnej. Wyzwanie logistyczne polega zatem na braku centralnego mechanizmu monitorowania stanu zajętości w czasie rzeczywistym. Projekt wyrasta z potrzeby implementacji inteligentnej infrastruktury, która przekształca izolowane pomieszczenia w aktywne źródła danych (ang. \textit{data points}), zintegrowane w ramach scentralizowanego systemu wizualizacji dostępnego w głównym węźle komunikacyjnym wydziału.
 \subsection{Definicja celu i funkcja „Inteligentnej Rekomendacji”}
 Głównym celem systemu jest redukcja „kosztu dotarcia” do wolnego miejsca pracy lub odpoczynku. W zaproponowanym modelu system nie tylko pasywnie informuje o zajętości, ale pełni również funkcję aktywnego asystenta -- sugeruje alternatywne lokalizacje. Jeśli wybrana przez studenta sala wykazuje wysoki stopień obłożenia, interfejs (ekran w lobby) automatycznie wskazuje najbliższą wolną przestrzeń o podobnym przeznaczeniu. Przykładowo, w sytuacji przepełnienia pokoju JetBrains, system wyświetli komunikat: „Brak miejsc w JetBrains. Sprawdź Laboratorium (piętro 1) -- dostępność: Wysoka”.
 
@@ -100,12 +99,13 @@ Dla potrzeb systemu zdefiniowano bazę monitorowanych pomieszczeń wraz z ich no
     \item Laboratorium komputerowe: $\sim$15 osób (stanowiska do pracy własnej)
     \item Salki Nauki (3 obiekty): średnio $\sim$10 osób/salka (pokoje cichej pracy)
 \end{itemize}
-Logika interpretacji opiera się na priorytetyzacji komfortu. Przyjęto, że dla studenta kluczowa jest informacja o dostępnym miejscu siedzącym. Stany informacyjne prezentowane w lobby zmieniają się dynamicznie w zależności od obłożenia:
+Logika interpretacji opiera się na priorytetyzacji komfortu. Przyjęto, że dla studenta kluczowa jest informacja o dostępnym miejscu siedzącym. Stany informacyjne prezentowane w lobby zmieniają się dynamicznie w zależności od obłożenia, a dodatkowo system posiada odrębny stan techniczny:
 \begin{itemize}
     \item 0-50\% (Wolne / Dużo miejsc): pełna dostępność.
     \item 51-80\% (Umiarkowany ruch): możliwość znalezienia pojedynczych wolnych miejsc.
-    \item $>80\%$ (Prawie pełny): krytyczny poziom zajętości; aktywacja systemu rekomendacji alternatywnych sal.
+    \item $>80\%$ i $<100\%$ (Prawie pełny): krytyczny poziom zajętości; aktywacja systemu rekomendacji alternatywnych sal.
     \item 100\% (Pełny): komunikat o całkowitym braku miejsc.
+    \item Sprzątanie (tryb techniczny): stan nadrzędny aktywowany przez obsługę; sala jest czasowo wyłączona z rekomendacji niezależnie od obłożenia.
 \end{itemize}
 
 \subsection{Wyzwanie techniczne: Precyzyjna detekcja obecności a zgodność z RODO}
@@ -114,19 +114,12 @@ Podstawowym problemem inżynieryjnym w projekcie jest bezbłędne odróżnienie 
 Zgodnie z zasadą Privacy by Design, projekt „MINI Info” zakłada wykorzystanie wyspecjalizowanych sensorów obecności nowej generacji, operujących na poziomie sprzętowej anonimizacji danych:
 \begin{itemize}
     \item \textbf{Radary fal milimetrowych (mmWave):} Technologia ta wykorzystuje wysokoczęstotliwościowe fale radiowe do mapowania przestrzeni. W przeciwieństwie do czujników PIR, sensory mmWave są w stanie wykryć mikroruchy, takie jak unoszenie się klatki piersiowej podczas oddychania czy bicie serca. Pozwala to na nieprzerwane monitorowanie obecności osób pracujących w całkowitym bezruchu, nie zbierając przy tym żadnych danych wizualnych.
-    \item \textbf{Niskorozdzielcze matryce termiczne (np. technologia Grid-Eye):} Są to sensory podczerwieni zbudowane z niewielkiej siatki detektorów (np. 8x8 pikseli). Urządzenie to nie rejestruje klasycznego obrazu, a jedynie „plamy ciepła”. Rozdzielczość jest celowo na tyle niska, że fizycznie niemożliwe jest zidentyfikowanie twarzy lub sylwetki konkretnego studenta. Pozwala jednak ze stuprocentową pewnością określić, że na konkretnych stanowiskach (krzesłach) znajdują się obiekty emitujące ciepło ludzkiego ciała, co umożliwia precyzyjne liczenie zajętych miejsc.
+    \item \textbf{System kontroli wejść RFID/NFC:} Czytniki legitymacji przy wejściach do stref pozwalają rejestrować strumień wejść i wyjść bez przetwarzania danych biometrycznych, co utrzymuje pełną zgodność z RODO i upraszcza audyt procesu.
 \end{itemize}
-Wdrożenie powyższych rozwiązań gwarantuje najwyższą wiarygodność semantyczną danych wejściowych, zapewniając bezbłędne działanie systemu rekomendacji, przy całkowitym braku ryzyka prawnego i etycznego związanego z przetwarzaniem danych osobowych.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.75\textwidth]{r2photo.png}
-    \caption{Koncepcyjny schemat topologii przestrzennej systemu. Skanowanie wnętrza za pomocą radaru (weryfikacja obecności statycznej) połączone z punktowym czytnikiem RFID w świetle drzwi.}
-    \label{fig:topologia_sensorow}
-\end{figure}
-\section{Modelowanie i reprezentacja informacji (Syntaktyka i Semantyka)}
+W procesie projektowym rozważaliśmy również niskorozdzielcze matryce termiczne (np. Grid-Eye), ponieważ zapewniają one anonimowość i dobrą detekcję źródeł ciepła. Ostatecznie zrezygnowaliśmy jednak z ich wdrożenia na rzecz toru mmWave + RFID/NFC. Decyzję tę podjęliśmy z powodów pragmatycznych: niższej złożoności integracji z istniejącą infrastrukturą wejściową wydziału, mniejszych kosztów skalowania na wiele pomieszczeń oraz prostszej kalibracji i utrzymania eksploatacyjnego. W praktyce połączenie radaru obecności (detekcja realnej obecności także w bezruchu) z kontrolą wejść (kontekst zdarzeń drzwiowych) daje wysoką wiarygodność semantyczną danych wejściowych, zapewniając stabilne działanie systemu rekomendacji przy całkowitym braku ryzyka prawnego i etycznego związanego z przetwarzaniem danych osobowych.
 
 Kluczowym wyzwaniem w rozwoju naszego zintegrowanego systemu wizualnego na Wydziale MiNI jest nie tylko wyznaczanie badanych wcześniej tras, ale przede wszystkim dostarczanie wiedzy na żywo o dostępności poszczególnych stref (np. \textit{Pokój cichej nauki}, \textit{Strefa Jet Brains}) bezpośrednio na wielkoformatowe ekrany w lobby. Aby było to możliwe, system musi nieustannie dokonywać zamiany fizycznego świata rzeczywistego na użyteczną postać cyfrową. Realizujemy to dzieląc zjawisko informacji na dwa zasadnicze poziomy: syntaktyczny (zbieranie struktury sygnałów) oraz semantyczny (nadawanie im ostatecznego znaczenia).
-
+\section{Modelowanie i reprezentacja informacji (Syntaktyka i Semantyka)}
 \subsection{Poziom syntaktyczny: Zbieranie surowych danych}
 
 Na poziomie syntaktycznym system nie rozumie kontekstu zdarzeń na wydziale -- zajmuje się jedynie automatyczną rejestracją surowej formy sygnałów fizycznych. Z uwagi na restrykcyjne normy prywatności i przepisy o ochronie danych (RODO), w projekcie całkowicie odrzuciliśmy możliwość korzystania z kamer wideo oraz jakichkolwiek mikrofonów. Podstawą naszego systemu stały się w pełni zanonimizowane urządzenia pomiarowe. Zbieramy następujące typy strumieni danych:
@@ -135,6 +128,13 @@ Na poziomie syntaktycznym system nie rozumie kontekstu zdarzeń na wydziale -- z
     \item \textbf{System kontroli wejść na legitymacje (RFID/NFC):} Klasyczne czytniki zbliżeniowe montowane przed wejściem do określonych stref wydziału (takich jak \textit{Pokój cichej nauki}). Każde odbicie fizycznej legitymacji generuje po prostu standardowy strumień systemowych zapytań dodających/odejmujących studenta z tablicy w bazie danych.
 \end{itemize}
 Z perspektywy prawa oświatowego i braku konieczności instalowania kamer – układ ten sprawdza się doskonale. Jednakże dla końcowego odbiorcy – czyli studenta w holu – goła liczba logowań z czytników czy surowe zera z ZigBee to na ten moment bezwartościowy szum (fizyczna syntaktyka). Wyświetlenie takich surowych i nieprzetworzonych porcji zmiennych na wielkich ekranach byłoby dla studentów po prostu brzydkie i stanowczo niezrozumiałe.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{r2photo.png}
+    \caption{Koncepcyjny schemat topologii przestrzennej systemu. Skanowanie wnętrza za pomocą radaru (weryfikacja obecności statycznej) połączone z punktowym czytnikiem RFID w świetle drzwi.}
+    \label{fig:topologia_sensorow}
+\end{figure}
+
 \subsection{Jak często "pytać" czujniki? (Twierdzenie Nyquista w praktyce)}
 W tym miejscu pojawia się jednak pewien twardy problem fizyczny: jak często nasze radary ZigBee i czytniki powinny „pytać” pokój o to, co się w nim dzieje? Tutaj na białym koniu wjeżdża słynne twierdzenie Nyquista-Shannona z wykładów. Żeby nasz serwer nie zwariował od nadmiaru danych i żebyśmy poprawnie odwzorowali to, co faktycznie dzieje się w pokoju (czyli uniknęli tzw. aliasingu), musimy dobrać idealny interwał próbkowania. 
 
@@ -201,14 +201,16 @@ Z perspektywy teorii i inżynierii danych określilibyśmy to klasycznym przesko
 \end{enumerate}
 
 Podsumowując, nasz unikalny system podejmuje długą i solidną drogę programistyczną. Zaczynamy od hardware'owych detektorów pod sufitem ograniczających problematykę RODO (syntaktyka). Następnie zestawiamy je z wejściami legitymacji i wyliczamy ułamek zajętości miejsc, ubezpieczając się na wypadek wejścia kogoś niejawnie (semantyka). Wrzucenie tego w końcową, wielostopniową listę statusów stanowi dowód na to, jak z tysiąca odczytów radiowych uzyskać prostą i użyteczną tablicę decyzji dla zabieganego studenta przed wykładem.
-\subsection{Zapychanie sieci a próbkowanie, czyli Nyquist w praktyce}
+\subsection{Ile faktycznie "wiedzy" daje system? (Entropia Shannona)}
 Ale ile tak naprawdę czystej „wiedzy” dajemy studentowi na tym ekranie? Żeby nie być gołosłownym, postanowiliśmy przeliczyć to korzystając z matematycznego aparatu teorii informacji. Zgodnie z koncepcją Shannona, wartość informacji to po prostu „element zaskoczenia”. Im rzadszy jest dany kolor kafelka na ekranie, tym bardziej redukuje on naszą niepewność i tym więcej „bitów informacji” ze sobą niesie.
 
-Zebraliśmy próbne statystyki z naszego radaru z najbardziej obleganych godzin (10:00 - 14:00) dla testowej sali Jet Brains. Wyszło nam, że statusy rozkładają się następująco:
+Zebraliśmy próbne statystyki z naszego radaru z najbardziej obleganych godzin (10:00 - 14:00) dla testowej sali Jet Brains. Wyszło nam, że pełny, 5-stanowy model rozkłada się następująco:
 \begin{itemize}
-    \item \textbf{Zajęty (Czerwony):} Świeci się przez 60\% czasu (prawdopodobieństwo $p = 0.60$).
-    \item \textbf{Wolny (Zielony):} Udaje się go trafić przez 35\% czasu ($p = 0.35$).
-    \item \textbf{Sprzątanie (Szary):} Zdarza się bardzo rzadko, raptem przez 5\% czasu ($p = 0.05$).
+    \item \textbf{Wolne / Dużo miejsc (Zielony):} 35\% czasu ($p = 0.35$).
+    \item \textbf{Umiarkowany ruch (Żółty):} 30\% czasu ($p = 0.30$).
+    \item \textbf{Prawie pełny (Pomarańczowy):} 20\% czasu ($p = 0.20$).
+    \item \textbf{Pełny (Czerwony):} 10\% czasu ($p = 0.10$).
+    \item \textbf{Sprzątanie (Szary):} 5\% czasu ($p = 0.05$).
 \end{itemize}
 
 Teraz wystarczy wrzucić to do klasycznego wzoru na samoinformację: $I(x) = -\log_2(p(x))$.
@@ -219,9 +221,13 @@ Teraz wystarczy wrzucić to do klasycznego wzoru na samoinformację: $I(x) = -\l
         \hline
         \textbf{Kolor na ekranie} & \textbf{Prawdopodobieństwo} & \textbf{Ilość informacji [bit]} \\
         \hline
-        Czerwony (Zajęty) & $0.60$ & $\sim 0.74$ \\
+        Zielony (Wolne / Dużo miejsc) & $0.35$ & $\sim 1.51$ \\
         \hline
-        Zielony (Wolny) & $0.35$ & $\sim 1.51$ \\
+        Żółty (Umiarkowany ruch) & $0.30$ & $\sim 1.74$ \\
+        \hline
+        Pomarańczowy (Prawie pełny) & $0.20$ & $\sim 2.32$ \\
+        \hline
+        Czerwony (Pełny) & $0.10$ & $\sim 3.32$ \\
         \hline
         Szary (Sprzątanie) & $0.05$ & $\sim 4.32$ \\
         \hline
@@ -230,14 +236,14 @@ Teraz wystarczy wrzucić to do klasycznego wzoru na samoinformację: $I(x) = -\l
     \label{tab:entropia}
 \end{table}
 
-Jak na dłoni widać, że jak system wypluje szary kafelek „Sprzątanie”, to student dostaje gigantyczny strzał informacyjny (aż 4.32 bita zaskoczenia!), bo to mega rzadka sytuacja. Z kolei czerwony kafelek w godzinach szczytu nikogo aż tak nie dziwi, więc niesie tylko 0.74 bita.
+Jak na dłoni widać, że jak system wypluje szary kafelek „Sprzątanie”, to student dostaje gigantyczny strzał informacyjny (aż 4.32 bita zaskoczenia), bo to bardzo rzadka sytuacja. Z kolei zielony i żółty status pojawiają się częściej, więc niosą mniej informacji jednostkowej.
 
 Mając te liczby, z łatwością policzyliśmy średnią niepewność (czyli słynną Entropię $H$) całego naszego wirtualnego pokoju:
 \begin{equation}
-    H(X) = \sum p(x) \cdot I(x) = (0.60 \cdot 0.74) + (0.35 \cdot 1.51) + (0.05 \cdot 4.32) \approx 1.19 \text{ bit/symbol}
+    H(X) = \sum p(x) \cdot I(x) = (0.35 \cdot 1.51) + (0.30 \cdot 1.74) + (0.20 \cdot 2.32) + (0.10 \cdot 3.32) + (0.05 \cdot 4.32) \approx 2.06 \text{ bit/symbol}
 \end{equation}
 
-Maksymalna entropia dla układu 3-stanowego wynosi w teorii około $1.58$ bita. Nasz wynik, czyli 1.19 bita na każde spojrzenie na ekran, to świetny dowód pragmatyczny. Pokazuje to czarno na białym, że nasza wizualizacja zdejmuje ze studentów konkretną porcję niewiadomych, optymalizując ich ruchy po wydziale.
+Maksymalna entropia dla układu 5-stanowego wynosi w teorii około $\log_2(5) \approx 2.32$ bita. Nasz wynik, czyli 2.06 bita na każde spojrzenie na ekran, to mocny dowód pragmatyczny. Pokazuje to czarno na białym, że nasza wizualizacja zdejmuje ze studentów konkretną porcję niewiadomych, optymalizując ich ruchy po wydziale.
 \subsection{Architektura przesyłu danych}
 
 Aby system tak płynnie przechodził od czujników do ostatecznej oceny zajętości na wyświetlaczach w holu, korzystamy ze świetnie zaplanowanej architektury technologicznej. Poniższy obraz przedstawia najważniejsze moduły tego układu:
