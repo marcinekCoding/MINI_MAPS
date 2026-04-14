@@ -264,5 +264,106 @@ Działanie całości jest bardzo proste i można je opisać w zaledwie trzech kr
 \end{itemize}
 
 Rozbicie fizyki na te trzy elementy sprzętowe mocno upraszcza pisanie każdej linijki kodu oraz pozwala np. zresetować duży ekran w holu bez przerywania analizy liczenia wejściówek do stref nauki.
+\subsection{Podsumowanie przepływu informacji w architekturze systemu}
 
+W celu ostatecznego uporządkowania przetwarzanych danych, poniższa tabela zestawia zaimplementowane w systemie warstwy informacji zgodnie z klasycznym podziałem badawczym:
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|>{\raggedright\arraybackslash}p{3cm}|>{\raggedright\arraybackslash}p{6cm}|>{\raggedright\arraybackslash}p{5.5cm}|}
+    \hline
+    \rowcolor{gray!20}
+    \textbf{Warstwa Informacji} & \textbf{Opis w systemie „MINI Info”} & \textbf{Wartość dla odbiorcy docelowego} \\ \hline
+    \textbf{Syntaktyczna} & Surowe sygnały z czujników mmWave (radary) oraz logi RFID. Czyste wartości liczbowe (\texttt{int}) bez kontekstu przestrzennego. & Brak (czysty szum informacyjny, niezrozumiały dla studenta w holu). \\ \hline
+    \textbf{Semantyczna} & Kontekstualizacja danych przez algorytm. Powiązanie surowej liczby osób z maksymalną pojemnością konkretnej sali (np. $18/25$ osób). & Średnia (wymaga od studenta analizy i znajomości pojemności danej sali). \\ \hline
+    \textbf{Pragmatyczna} & Gotowy, skwantyzowany komunikat decyzyjny wyświetlany na ekranie (np. status ŻÓŁTY -- Umiarkowany ruch, lub rekomendacja innej sali). & Bardzo wysoka (użyteczna wiedza bezpośrednio redukująca ,,koszt dotarcia''). \\ \hline
+    \end{tabular}
+    \vspace{0.2cm}
+    \caption{Zestawienie poziomów modelowania informacji w projektowanym systemie.}
+    \label{tab:poziomy_informacji}
+\end{table}
+\section{Metryki efektywności i optymalizacja przesyłu (Kompresja i Jakość)}
+
+Każdy system informatyczny dostarczający użytkownikowi końcowemu wartościowej informacji w czasie rzeczywistym musi mierzyć się z fundamentalnym pytaniem inżynierskim: ile danych naprawdę potrzebujemy przesłać, żeby odpowiedź była użyteczna? W naszym przypadku pytanie to przyjmuje bardzo konkretną formę. Student stojący w holu Wydziału Matematyki i Nauk Informacyjnych chce wiedzieć jedną rzecz: czy warto iść na górę do Pokoju Cichej Nauki, strefy JetBrains, czy może lepiej zająć kanapę na korytarzu. Droga do uzyskania tej odpowiedzi może różnić się o kilka rzędów wielkości pod względem ilości przesyłanych danych, złożoności obliczeniowej i ryzyka prawnego.
+
+\subsection{Porównanie podejść: kamery kontra czujniki obecności}
+
+Zanim przejdziemy do omawiania metryk i optymalizacji w kontekście naszego systemu, warto osadzić nasze decyzje projektowe na tle alternatywnego podejścia opartego na kamerach wideo. Analiza porównawcza pozwala bowiem najlepiej uzasadnić wybory poczynione na etapie projektowania architektury.
+
+Systemy oparte na kamerach charakteryzują się bardzo wysoką wymaganą przepustowością sieci. Pojedyncza kamera 1080p przesyła surowy strumień rzędu 3--6 Gb/s przed kompresją. Nawet po zastosowaniu kodowania H.264 do poziomu typowego dla systemów nadzoru (2--4 Mb/s na kamerę), sieć wydziałowa przy założeniu 12 kamer musiałaby obsługiwać ciągły ruch rzędu 24--48 Mb/s. To obciążenie generuje poważne koszty infrastrukturalne i wymaga dedykowanego serwera do przetwarzania obrazu w czasie rzeczywistym.
+
+Co jednak ważniejsze -- dane z kamer stanowią z definicji dane osobowe w rozumieniu RODO. Obraz twarzy czy sylwetki pozwala na identyfikację konkretnej osoby fizycznej. Nawet systemy stosujące anonimizację w czasie rzeczywistym przez ułamek sekundy przetwarzają pełny obraz, co technicznie oznacza, że dane osobowe istnieją w pamięci systemu. Wdrożenie takiego rozwiązania na uczelni wymagałoby przeprowadzenia oceny skutków dla ochrony danych (DPIA) oraz konsultacji z uczelnianym inspektorem ochrony danych. Co więcej, samo poinformowanie użytkowników przestrzeni o monitoringu wizyjnym zmieniałoby charakter tych stref jako miejsc spokojnej nauki.
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            ymode=log,
+            width=0.85\textwidth,
+            height=7cm,
+            enlarge x limits=0.5,
+            ylabel={Dobowy transfer danych [MB] (skala logarytmiczna)},
+            symbolic x coords={Sieć Kamer CCTV, Sieć Czujników mmWave},
+            xtick=data,
+            nodes near coords,
+            nodes near coords align={vertical},
+            bar width=1.5cm,
+            ymajorgrids=true
+            ]
+            % Kamery: ~ 48 Mb/s to ok. 518 400 MB dziennie
+            % Czujniki: ok. 2.8 MB dziennie
+            \addplot[fill=red!60!white] coordinates {(Sieć Kamer CCTV, 518400)};
+            \addplot[fill=blue!50!white] coordinates {(Sieć Czujników mmWave, 2.8)};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Porównanie dobowego obciążenia sieci wydziałowej dla 12 węzłów obserwacyjnych. Zastosowanie sensorów milimetrowych pozwala na redukcję przesyłanych danych o ponad pięć rzędów wielkości.}
+    \label{fig:transfer_porownanie}
+\end{figure}
+Nasz system oparty na czujnikach milimetrowych oraz czytnikach legitymacji całkowicie omija ten problem -- co zostało szczegółowo omówione w rozdziale dotyczącym poziomu syntaktycznego. Z perspektywy niniejszego rozdziału kluczowe jest natomiast to, co ta decyzja oznacza dla ilości przesyłanych danych i wymagań obliczeniowych. Pojedynczy odczyt czujnika mmWave to komunikat nieprzekraczający kilkudziesięciu bajtów. Przy odpytywaniu co 30 sekund, sumaryczny ruch generowany przez 8 czujników wynosi mniej niż 2 KB/min -- w skali doby około 2,8 MB. Jest to wartość o cztery do pięciu rzędów wielkości mniejsza niż w przypadku systemu kamerowego, co przekłada się na znikome wymagania infrastrukturalne i brak potrzeby stosowania jakiejkolwiek kompresji strumieniowej.
+
+\subsection{Granularność danych wyjściowych i kryteria jakości informacji}
+
+Przyjęta architektura czujnikowa narzuca konkretny kształt danych, jakie system jest w stanie dostarczyć, i warto ten kształt precyzyjnie zdefiniować jako metrykę jakości informacji.
+
+Naszym podstawowym wyjściem jest liczba całkowita reprezentująca liczbę osób aktualnie przebywających w danej strefie. Jest to celowo surowa, liczbowa wartość -- nie uproszczony stan semantyczny. Świadomie rezygnujemy z dostarczania jedynie etykiety „wolne/zajęte”, ponieważ student podejmując decyzję o przemieszczeniu się na wyższe piętro ocenia sytuację bardziej subtelnie. Informacja „4/6 miejsc zajętych” jest znacznie wartościowsza decyzyjnie niż samo „częściowo zajęte” -- pozwala ocenić, czy znajdzie się miejsce przy konkretnym biurku, czy warto w ogóle podejmować wędrówkę. Liczba osób stanowi więc metrykę pierwszego rzędu, z której interfejs użytkownika może samodzielnie wyprowadzić dowolną reprezentację wizualną -- ułamek zajętości, pasek postępu, kolor kafelka.
+
+Kluczowym kryterium jakości w naszym systemie jest aktualność informacji, czyli maksymalne dopuszczalne opóźnienie między zmianą stanu fizycznego pomieszczenia a aktualizacją danych na ekranie. Dla naszego zastosowania przyjmujemy jako akceptowalne opóźnienie rzędu jednej minuty -- decyzja studenta o przemieszczeniu się nie wymaga danych aktualizowanych co sekundę, a raczej co kilkanaście do kilkudziesięciu sekund. Drugim kryterium jest spójność danych między dwoma źródłami -- czujnikiem mmWave i czytnikiem RFID. Jak opisano w rozdziale dotyczącym semantyki, algorytm wybiera zawsze wyższą z dwóch wartości, traktując ją jako bezpieczniejsze oszacowanie. Z punktu widzenia metrycznego oznacza to, że system jest zaprojektowany tak, aby raczej zawyżać niż zaniżać obłożenie -- co chroni studenta przed niepotrzebną wędrówką do faktycznie zajętej sali.
+
+Trzecim istotnym kryterium jakości jest kompletność pokrycia stref. System musi dostarczać dane dla wszystkich monitorowanych lokalizacji jednocześnie, bez „ślepych plam”, które zmuszałyby studenta do samodzielnego sprawdzenia danego miejsca. W praktyce oznacza to wymaganie na dostępność każdego węzła sieci czujnikowej na poziomie bliskim 100\% w godzinach funkcjonowania wydziału. Sieć ZigBee w topologii mesh częściowo adresuje ten problem poprzez redundancję ścieżek komunikacyjnych -- awaria pojedynczego węzła nie odcina pozostałych czujników od bramki.
+
+\subsection{Forma przesyłu danych i ich analiza}
+
+Dane z czujników są zbierane przez bramkę podłączoną do sieci LAN wydziału i przesyłane do serwera protokołem MQTT. Każdy komunikat ma rozmiar nieprzekraczający 64 bajtów i zawiera identyfikator czujnika, znacznik czasu oraz aktualną liczbę wykrytych osób. Protokół MQTT jest tu wyborem nieprzypadkowym -- jego architektura oparta na modelu publikacja-subskrypcja (publish-subscribe) pozwala na elastyczne dodawanie nowych czujników do sieci bez modyfikacji istniejącej infrastruktury serwerowej. Nowy czujnik po prostu zaczyna publikować dane na dedykowanym kanale tematycznym (topic), a serwer automatycznie go subskrybuje.
+
+Na serwerze dane są agregowane i przechowywane w bazie danych szeregów czasowych. Dla celów bieżącego wyświetlania wystarczający jest ostatni odczyt z każdego czujnika. Dla celów analitycznych -- na przykład wyznaczania wzorców obłożenia w ciągu dnia lub tygodnia, co może być przydatne przy planowaniu godzin dostępności stref -- przechowujemy dane zagregowane do rozdzielczości 5-minutowej. Dane historyczne w rozdzielczości godzinowej pozwalają z kolei na analizę długoterminowych trendów, np. porównanie obłożenia strefy JetBrains w tygodniu sesyjnym versus normalnym tygodniu zajęć.
+
+Surowe dane z czujników są przechowywane przez 48 godzin w celu umożliwienia debugowania, po czym automatycznie usuwane. Polityka ta jest zgodna z zasadą minimalizacji danych wynikającą z RODO. Szacowane łączne zapotrzebowanie na przestrzeń dyskową dla całej sieci czujników wynosi około 50 MB miesięcznie -- wartość pomijalna z punktu widzenia infrastruktury serwerowej uczelni.
+
+Wynikowy stan każdej strefy eksponowany jest przez REST API, z którego korzysta interfejs wyświetlany na ekranach w holu. Całkowite opóźnienie systemu -- od zmiany stanu fizycznego do aktualizacji ekranu -- wynosi w normalnych warunkach poniżej 45 sekund i wynika głównie z przyjętego interwału odpytywania czujników oraz czasu propagacji danych przez stos MQTT. Wartość ta spełnia z dużym zapasem przyjęte kryterium jakości dotyczące aktualności informacji.
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{|>{\raggedright\arraybackslash}p{3cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{4cm}|>{\raggedright\arraybackslash}p{3.5cm}|}
+    \hline
+    \rowcolor{gray!20}
+    \textbf{Etap w systemie} & \textbf{Format danych} & \textbf{Działanie w kontekście PTI} & \textbf{Częstotliwość / Interwał} \\ \hline
+    \textbf{1. Akwizycja \newline (Sensory mmWave)} & Sygnał ciągły \newline (fala radiowa) & Ekstrakcja cech i ekstremalna kompresja wymiarowości zjawiska fizycznego. & Czas rzeczywisty \\ \hline
+    \textbf{2. Transmisja \newline (Protokół MQTT)} & Dyskretny ładunek JSON \newline ($<64$ bajtów) & Redukcja nadmiarowości kanału transmisyjnego (model subskrypcji). & Co 45-60 sekund \\ \hline
+    \textbf{3. Agregacja \newline (Baza Szeregów)} & Wartość uśredniona \newline (\texttt{float}) & Downsampling w dziedzinie czasu (potencjalny aliasing krótkich zdarzeń). & Okno 5-minutowe \\ \hline
+    \textbf{4. Prezentacja \newline (REST API $\rightarrow$ Ekran)} & Metadane stanu \newline (\texttt{np. "status": "RED"}) & Ostateczna kwantyzacja użyteczna dla celów decyzyjnych odbiorcy (Pragmatyka). & Na żądanie klienta ($<200$ ms) \\ \hline
+    \end{tabular}
+    \vspace{0.2cm}
+    \caption{Cykl życia informacji w systemie MINI Info -- od zjawiska ciągłego po użyteczny sygnał decyzyjny.}
+    \label{tab:cykl_zycia_informacji}
+\end{table}
+\section{Wnioski z analizy systemu i uzasadnienie architektury}
+
+\subsection{Uzasadnienie wyboru architektury mmWave + RFID/NFC}
+
+Zestawiając przegląd dostępnych na rynku systemów Smart Building z naszymi wyliczeniami opartymi na teorii informacji, wybór autorskiej architektury wykorzystującej zanonimizowane radary fal milimetrowych (mmWave) wsparte systemem RFID/NFC stanowi rozwiązanie optymalne. W literaturze przedmiotu oraz rozwiązaniach komercyjnych często promuje się systemy oparte na zaawansowanej analityce obrazu (np. z użyciem sieci YOLO) lub czujnikach środowiskowych takich jak mierniki stężenia CO2. Odrzucamy te metody, ponieważ kamery drastycznie obciążają sieć i budzą uzasadniony opór społeczny związany z wymogami RODO, natomiast czujniki pośrednie charakteryzują się zbyt dużym opóźnieniem w stosunku do dynamicznych przerw między zajęciami. Nasz system dokonuje redukcji złożoności już na poziomie syntaktycznym, gdzie radary sprzętowo zamieniają fizyczną obecność studentów na zwykłą liczbę całkowitą (\texttt{integer}), co gwarantuje najwyższą wiarygodność semantyczną przy minimalnym koszcie przesyłu w sieci ZigBee.
+
+\subsection{Wartość pragmatyczna i redukcja niepewności użytkownika}
+
+Wygenerowane i przefiltrowane w ten sposób dane muszą zostać zaprezentowane odbiorcy w sposób maksymalnie pragmatyczny, aby zrealizować główny cel systemu. Zamiast zmuszać studenta do analizy surowych odczytów z czujników, nasz algorytm przekształca warstwę semantyczną w prosty interfejs wyświetlany na ekranach w lobby, wykorzystujący intuicyjną paletę pięciu stanów (od zielonego do czerwonego i szarego). Jak udowodniliśmy za pomocą wzoru Shannona, takie podejście dostarcza statystycznemu odbiorcy konkretną dawkę informacji wynoszącą średnio 2.06 bita przy każdym spojrzeniu na tablicę. Dzięki temu system skutecznie i błyskawicznie redukuje niepewność użytkownika co do sensu udania się na wyższe piętra, eliminując problem pustych przebiegów i optymalizując logistykę wewnątrz gmachu Wydziału MiNI.
 \end{document}
