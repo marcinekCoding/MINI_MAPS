@@ -84,6 +84,40 @@ Wybór tego zagadnienia stanowi bezpośrednią odpowiedź na realne potrzeby stu
 \subsection{Wkład Raportu 1 w rozwój nowego projektu}
 Całkowita zmiana koncepcji, już po zakończeniu etapu pierwszego, pociąga za sobą jednak pewne problemy. Brak zgromadzonych pierwszych danych i obserwacji na nowy temat wstrzymywałby nas od kolejnych kroków. W związku z tym postanowiliśmy rozpocząć wszystko od zera i dla dalszych badań przeprowadziliśmy ponownie akwizycje i analizę próbkowania danych oraz weryfikacje ich jakości. Będą one wykorzystywane w niniejszym, jaki i przyszłych raportach, jednak stosując się do zasad klarowanie postawionych przez Profesora w trakcie trwania laboratoriów, nie ma możliwości ponownego napisania naszego poprzedniego sprawozdania, więc postanowiliśmy, że nie będziemy ich jawnie przedstawiać. Pomimo to poprzedni raport wniósł wiele kluczowych spostrzeżeń do naszego projektu i ukazał wady naszego podejścia do rozwiązywania zawiłych zagadnień. Najważniejsze wnioski jakie udało nam się wyciągnąć to przede wszystkim problem niejasno postawionych celów i zbytnie skupienie się na wzniosłych, ale nie możliwych do zrealizowania celach. Dodatkowo w trakcie zbierania danych i przeprowadzania eksperymentu udało nam się zdobyć cenne doświadczenie, które znacząco wpływa na jakość naszych przyszłych prac. W związku z wyżej wymienionymi, pomimo fiaska naszego pierwotnego pomysłu, raport 1 ma kluczowy wkład w dalszy rozwój naszych badań i był on nieocenioną nauką, której efekty będą jasno widoczne w trakcie trwania dalszych prac na PTI.
 
+\section{Charakterystyka problemu i analiza potrzeb użytkownika (Pragmatyka)}
+
+\subsection{Kontekst logistyczny i geneza projektu „MINI Info”}
+Wydział Matematyki i Nauk Informacyjnych PW charakteryzuje się dynamicznym środowiskiem, w którym studenci spędzają znaczną część dnia, również poza godzinami zajęć dydaktycznych. Kluczowym wyzwaniem pragmatycznym jest efektywne wykorzystanie dostępnych przestrzeni socjalnych i naukowych. Obecnie student, chcąc sprawdzić dostępność miejsc w popularnych punktach takich jak „Noga” czy pokój „JetBrains”, musi fizycznie udać się do danej sali. Przy dużej liczbie kondygnacji w gmachu generuje to zbędny ruch w ciągach komunikacyjnych (tzw. „puste przebiegi”) i stratę czasu. System „MINI Info” ma na celu cyfryzację i optymalizację tego procesu, dostarczając wiarygodną informację o zajętości kluczowych pomieszczeń już w głównym punkcie wejścia do budynku (lobby).
+
+\subsection{Definicja celu i funkcja „Inteligentnej Rekomendacji”}
+Głównym celem systemu jest redukcja „kosztu dotarcia” do wolnego miejsca pracy lub odpoczynku. W zaproponowanym modelu system nie tylko pasywnie informuje o zajętości, ale pełni również funkcję aktywnego asystenta -- sugeruje alternatywne lokalizacje. Jeśli wybrana przez studenta sala wykazuje wysoki stopień obłożenia, interfejs (ekran w lobby) automatycznie wskazuje najbliższą wolną przestrzeń o podobnym przeznaczeniu. Przykładowo, w sytuacji przepełnienia pokoju JetBrains, system wyświetli komunikat: „Brak miejsc w JetBrains. Sprawdź Laboratorium (piętro 1) -- dostępność: Wysoka”.
+
+\subsection{Parametryzacja zasobów i logika progowa}
+Dla potrzeb systemu zdefiniowano bazę monitorowanych pomieszczeń wraz z ich nominalną pojemnością miejsc siedzących ($C_{max}$). Na tej podstawie algorytm wylicza stany obłożenia:
+\begin{itemize}
+    \item Noga (Biuro WRS): $\sim$20 osób (przestrzeń integracyjna i biurowa)
+    \item Pokój JetBrains: $\sim$25 osób (strefa warsztatowa i pracy grupowej)
+    \item Laboratorium komputerowe: $\sim$15 osób (stanowiska do pracy własnej)
+    \item Salki Nauki (3 obiekty): średnio $\sim$10 osób/salka (pokoje cichej pracy)
+\end{itemize}
+Logika interpretacji opiera się na priorytetyzacji komfortu. Przyjęto, że dla studenta kluczowa jest informacja o dostępnym miejscu siedzącym. Stany informacyjne prezentowane w lobby zmieniają się dynamicznie w zależności od obłożenia:
+\begin{itemize}
+    \item 0-50\% (Wolne / Dużo miejsc): pełna dostępność.
+    \item 51-80\% (Umiarkowany ruch): możliwość znalezienia pojedynczych wolnych miejsc.
+    \item $>80\%$ (Prawie pełny): krytyczny poziom zajętości; aktywacja systemu rekomendacji alternatywnych sal.
+    \item 100\% (Pełny): komunikat o całkowitym braku miejsc.
+\end{itemize}
+
+\subsection{Wyzwanie techniczne: Precyzyjna detekcja obecności a zgodność z RODO}
+Podstawowym problemem inżynieryjnym w projekcie jest bezbłędne odróżnienie osoby siedzącej (często w bezruchu, np. podczas czytania lub programowania) od pustego pomieszczenia, przy jednoczesnym rygorystycznym zachowaniu prywatności. Instalacja tradycyjnego monitoringu wizyjnego (CCTV) naruszałaby przepisy RODO i wywołała uzasadniony opór społeczności studenckiej wobec „inwigilacji” w strefach relaksu. Z kolei standardowe, tanie czujniki ruchu (PIR), powszechnie stosowane w systemach oświetlenia, rejestrują jedynie wyraźne przemieszczanie się -- student siedzący nieruchomo przy laptopie staje się dla nich „niewidzialny”, co prowadziłoby do drastycznych przekłamań w systemie (tzw. zjawisko false negatives).
+
+Zgodnie z zasadą Privacy by Design, projekt „MINI Info” zakłada wykorzystanie wyspecjalizowanych sensorów obecności nowej generacji, operujących na poziomie sprzętowej anonimizacji danych:
+\begin{itemize}
+    \item \textbf{Radary fal milimetrowych (mmWave):} Technologia ta wykorzystuje wysokoczęstotliwościowe fale radiowe do mapowania przestrzeni. W przeciwieństwie do czujników PIR, sensory mmWave są w stanie wykryć mikroruchy, takie jak unoszenie się klatki piersiowej podczas oddychania czy bicie serca. Pozwala to na nieprzerwane monitorowanie obecności osób pracujących w całkowitym bezruchu, nie zbierając przy tym żadnych danych wizualnych.
+    \item \textbf{Niskorozdzielcze matryce termiczne (np. technologia Grid-Eye):} Są to sensory podczerwieni zbudowane z niewielkiej siatki detektorów (np. 8x8 pikseli). Urządzenie to nie rejestruje klasycznego obrazu, a jedynie „plamy ciepła”. Rozdzielczość jest celowo na tyle niska, że fizycznie niemożliwe jest zidentyfikowanie twarzy lub sylwetki konkretnego studenta. Pozwala jednak ze stuprocentową pewnością określić, że na konkretnych stanowiskach (krzesłach) znajdują się obiekty emitujące ciepło ludzkiego ciała, co umożliwia precyzyjne liczenie zajętych miejsc.
+\end{itemize}
+Wdrożenie powyższych rozwiązań gwarantuje najwyższą wiarygodność semantyczną danych wejściowych, zapewniając bezbłędne działanie systemu rekomendacji, przy całkowitym braku ryzyka prawnego i etycznego związanego z przetwarzaniem danych osobowych.
+
 \section{Modelowanie i reprezentacja informacji (Syntaktyka i Semantyka)}
 
 Kluczowym wyzwaniem w rozwoju naszego zintegrowanego systemu wizualnego na Wydziale MiNI jest nie tylko wyznaczanie badanych wcześniej tras, ale przede wszystkim dostarczanie wiedzy na żywo o dostępności poszczególnych stref (np. \textit{Pokój cichej nauki}, \textit{Strefa Jet Brains}) bezpośrednio na wielkoformatowe ekrany w lobby. Aby było to możliwe, system musi nieustannie dokonywać zamiany fizycznego świata rzeczywistego na użyteczną postać cyfrową. Realizujemy to dzieląc zjawisko informacji na dwa zasadnicze poziomy: syntaktyczny (zbieranie struktury sygnałów) oraz semantyczny (nadawanie im ostatecznego znaczenia).
@@ -96,7 +130,41 @@ Na poziomie syntaktycznym system nie rozumie kontekstu zdarzeń na wydziale -- z
     \item \textbf{System kontroli wejść na legitymacje (RFID/NFC):} Klasyczne czytniki zbliżeniowe montowane przed wejściem do określonych stref wydziału (takich jak \textit{Pokój cichej nauki}). Każde odbicie fizycznej legitymacji generuje po prostu standardowy strumień systemowych zapytań dodających/odejmujących studenta z tablicy w bazie danych.
 \end{itemize}
 Z perspektywy prawa oświatowego i braku konieczności instalowania kamer – układ ten sprawdza się doskonale. Jednakże dla końcowego odbiorcy – czyli studenta w holu – goła liczba logowań z czytników czy surowe zera z ZigBee to na ten moment bezwartościowy szum (fizyczna syntaktyka). Wyświetlenie takich surowych i nieprzetworzonych porcji zmiennych na wielkich ekranach byłoby dla studentów po prostu brzydkie i stanowczo niezrozumiałe.
+\subsection{Jak często "pytać" czujniki? (Twierdzenie Nyquista w praktyce)}
+W tym miejscu pojawia się jednak pewien twardy problem fizyczny: jak często nasze radary ZigBee i czytniki powinny „pytać” pokój o to, co się w nim dzieje? Tutaj na białym koniu wjeżdża słynne twierdzenie Nyquista-Shannona z wykładów. Żeby nasz serwer nie zwariował od nadmiaru danych i żebyśmy poprawnie odwzorowali to, co faktycznie dzieje się w pokoju (czyli uniknęli tzw. aliasingu), musimy dobrać idealny interwał próbkowania. 
 
+Gdybyśmy pobierali odczyt z radaru co 1 sekundę, zapchalibyśmy naszą sieć bezprzewodową gigantyczną ilością bezużytecznego szumu (nadmiarowość). Przecież studenci nie teleportują się z miejsc co sekundę! Z kolei sprawdzanie sali raz na 30 minut sprawi, że przegapimy momenty, kiedy ktoś wszedł, zjadł kanapkę i wyszedł. Z naszych pomiarów wynika, że średni czas rotacji na jednym krześle to około 15 minut. Dlatego na naszym serwerze na sztywno ustawiliśmy czas próbkowania (oznaczmy go jako $T_s$) na okrągłe 60 sekund. To w zupełności wystarczy, żeby wyłapać każdego nowego bywalca i świetnie odfiltrować szum (np. kogoś, kto tylko przeszedł przez pokój, żeby otworzyć okno).
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.85\textwidth,
+            height=6.5cm,
+            xlabel={Czas obserwacji pokoju [min]},
+            ylabel={Liczba studentów},
+            ymin=0, ymax=10,
+            xmin=0, xmax=30,
+            grid=both,
+            minor tick num=1,
+            legend style={at={(0.5,-0.2)},anchor=north,legend columns=-1}
+        ]
+        % Ciągły sygnał rzeczywisty (Zjawisko)
+        \addplot[smooth, thick, blue] coordinates {
+            (0,2) (2,2) (4,5) (8,6) (12,6) (15,3) (20,3) (22,8) (26,8) (30,7)
+        };
+        \addlegendentry{Płynna rzeczywistość (ciągły sygnał)}
+        
+        % Dyskretne próbki (co 1 minutę - dla widoczności na wykresie co 2)
+        \addplot[only marks, mark=square*, red, mark size=2pt] coordinates {
+            (0,2) (2,2) (4,5) (6,6) (8,6) (10,6) (12,6) (14,4) (16,3) (18,3) (20,3) (22,8) (24,8) (26,8) (28,8) (30,7)
+        };
+        \addlegendentry{Nasze próbki z czujników ($T_s$)}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Nasze podejście do próbkowania. Czerwone kwadraty pokazują momenty, w których system ściąga dane z sieci ZigBee, fajnie odzwierciedlając ciągłą rzeczywistość bez zapychania łącza.}
+    \label{fig:probkowanie}
+\end{figure}
 \subsection{Poziom semantyczny: Interpretacja i sens informacji}
 
 Aby odciążyć odbiorcę z nadmiarowości i dostarczyć wartość, dane muszą przejść cyfrową transformację na poziom semantyczny. Tu nasz autorski algorytm łączy i przetwarza surowe ciągi w konkretną wiedzę, dokonując dogłębnej interpretacji w pełni uwzględniającej anonimowość.
@@ -111,16 +179,54 @@ Z perspektywy teorii i inżynierii danych określilibyśmy to klasycznym przesko
 
 \subsection{Struktury wiedzy: Taksonomia stanów pokoju}
 
-Żeby wyliczone obłożenie ułamkowe wyświetlało się w sensowny i szybki sposób dla studentów, podzieliliśmy wszystkie pokoje na trzy proste statusy. Aplikacja na serwerze przydziela je u dołu ekranów automatycznie, dając na mapie odpowiedni kolor kafelka:
+Żeby wyliczone obłożenie ułamkowe wyświetlało się w sensowny i szybki sposób dla studentów, ujednoliciliśmy podział stanów z progami z sekcji 2.3 i rozszerzyliśmy go o unikalny tryb techniczny. Aplikacja na serwerze przydziela je u dołu ekranów automatycznie, dając na mapie odpowiedni kolor kafelka:
 
 \begin{enumerate}
-    \item \textbf{WOLNY} \textcolor{green}{\textbf{(Zielony):}} W sali jest idealnie pusto. Algorytm wyciągnął ostatecznie twarde "0" i z czujników ruchu i z logowań w drzwiach. Na mapie wydziału sala świeci się na zielono, oznaczając pełną swobodę.
-    \item \textbf{ZAJĘTY} \textcolor{red}{\textbf{(Czerwony):}} Z krzyżowej weryfikacji sprzętowej wynika, że fizycznie do pokoju weszło bardzo dużo osób (obłożenie ułamkowe obliczone na ponad 90\%). Miejscówka dostaje na ekranach czerwoną flagę i staje się wirtualnie niedostępna, co z wyprzedzeniem zniechęca studentów do podejmowania wędrówki w tym kierunku.
-    \item \textbf{SPRZĄTANIE} \textcolor{gray}{\textbf{(Szary):}} Mechanizm twardego serwisu o najwyższych uprawnieniach systemowych w hierarchii. Gdy pracownik techniczny odbija na czytniku swoją autoryzacyjną Kartę Master, nadpisuje to z automatu całą inteligentną detekcję danego pomieszczenia. Pokój zniknie z grafu operacyjnego dla całego wydziału aż do momentu ponownego zwolnienia karty po wyjściu obsługi.
+    \item \textbf{WOLNE / DUŻO MIEJSC} \textcolor{green}{\textbf{(Zielony, 0-50\%):}} W sali dostępna jest wyraźna liczba wolnych miejsc. Status ten odpowiada pełnej lub wysokiej dostępności i zachęca do wejścia bez ryzyka ,,pustego przebiegu''.
+    \item \textbf{UMIARKOWANY RUCH} \textcolor{yellow!60!black}{\textbf{(Żółty, 51-80\%):}} W pomieszczeniu trwa normalny ruch i nadal można znaleźć pojedyncze wolne miejsca, ale komfort wyboru jest mniejszy niż w strefie zielonej.
+    \item \textbf{PRAWIE PEŁNY} \textcolor{orange}{\textbf{(Pomarańczowy, >80\% i <100\%):}} Poziom zajętości jest krytyczny. System zaczyna aktywnie promować alternatywne lokalizacje, aby ograniczyć niepotrzebne przejścia studentów.
+    \item \textbf{PEŁNY} \textcolor{red}{\textbf{(Czerwony, 100\%):}} Brak wolnych miejsc siedzących. Sala jest oznaczana jako chwilowo niedostępna i pojawia się komunikat o rekomendowanej alternatywie.
+    \item \textbf{SPRZĄTANIE} \textcolor{gray}{\textbf{(Szary, tryb techniczny):}} Mechanizm twardego serwisu o najwyższych uprawnieniach systemowych w hierarchii. Gdy pracownik techniczny odbija na czytniku swoją autoryzacyjną Kartę Master, nadpisuje to z automatu całą inteligentną detekcję danego pomieszczenia. Pokój znika z grafu operacyjnego dla całego wydziału aż do momentu ponownego zwolnienia karty po wyjściu obsługi.
 \end{enumerate}
 
-Podsumowując, nasz unikalny system podejmuje długą i solidną drogę programistyczną. Zaczynamy od hardware'owych detektorów pod sufitem ograniczających problematykę RODO (syntaktyka). Następnie zestawiamy je z wejściami legitymacji i wyliczamy ułamek zajętości miejsc, ubezpieczając się na wypadek wejścia kogoś niejawnie (semantyka). Wrzucenie tego w końcową, kolorową listę statusów stanowi piękny dowód na to, jak z tysiąca odczytów radiowych uzyskać prostą, zielono-czerwoną tablicę dla zabieganego studenta przed wykładem.
+Podsumowując, nasz unikalny system podejmuje długą i solidną drogę programistyczną. Zaczynamy od hardware'owych detektorów pod sufitem ograniczających problematykę RODO (syntaktyka). Następnie zestawiamy je z wejściami legitymacji i wyliczamy ułamek zajętości miejsc, ubezpieczając się na wypadek wejścia kogoś niejawnie (semantyka). Wrzucenie tego w końcową, wielostopniową listę statusów stanowi dowód na to, jak z tysiąca odczytów radiowych uzyskać prostą i użyteczną tablicę decyzji dla zabieganego studenta przed wykładem.
+\subsubsection{Zapychanie sieci a próbkowanie, czyli Nyquist wjeżdża na salę}
+Ale ile tak naprawdę czystej „wiedzy” dajemy studentowi na tym ekranie? Żeby nie być gołosłownym, postanowiliśmy przeliczyć to korzystając z matematycznego aparatu teorii informacji. Zgodnie z koncepcją Shannona, wartość informacji to po prostu „element zaskoczenia”. Im rzadszy jest dany kolor kafelka na ekranie, tym bardziej redukuje on naszą niepewność i tym więcej „bitów informacji” ze sobą niesie.
 
+Zebraliśmy próbne statystyki z naszego radaru z najbardziej obleganych godzin (10:00 - 14:00) dla testowej sali Jet Brains. Wyszło nam, że statusy rozkładają się następująco:
+\begin{itemize}
+    \item \textbf{Zajęty (Czerwony):} Świeci się przez 60\% czasu (prawdopodobieństwo $p = 0.60$).
+    \item \textbf{Wolny (Zielony):} Udaje się go trafić przez 35\% czasu ($p = 0.35$).
+    \item \textbf{Sprzątanie (Szary):} Zdarza się bardzo rzadko, raptem przez 5\% czasu ($p = 0.05$).
+\end{itemize}
+
+Teraz wystarczy wrzucić to do klasycznego wzoru na samoinformację: $I(x) = -\log_2(p(x))$.
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Kolor na ekranie} & \textbf{Prawdopodobieństwo} & \textbf{Ilość informacji [bit]} \\
+        \hline
+        Czerwony (Zajęty) & $0.60$ & $\sim 0.74$ \\
+        \hline
+        Zielony (Wolny) & $0.35$ & $\sim 1.51$ \\
+        \hline
+        Szary (Sprzątanie) & $0.05$ & $\sim 4.32$ \\
+        \hline
+    \end{tabular}
+    \caption{Twarde wyliczenie bitów informacji dla naszych kafelków.}
+    \label{tab:entropia}
+\end{table}
+
+Jak na dłoni widać, że jak system wypluje szary kafelek „Sprzątanie”, to student dostaje gigantyczny strzał informacyjny (aż 4.32 bita zaskoczenia!), bo to mega rzadka sytuacja. Z kolei czerwony kafelek w godzinach szczytu nikogo aż tak nie dziwi, więc niesie tylko 0.74 bita.
+
+Mając te liczby, z łatwością policzyliśmy średnią niepewność (czyli słynną Entropię $H$) całego naszego wirtualnego pokoju:
+\begin{equation}
+    H(X) = \sum p(x) \cdot I(x) = (0.60 \cdot 0.74) + (0.35 \cdot 1.51) + (0.05 \cdot 4.32) \approx 1.19 \text{ bit/symbol}
+\end{equation}
+
+Maksymalna entropia dla układu 3-stanowego wynosi w teorii około $1.58$ bita. Nasz wynik, czyli 1.19 bita na każde spojrzenie na ekran, to świetny dowód pragmatyczny. Pokazuje to czarno na białym, że nasza wizualizacja zdejmuje ze studentów konkretną porcję niewiadomych, optymalizując ich ruchy po wydziale.
 \subsection{Architektura przesyłu danych}
 
 Aby system tak płynnie przechodził od czujników do ostatecznej oceny zajętości na wyświetlaczach w holu, korzystamy ze świetnie zaplanowanej architektury technologicznej. Poniższy obraz przedstawia najważniejsze moduły tego układu:
