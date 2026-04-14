@@ -117,7 +117,12 @@ Zgodnie z zasadą Privacy by Design, projekt „MINI Info” zakłada wykorzysta
     \item \textbf{Niskorozdzielcze matryce termiczne (np. technologia Grid-Eye):} Są to sensory podczerwieni zbudowane z niewielkiej siatki detektorów (np. 8x8 pikseli). Urządzenie to nie rejestruje klasycznego obrazu, a jedynie „plamy ciepła”. Rozdzielczość jest celowo na tyle niska, że fizycznie niemożliwe jest zidentyfikowanie twarzy lub sylwetki konkretnego studenta. Pozwala jednak ze stuprocentową pewnością określić, że na konkretnych stanowiskach (krzesłach) znajdują się obiekty emitujące ciepło ludzkiego ciała, co umożliwia precyzyjne liczenie zajętych miejsc.
 \end{itemize}
 Wdrożenie powyższych rozwiązań gwarantuje najwyższą wiarygodność semantyczną danych wejściowych, zapewniając bezbłędne działanie systemu rekomendacji, przy całkowitym braku ryzyka prawnego i etycznego związanego z przetwarzaniem danych osobowych.
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{r2photo.png}
+    \caption{Koncepcyjny schemat topologii przestrzennej systemu. Skanowanie wnętrza za pomocą radaru (weryfikacja obecności statycznej) połączone z punktowym czytnikiem RFID w świetle drzwi.}
+    \label{fig:topologia_sensorow}
+\end{figure}
 \section{Modelowanie i reprezentacja informacji (Syntaktyka i Semantyka)}
 
 Kluczowym wyzwaniem w rozwoju naszego zintegrowanego systemu wizualnego na Wydziale MiNI jest nie tylko wyznaczanie badanych wcześniej tras, ale przede wszystkim dostarczanie wiedzy na żywo o dostępności poszczególnych stref (np. \textit{Pokój cichej nauki}, \textit{Strefa Jet Brains}) bezpośrednio na wielkoformatowe ekrany w lobby. Aby było to możliwe, system musi nieustannie dokonywać zamiany fizycznego świata rzeczywistego na użyteczną postać cyfrową. Realizujemy to dzieląc zjawisko informacji na dwa zasadnicze poziomy: syntaktyczny (zbieranie struktury sygnałów) oraz semantyczny (nadawanie im ostatecznego znaczenia).
