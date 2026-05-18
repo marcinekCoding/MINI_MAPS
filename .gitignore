@@ -4,3 +4,7 @@
 *.toc
 *.out
 *.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*marcin_playground*
