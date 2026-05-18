@@ -1,0 +1,51 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+\begin{document}
+
+\section{Weryfikacja, Ocena Jakości i Normalizacja Danych}
+
+Zanim przeszliśmy do właściwego modelowania i kompresji, musieliśmy ocenić jakość i formę pozyskanej wiedzy. Zgodnie z zasadą szerokiego poznania przedmiotu badań, dokonaliśmy dokładnej obserwacji i rejestracji sygnałów (czasów przemieszczania się po wydziale) w możliwie najszerszym zakresie. Wyniki te traktowaliśmy stricte jako nośnik surowej informacji wejściowej. Głównym trzonem naszej początkowej bazy danych stał się powszechny dylemat ,,pieszo czy windą?''. 
+
+Już na tym etapie zdefiniowaliśmy realnego, niesformalizowanego odbiorcę naszej informacji: jest to typowy przemieszczający się po kampusie student, któremu zależy na oszczędności czasu (jego określona aktywność). Zasadniczym celem realizowanego projektu stało się więc takie przetworzenie surowych czasowników, by poprzez filtrację i modelowanie dostarczyć mu zoptymalizowaną, pełnowartościową informację decyzyjną.
+
+\subsection{Charakterystyka i ocena jakości zebranych obserwacji}
+
+Dzięki jasnemu podziałowi zadań w zespole projektowym, przeprowadziliśmy eksperymentalną weryfikację tras w terenie (m.in. z użyciem stoperów i arkuszy badawczych). Nasze surowe zbiory składały się z kilkudziesięciu pomiarów, podczas których student-ochotnik pokonywał trasę z parteru na wyższe piętra. Kiedy jednak poddaliśmy dogłębnej analizie pozyskane sygnały, szybko okazało się, że z punktu widzenia analizy informacji, jakość niektórych wyników pozostawia wiele do życzenia.
+
+Głównym problemem był czynnik ludzki. W kilku przypadkach badana osoba zatrzymała się na korytarzu, żeby porozmawiać ze znajomym, a w innym przypadku winda przyjechała od razu, co nie jest standardową sytuacją (zazwyczaj trzeba na nią chwilę poczekać). Z punktu widzenia teorii informacji, takie surowe i nieprzetworzone obserwacje są obciążone ogromnym szumem informacyjnym. Gdybyśmy wzięli je od razu do analizy, nasze ostateczne wnioski -- i stworzony na ich podstawie graf decyzyjny -- byłyby po prostu błędne.
+
+\subsection{Normalizacja i redukcja szumów obserwacyjnych}
+
+Aby nasze dane miały realną wartość i mogły posłużyć do reprezentacji problemu, musieliśmy je znormalizować oraz poddać filtracji (odszumianiu). Proces ten podzieliliśmy na na dwa proste kroki:
+
+\begin{enumerate}
+    \item \textbf{Filtracja wyników skrajnych (odszumianie):} Zdecydowaliśmy się odrzucić ze zbioru danych te pomiary, w których wystąpiły nieprzewidziane anomalie (np. wspomniane pogawędki na korytarzu, zawiązanie buta, czy awaria windy w trakcie jazdy). Ustaliliśmy, że interesuje nas tylko ,,czysty'' czas przemieszczania się. 
+    
+    Aby zidentyfikować wartości skrajne (odstające) w sposób obiektywny, posłużyliśmy się miarami statystycznymi. Zbiór naszych pomiarów czasu zapisaliśmy jako wektor obserwacji $X = \{x_1, x_2, \dots, x_N\}$, a następnie wyznaczyliśmy jego średnią arytmetyczną $\bar{x}$:
+    \begin{equation}
+        \bar{x} = \frac{1}{N} \sum_{i=1}^{N} x_i
+    \end{equation}
+    Kolejnym krokiem było wyliczenie odchylenia standardowego próby $s$, które precyzyjnie matematycznie obrazuje stopień rozrzutu pomiarów wokół wartości średniej i pozwala ustalić tzw. szerokość "normalnego" okna czasowego:
+    \begin{equation}
+        s = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (x_i - \bar{x})^2}
+    \end{equation}
+    Mając te dane, podjęliśmy uzasadnioną decyzję o odrzuceniu pomiarów drastycznie odbijających od średniej. Wyniki te traktowaliśmy jako zaszumione anomalie przekraczające dopuszczalną granicę rozrzutu $|x_i - \bar{x}| > k \cdot s$, gdzie $k$ było badanym współczynnikiem tolerancji dla skrajnych wyników.
+    
+    Aby mieć pewność co do rezultatów, wdrożyliśmy mechanizm sprzężenia zwrotnego. Po wstępnej filtracji sprawdzaliśmy, czy nałożony margines odchylenia obiektywnie polepsza jakość, czy wycina również sensowne dane. Taki sygnał zwrotny pozwalał nam na powrót i poprawę efektywności doboru współczynnika, co skutecznie kalibrowało cały proces. Taka prezentacja i optymalizacja problemu pozwoliła nam na sformułowanie trafnego wniosku: zmniejszenie objętości archiwum o 15\% paradoksalnie znacznie wywindowało zagęszczenie i jakość użytecznej informacji semantycznej w ostatecznym zbiorze.
+    
+    \item \textbf{Ujednolicenie jednostek (normalizacja):} Część danych mieliśmy zapisaną w formacie ,,minuty i sekundy'' (np. 1:15), a część wyłącznie w sekundach. Dokonaliśmy transformacji wszystkich wartości do jednolitej miary w sekundach (skalarnej). Dzięki temu pozbyliśmy się nadmiarowości w zapisie, co znacznie ułatwiło nam późniejsze kodowanie tych czasów jako wag krawędzi w strukturze grafu. Rozmiar danych spadł, a sama ich czytelność dla algorytmów wzrosła.
+\end{enumerate}
+
+Dzięki tym zabiegom przeszliśmy od surowego, chaotycznego archiwum obserwacji do skondensowanego i ujednoliconego zbioru, gotowego do tego, by wyciągnąć z niego to, co najważniejsze -- czystą strukturę zależności.
+
+\end{document}

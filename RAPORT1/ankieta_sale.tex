@@ -1,0 +1,65 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{pgfplots}
+
+\pgfplotsset{compat=1.18} 
+
+\begin{document}
+
+% --- POCZĄTEK ROZDZIAŁU DO SKOPIOWANIA ---
+
+\section{Analiza potrzeb użytkowników i identyfikacja problemów}
+
+\subsection{Metodologia badania pilotażowego}
+Aby projektowana aplikacja odpowiadała na rzeczywiste problemy studentów Wydziału MiNI, zrezygnowano z opierania logiki nawigacyjnej wyłącznie na statycznych planach ewakuacyjnych budynku. Zamiast tego przeprowadzono badanie pilotażowe na grupie docelowej ($N=100$ studentów pierwszego roku). Głównym celem zwiadu badawczego była identyfikacja tzw. krytycznych węzłów nawigacyjnych, czyli miejsc, w których architektura gmachu najczęściej wprowadza użytkowników w błąd. 
+
+\subsection{Wyniki: Krytyczne węzły nawigacyjne (Pain points)}
+
+Zgromadzone dane ilościowe zostały poddane agregacji i przedstawione na poniższym wykresie.
+
+\begin{figure}[htpb]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar,                   
+            y dir=reverse,          
+            xlabel={Odsetek studentów wskazujących salę (\%)},
+            ylabel={Numer sali dydaktycznej},
+            symbolic y coords={313, 107, 303, 216, 215}, 
+            ytick=data,             
+            nodes near coords,       
+            nodes near coords align={horizontal},
+            bar width=18pt,          
+            width=12cm,             
+            height=7cm,              
+            xmin=0, xmax=45,        
+            title={Wyniki ankiety: Gdzie studenci gubią się najczęściej?},
+            grid=major,             
+            major grid style={dotted, gray}
+        ]
+        
+        \addplot[fill=red!70!black, draw=black] coordinates {
+            (35,313)    
+            (22,107)    
+            (18,303)    
+            (10,216)    
+            (8,215)     
+        };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Rozkład odpowiedzi na pytanie o najtrudniejszą do zlokalizowania salę ($N=100$).}
+    \label{fig:trudne_sale}
+\end{figure}
+
+Wykres z ankiety (Rysunek \ref{fig:trudne_sale}) jasno pokazuje jedną rzecz: problemem na MiNI nie jest wcale wielkość gmachu, tylko jego nieintuicyjne zakamarki. Skoro na pierwszym miejscu ląduje sala 313, a zaraz za nią 107 z zupełnie innego piętra, to widać, że studenci nie gubią się ogólnie, tylko w bardzo konkretnych, dziwnych miejscach. Numery pokoi po prostu nie zawsze układają się tak, jak podpowiadałaby logika korytarzy.
+
+\subsection{Wnioski dla logiki i architektury systemu}
+Wniosek dla naszego projektu jest prosty -- zwykła, płaska mapa z zaznaczoną trasą to za mało. Skoro sam układ korytarzy potrafi zmylić, nasza aplikacja musi być o krok przed użytkownikiem. Jeśli student wyznacza trasę do tej nieszczęsnej sali 313, algorytm nie powinien tylko rysować suchej wektorowej kreski na ekranie. 
+
+System musi natychmiast wyłapać, że węzeł docelowy posiada wysoką ,,wagę trudności'' i dorzucić dodatkową podpowiedź. Może to być zdjęcie kłopotliwego rozwidlenia wyświetlane w interfejsie wariantu trasy, albo szybki komunikat tekstowy w stylu: ,,za automatami z kawą skręć w lewo''. Krótko mówiąc: nasza nawigacja ma celowo łatać błędy w UX (User Experience) samego budynku i prowadzić za rękę dokładnie tam, gdzie statystyki pokazują, że najłatwiej się zgubić.
+
+% --- KONIEC ROZDZIAŁU ---
+
+\end{document}
