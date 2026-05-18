@@ -1,0 +1,407 @@
+Podstawy teorii informacji 
+Artur Przelaskowski 
+Wydział Matematyki i Nauk Informacyjnych  
+ 
+Laboratorium 
+ 
+Projekt „NERW 2 PW. Nauka – Edukacja – Rozwój – Współpraca” 
+współfinansowany jest ze środków Unii Europejskiej                    
+w ramach Europejskiego Funduszu Społecznego 
+Zadanie 10 pn. „Modyfikacja programów studiów na kierunkach  
+prowadzonych przez Wydział Matematyki i Nauk 
+ Informacyjnych”, realizowane w ramach projektu  
+„NERW 2 PW. Nauka – Edukacja – Rozwój – Współpraca”, 
+ współfinansowanego jest ze środków Unii Europejskiej  
+w ramach Europejskiego Funduszu Społecznego 
+
+Podstawy Teorii Informacji 
+ 
+ 
+Laboratoria 
+ 
+ 
+ 
+Artur Przelaskowski 
+MiNI, p. 506, artur.przelaskowski@pw.edu.pl, tel.w. 7821 
+ 
+Materiały: www.ire.pw.edu.pl/~arturp/Dydaktyka/Info 
+ 
+ 
+ 
+ 
+
+Tematyka laboratorium 
+• L1 POMIARY I REKONSTRUKCJE SYGNAŁÓW: zasady akwizycji sygnałów, 
+zniekształcenia sygnałów, modelowanie i rekonstrukcje sygnałów, transformacje 
+sygnałów, ocena jakości (obliczeniowo, percepcja), problem odwrotny w realnych  
+systemach pozyskiwania informacji, uwarunkowania macierzy pomiaru, 
+ograniczenia liczby pomiarów 
+ 
+• L2 REPREZENTACJA INFORMACJI: definicje informacji, modelowanie, licznie 
+informacji, kodowanie informacji, eksperymentalna redukcja nadmiarowości w 
+reprezentacji danych  
+ 
+• L3 EKSTRAKCJA INFORMACJI: rekonstrukcja informacji, przetwarzanie celem 
+ekstrakcji, aproksymacja treści, kompresja z selekcją informacji (obraz, dźwięk) 
+  
+• L4 WYSZUKIWANIE INFORMACJI: indeksowanie danych, deskryptory 
+semantyczne, selektywność wyszukiwania – precyzja, przywołanie, stopa sukcesu, 
+przeglądarki, testy wyszukiwania 
+ 
+• L5 WYKORZYSTANIE INFORMACJI: eksperymentalna weryfikacja użytkowych 
+walorów przekazu informacji, odniesienie do praktycznych zastosowań, wybrane 
+przykłady, ocena przydatności, korzyści użytkowych 
+ 
+LAB1:  POMIARY I REKONSTRUKCJE SYGNAŁÓW 
+• zasady akwizycji sygnałów 
+• Reguła próbkowania (twierdzenie Nyquista-Shannona), efekt aliasingu (sygnały 1D, 
+obrazy), metody redukcji 
+• Metody kwantyzacji: skalarnej, blokowej, wektorowej (słownikowej), optymalizacja 
+schematu kwantyzacji (Loyda-Maxa, LBG)  
+• szacowanie zniekształceń sygnałów 
+• Zaszumienie, rozmycie, artefakty, różnego typu odkształcenia 
+• przetwarzanie wstępne sygnałów celem poprawy jakości 
+• transformacje sygnałów, analiza sygnałów za pomocą różnych ich reprezentacji, 
+rozwinięcia w bazach, ramach, słownikach  
+• ocena jakości sygnałów (obliczeniowo, percepcja) 
+• dobór miar obliczeniowych, wektorowych, semantycznych; testy z subiektywną 
+oceną jakości (‘ładny’ sygnał), testy dot. ocena przydatności sygnałów (sygnał 
+informatywny) 
+• modelowanie procesu akwizycji i kształtowanie/rekonstrukcja reprezentacji sygnałów 
+mierzonych, rozwiązywanie problemu odwrotnego w pozyskiwaniu informacji  
+• analiza uwarunkowań pomiaru: właściwości macierzy pomiaru, realne ograniczenia 
+liczby pomiarów, poprawa jakości rejestrowanych sygnałów cyfrowych 
+• symulacja realnych ograniczeń pomiarowych w zakresie liczby i precyzji pomiarów, 
+dobór metod rekonstrukcji sygnałów o możliwie wysokiej jakości 
+ 
+ 
+  
+ 
+Przykładowe formy realizacji 
+• wstępna charakterystyka procesu akwizycji sygnałów na prostych sygnałach, testowanie 
+zasad procesów próbkowania i kwantyzacji oraz formowania formatu zapisu danych 
+cyfrowych 
+• ocena efektów próbkowania względem zmieniającej się częstości próbkowania, ocena 
+wpływu filtru ograniczającego pasmo sygnału na redukcję aliasingu 
+• ocena efektów kwantyzacji przy zmieniających się parametrach tego procesu (wielkość 
+przedziału kwantyzacji, wpływ przechodzenia od schematu równomiernego do 
+nierównomiernego Lloyda-Maxa), zmiana wymiarowości sygnałów, dobór binarnej 
+reprezentacji kodów stałej długości  
+• testowanie efektów formowania cyfrowej reprezentacji sygnałów złożonych typu 
+dźwięk, obraz, wideo, strumień multimedialny; rejestracja np. zapisów dźwiękowych za 
+pomocą różnych zestawów mikrofonowych, uwarunkowań zapisu (orientacja 
+przestrzenna, studyjnie, na ''ulicy'', itp.), z użyciem kart dźwiękowych z użytecznym 
+oprogramowaniem 
+• testowanie metod rejestracji obrazów, zmiana jakościowych uwarunkowań zapisu 
+obrazów za pomocą różnej jakości kamer, aparatów fotograficznych itp.; analiza ruchu 
+w zapisach wideo, różnic w dynamice, poziomie złożoności treści zapisów, przestrzeni 
+barw, doboru parametrów archiwizacji (kompresji) 
+Przykładowe narzędzia 
+• wybrane funcje Matlaba (Signal Processing Toolbox, Image Acquisition 
+Toolbox, Data Acquisition Toolbox, Wavelab850, wavelet toolbox, FFST-
+master, bioinfo, audio itd.) 
+• inne biblioteki funkcji, np. ze strony  
+• http://www-mmdb.iai.uni-
+bonn.de/lehre/BIT/ss03_DSP_Vorlesung/matlab_demos/index.html 
+http://www.falstad.com/mathphysics.html 
+• narzędzia Wavosaur lub inne (np. GoldWave), aplety ze strony 
+http://www.falstad.com/mathphysics.html 
+• edytor dźwięku Audacity  http://audacity.sourceforge.net/ 
+ 
+Próbkowanie (filtracja) - przykładowo 
+ 
+
+
+W realizacji zadań istotne są: 
+ - analiza specyfiki treści dostarczanej z różnych źródeł informacji oraz formy przekazu  
+- badanie procesu rozumienia przekazywanej informacji o różnym charakterze  
+- ocena użyteczności informacji 
+ Analiza specyfiki treści dostarczanej z różnych źródeł informacji oraz formy przekazu 
+polega na przeprowadzeniu wstępnej charakterystyki różnego typu danych: obrazów 
+statycznych, sekwencji wizyjnych, filmów oraz zapisów mowy i muzyki. Chodzi tutaj przede 
+wszystkim o odwołanie do ludzkich modeli postrzegania i odczytywania treści (ograniczenia 
+postrzegania obrazów i dźwięku, zróżnicowanie postrzegania, komponenty treści, 
+rozpoznawanie obiektów, wzajemnych relacji, itd.). Należy na wybranych, własnych 
+przykładach omówić specyfikę postrzegania obrazów i dźwięku, podkreślając przede 
+wszystkim jej znaczenie w kontekście różnych zastosowań  
+Badanie procesu percepcji przekazywanej informacji dotyczy dwóch zasadniczych 
+aspektów:  
+- obliczeniowej oceny ogólnej jakości danych, przy czym należy wziąć pod uwagę 
+przede wszystkim te cechy sygnału, które mają bezpośredni związek z percepcją 
+przenoszonej informacji; 
+-  oceny percepcji danych w teście subiektywnej oceny jakości według różnych 
+scenariuszy.  
+Szacując jakość obrazów i dźwięku, stanowiących podstawę przekazu informacji, należy 
+wykorzystać różne miary obliczeniowe 
+Wstępna ocena jakości wybranej grupy zróżnicowanych obrazów testowych powinna dotyczyć 
+obliczeń kontrastu lokalnego (w wybranych regionach zainteresowań), histogramu 
+poszczególnych komponentów i poziomu szumów na podstawie widma częstotliwościowego oraz 
+analizy statystycznej.  
+Zdolność rozdzielczą systemów obrazowania można oszacować pośrednio, analizując widma 
+oraz profile obrazowe istotnych krawędzi czy dokonując charakterystyki dominujących 
+tekstur 
+W przypadku dźwięku należy przeanalizować przede wszystkim postać widma, sonogram, 
+zróżnicowanie zapisu wielokanałowego, statystykę, itp. dla różnych sygnałów dźwiękowych oraz 
+mowy 
+Warto zwrócić uwagę na różnice w obliczeniowej ocenie dźwięku, występujące pomiędzy różnymi 
+typami muzyki (można skorzystać z nagrań własnych oraz referencyjnych), zapisami mowy o 
+zróżnicowanej barwie i cechach charakterystycznych.  
+
+Odnosząc względem siebie sygnały rejestrowane przy różnych uwarunkowaniach, czy też 
+wstępnie przetworzone za pomocą odmiennych procedur, należy wykorzystać miary 
+porównawcze, takie jak MSE czy PSNR, jak też złożone miary obliczeniowe, 
+uwzględniające ludzkie zdolności percepcji i/lub optymalizowane testem subiektywnym: 
+SSIM, VQM, OMW. 
+ Obok miar obliczeniowych, warto skorzystać z testów obserwacyjnych (subiektywnych), 
+odpowiednio dobierając skale i rodzaj formułowanych ocen (względne, absolutne, 
+porównawcze z porządkowaniem, itp.). Testy te mają służyć przede wszystkim badaniu 
+zdolności postrzegania obiektów, wybranych struktur czy cech przez obserwatorów. 
+Powinny to odzwierciedlić projektowane procedury realizacji testów -- w ich planowaniu 
+warto wykorzystać odpowiednie normy ITU-R 
+Pomocne w realizacji testów 
+subiektywnych, ale także przy 
+obliczaniu złożonych miar 
+obliczeniowych, korelujących  z 
+oceną subiektywną, mogą być 
+narzędzia MSU 
+http://www.compression.ru/video/ 
+
+Wykorzystując aplikację MSU perceptual video quality, przedstawioną 
+na rys. można zaprojektować procedurę testu, a następnie test 
+zrealizować. Za pomocą prostych procedur statystycznych można też 
+dokonać zestawienia i analizy wyników.  
+
+LAB2: REPREZENTACJA INFORMACJI 
+• definicje informacji 
+• matematyczna (Shannona), syntaktyczna 
+• semantyczna (obiektowa, komponentowa) 
+• pragmatyczna, przykłady zastosowań  
+• modelowanie i liczenie informacji 
+• modele statystyczne (bez pamięci, Markowa, kombinowane, problem rozrzedzenia kontekstu), 
+adaptacyjne 
+• entropia, entropia warunkowa, łączna, względna, wzajemna 
+• metody subiektywne, wzorce obliczeniowe 
+• kodowanie/kompresja informacji 
+• jednoznacznie dekodowalne, kody symboli (Huffmana, Golomba), blokowe (dobór alfabetu) i 
+strumieniowe (arytmetyczny) 
+• eksperymentalna redukcja nadmiarowości reprezentacji informacji, ocena koderów 
+bezstratnych, archiwizery 
+• ocena informatywności przekazu  
+• subiektywne testy z udziałem specjalistów i grupy kontrolnej 
+Przykładowe formy realizacji 
+• dyskusja różnic pomiędzy różnymi formami definiowania informacji na wybranych 
+przykładach - czym jest informacja w prezentowanych zapisach dźwięku, w obrazach i 
+zapisach wideo, danych multimedialnych; wskazanie różnic w reprezentowaniu informacji 
+na poziomie syntaktycznym, semantycznym oraz pragmatycznym; próby jakościowego 
+różnicowania postrzeganych danych 
+• formalna charakterystyka wybranych zbiorów danych/sygnałów pod kątem zawartej w 
+nich informacji; próby obliczeń formalnych odwołujących się do koncepcji Shannona o 
+różnych form modelowania informacji; dyskusja wyliczeń formalnych względem 
+percepcyjnej/obserwacyjnej oceny ilości informacji w kontekście określonych modeli 
+zastosowań –np. odwołanie do widoczności obiektów w obrazach 
+• analiza efektów kodowania za pomocą różnych koncepcji kodów jednoznacznie 
+dekodowalnych na różnych rodzajach zbiorów, porównanie uzyskiwanych średnich 
+bitowych z granicznymi wartościami wyliczanej entropii, ocena wpływu dopasowania 
+rodzaju modelu informacji do specyfiki danych na efektywność kodowania 
+• porównywanie efektywności kodowania różnego typu zbiorów za pomocą klasycznych 
+implementacji kodów symboli (Huffman, przedziałowe), strumieniowych (arytmetyczny), 
+archiwizerów, koderów obrazów i dźwięku 
+ 
+Przykładowe narzędzia 
+• wybrane funkcje i biblioteki Matlaba (Signal Processing Toolbox, Image 
+Acquisition Toolbox, Wavelab850, wavelet toolbox itp.)   
+• inne biblioteki funkcji dot. sposobów liczenia entropii, kodowania, 
+modelowania informacji 
+• narzędzia do optymalizacji reprezentacji danych metodami bezstratnymi, 
+różne implementacje kodeków danych, obrazów, dźwięku itp. 
+• narzędzia do wizualizacji danych oraz porównań jakościowych 
+ 
+
+LAB3: EKSTRAKCJA INFORMACJI 
+• rekonstrukcja informacji 
+• optymalizacja metodami wariacyjnymi – minimalizacja rozmiaru, kryteria jakościowe 
+i mechanizmy regularyzacji (kontrola jakości rekonstrukcji) 
+• przetwarzanie celem ekstrakcji 
+• estymacja i symulacje zakłóceń oraz testowanie skutecznych metod i ich redukcja 
+(szumy, rozmycia, kontrastowanie, artefakty) 
+• porównanie wybranych metod ekstrakcji informacji z różnego typu sygnałów, przy 
+różnych definicjach obiektów i cech zainteresowania oraz spodziewanych efektach  
+• aproksymacja treści 
+• poprawa jakości percepcji treści metodami aproksymacji nieliniowej 
+• segmentacja obiektów zainteresowania, opis ich cech, analiza porównawcza 
+• interpretacja obiektów i sceny w odniesieniu do konkretnych zastosowań 
+• kompresja z porządkowaniem i selekcją informacji (obraz, dźwięk, inne dane) 
+• metody przestrzenno-blokowe i obiektowe (MPEG, JPEG, mp3, AAC, frog itp.),  
+skalowalne (JPEG 2000), optymalizacja R(D), porządkowanie, zagnieżdżanie 
+• eksperymentalna ocena porównawcza efektywności kompresji 
+Przykładowe formy realizacji 
+• rekonstrukcja informacji na podstawie zarejestrowanej postaci sygnałów z 
+wykorzystaniem optymalizacyjnych metod wariacyjnych; rozwiązywanie problemu 
+aproksymacji informacji z wykorzystaniem metod wyznaczania semantycznej 
+reprezentacji rzadkiej; wyznaczenie istoty przekazu informacji metodami rekonstrukcji 
+jedynie istotnych cech informacji (infonów) w zredukowanej przestrzeni poznawczej; 
+problem rozwiązywany na przykładzie sygnałów uproszczonych, w formie symulacji 
+• ekstrakcja uproszczonych form informacji na podstawie źródłowych i symulowanych 
+danych cyfrowych, przy symulacji różnego typu zakłóceń oraz przy różnej postaci 
+komponentów informatywnych; wykorzystanie tradycyjnych metod filtracji, korekty 
+histogramu, operatorów morfologicznych itp. 
+• wydobycie treści za pomocą różnych mechanizmów aproksymacji nieliniowej osadzonych 
+na rozwinięciach w różnorodnych bazach dostosowanych do ekstrahowanych obiektów; 
+segmentacja konturowa i obszarowa tych obiektów, szacowanie cech istotnych w 
+konkretnych zastosowaniach, próby interpretacji uzyskanych sygnatur obiektów 
+• kompresja z selekcją informacji, jej uporządkowaniem i zagnieżdżeniem, wykorzystanie 
+standardów audio, rodziny JPEG i MPEG, przeprowadzenie eksperymentalnej oceny ich 
+efektywności za pomocą różnych wskaźników jakościowych i poznawczych, wykorzystanie 
+kilku form testów, analiza i wnioskowanie wyników 
+Przykładowe narzędzia 
+• wybrane funkcje i biblioteki Matlaba (Signal Processing Toolbox, Image Processing 
+Toolbox Wavelab850, wavelet toolbox, optimization toolbox itp.)  
+• pakiety i narzędzia do oszczędnego próbkowania (Compressed Sensing), 
+optymalizacji wariacyjnej itp. 
+ 
+• zróżnicowane implementacje 
+filtrów obrazowych (np. apaf), 
+sygnałowych, programów, narzędzi 
+i pakietów do przetwarzania 
+obrazów 
+• różne implementacje kodeków 
+stratnych, w tym według 
+standardów JPEG i MPEG 
+ 
+
+LAB4: WYSZUKIWANIE INFORMACJI 
+• porządkowanie i zarządzenia informacją 
+• analiza scen, różnicowanie cech jakościowych, semantycznych, poznawczych 
+• modele użytkownika, procedury odpytywania/wyszukiwania, interfejsy wyszukiwarek, 
+ocena skuteczności, formy sprzężenia zwrotnego; wyróżnianie regionów zainteresowania, 
+obiektów, wybranych cech, interaktywne protokoły wyszukiwania, analiza kryteriów i 
+form podobieństwa wyszukiwanej treści 
+• konstrukcja indeksu 
+• definicje atrybutów skalarnych, wektorowych, organizacja indeksu, jego implementacje, 
+struktury, wymagania wydajnościowe, ograniczenia pamięciowe; organizacja danych i 
+zasobów (pamięć, czas), listy obiektowe, kontrola dostępu do zasobów, aktualizacja 
+zasobów i ich specjalistyczny opis 
+• deskryptory opisu treści (wybrane) 
+• deskryptory obrazów, dźwięku, wektorowe, hybrydowe, inne; integracja i optymalizacja 
+zespołu deskryptorów 
+• dostosowanie schematów wyszukiwania do modelu użytkowego 
+• po kategoriach, anotacjach, słowach kluczowych;  zapytania przez przykład, klasyfikacja 
+zapytań na podstawie charakterystyki obiektów, interpretacja, wspomaganie decyzji 
+ 
+Przykładowe formy realizacji 
+• analiza rodzaju, formy wyszukiwanej informacji zależnie od rodzaju danych, ich 
+przeznaczenia, formy wykorzystania; użycie wcześniej zdobytej wiedzy nt. ekstrakcji i 
+charakterystyki informacji w określonej formie danych/sygnałów oraz wobec potrzeb 
+odbiorcy informacji; wybór konkretnego zastosowania, realnych postaci zarządzanych danych, 
+zdobycie reprezentatywnych zasobów; określenie oczekiwań użytkownika 
+• określenie relacji pomiędzy strukturą i formą implementacji indeksu, rodzajem 
+przeglądanych danych, specyfiką wyszukiwanej informacji, oczekiwaną postacią interfejsu 
+oraz scenariuszem użytkowania; uwzględnienie możliwości doboru parametrów wyszukiwania, 
+sprzężeniem zwrotnym (relevance feedback) i zawartością bazy danych (kontrola zasobów, 
+rozbudowa, preselekcja, redundancja) 
+• przegląd i charakterystyka możliwych do wykorzystania deskryptorów, zależnie od 
+zdefiniowanego przedmiotu i celu indeksowania, organizujących indeks i decydujących o 
+poznawczych walorach wyszukiwania; dobór i weryfikacja deskryptorów zgodnie z przyjętymi 
+kryteriami wyszukiwania, rodzajem informacji, specyfiką zróżnicowań treści, a także według 
+zdefiniowanej miary podobieństwa treści 
+• testowanie różnych scenariuszy wyszukiwania, ocena i ewentualnej korekta dostępnych 
+parametrów indeksowania i przeszukiwania (deskryptory, reprezentacje obiektów 
+bazodanowych), mechanizmy przeglądarki, analiza podobieństwa, zasady porządkowania treści, 
+wyliczanie efektywności wyszukiwania zależnie od przyjętej organizacji zapytań  
+ 
+Przykładowe narzędzia 
+• wybrane funkcje i biblioteki Matlaba (Signal Processing Toolbox, Image Processing 
+Toolbox, Optimization toolbox, Statistics and Machine Learning Toolbox)  
+• matlabowy framework do wyszukiwania obrazów: 
+https://www.mathworks.com/help/vision/ug/image-retrieval-using-customized-bag-of-
+features.html (można testować różne deskryptory i funkcje podobieństwa) 
+• https://www.mathworks.com/help/vision/ug/image-retrieval-with-bag-of-visual-
+words.html 
+• https://www.mathworks.com/matlabcentral/fileexchange/42008-content-based-image-
+retrieval 
+• https://www.mathworks.com/help/vision/ref/evaluateimageretrieval.html 
+• https://medium.com/sicara/keras-tutorial-content-based-image-retrieval-convolutional-
+denoising-autoencoder-dc91450cc511 
+• http://orpheus.ee.duth.gr/anaktisi/ 
+• http://www.akiwi.eu/ 
+• https://en.wikipedia.org/wiki/List_of_CBIR_engines 
+ 
+
+Wyszukiwarki sieciowe:  
+VideoGoogle http://www.robots.ox.ac.uk/~vgg/research/vgoogle  
+CIRES http://amazon.ece.utexas.edu/~qasim/research.htm  
+MUVIS http://muvis.cs.tut.fi 
+Tiltomo http://www.tiltomo.com 
+Retrievr http://labs.systemone.at/retrievr/  
+http://xcavator.net  
+TinEye http://www.tineye.com  
+LAB5: WYKORZYSTANIE INFORMACJI 
+• eksperymentalna weryfikacja użytkowych (pragmatycznych) walorów przekazu 
+informacji - testy realnych systemów i narzędzi zarządzania informacją poprzez ocenę 
+przydatności dla odbiorcy  
+• testowanie wybranych przykładów  
+• multimedia, dydaktyczne, sportowe, filmowe, biznesowe itp. 
+• wspomaganie określonych procedur medycznych, automatyczne interpretacje stanu 
+zdrowia, wskazywanie największych zagrożeń, podpowiadanie leków, formułowanie 
+ocen diagnostycznych, podpowiedzi konkretnych form terapii, rehabilitacji itd..  
+• ocena wartości użytkowej dostarczanej informacji 
+• modele użytkownika, ustalenie spodziewanych efektów praktycznych związanych ze 
+wykorzystaniem podanej/sformułowanej informacji 
+• ustalanie wzorca Ground Truth (GT), czyli poprawnych skutków działań odbiorcy 
+• ocena reprezentatywności modelu (zasobów uczących, deskryptorów, reguł 
+decyzyjnych i poznawczych) i metody oraz formy konstruowania podpowiedzi  
+• procedury możliwie realnych i zupełnych testów, metody analizy wyników, 
+obiektywne wskaźniki efektywności, formułowane wnioski 
+ 
+Przykładowe formy realizacji 
+• przygotowanie efektywnej weryfikacji narzędzi, metod, systemów dostarczających realne, 
+istotne informacje w wybranych zastosowaniach; istotny jest tutaj konkretny, wartościowy 
+model użytkowy, według którego odbiorca informacji ma wykonać skutecznie określone, 
+niebanalne, najlepiej ambitne zadanie; trzeba wybrać przedmiot działania odbiorcy, 
+zaplanować konkretny eksperyment w warunkach możliwe zbliżonych do rzeczywistych, 
+ustalić procedury testu działań na podstawie informacji według obowiązujących procedurę, 
+przy typowej formie podejmowania decyzji/formowania ocen/wskazania rozwiązania itp. 
+• można skorzystać z zamieszczonych narzędzi, które odnoszą się do ambitnych zadań 
+diagnostyki medycznej; można potraktować je jedynie jako przykład i wybrać zupełnie inny 
+problem, do którego trzeba dopasować właściwe narzędzie formujące przekaz informacji o 
+wspomnianych walorach (np. można wykorzystać webowe narzędzia do rozpoznawania 
+określonych chorób, sugerujących dietę czy przypisujących osoby do określonych profili 
+psychologicznych itd.; można też wykorzystać narzędzia użyte do realizacji poprzednich 
+ćwiczeń) 
+• procedury przeprowadzenia eksperymentów powinny być sformalizowane, możliwie 
+obiektywne, realne, zaś wykorzystane wskaźniki skuteczności, a następnie analiza wyników i 
+wyciąganie wniosków powinny dać możliwie wiarygodną ocenę pragmatyczną badanego 
+przekazu informacji. 
+Ocena użyteczności 
+Ocena użyteczności przekazywanych danych dotyczy weryfikacji przekazu informacji ze 
+względu na jego użyteczność w obliczu konkretnego zastosowania 
+Użyteczność rozumiana jest tutaj jako przydatność odczytywanej informacji w realizacji 
+określonego zadania, mierzona najczęściej sprawnością realizacji tego zadania. 
+Przykładowo, w medycznej diagnostyce obrazowej ocena użyteczności dotyczy 
+rozpoznania w obrazie symptomów określonej patologii  
+Procedura oceny może polegać na detekcji określonej treści (obiektu, właściwości) w 
+zbiorze danych testowych, a analizę wyników można przeprowadzić z wykorzystaniem 
+krzywej ROC, korzystając z pomocy specjalistów danej dziedziny lub też ogólnie 
+znawców przedmiotu 
+ Przydatne narzędzia 
+- IMLAB, CXIMAGE,  
+- VirtualDub,   
+- MSU Video Quality Measurement Tool 
+- MSU perceptual video quality 
+ 
+Przykładowe narzędzia 
+• MammoViewer, czyli narzędzie do wspomagania diagnostyki raka sutka, wykorzystujące 
+różne formy przetwarzania, analizy i interpretacji obrazów na użytek badań 
+przesiewowych; wskazanie symptomów raka i ich klasyfikacja ma pomóc diagnoście w 
+badaniach wstępnych, a decyzja dotyczy konieczności wykonania biopsji weryfikującej 
+obecność nowotworu; 
+• StrokeMonitor to ekstraktor cech lokalnej hipodensyjności w obrazach tomografii 
+komputerowej (CT) głowy celem wykrycia wczesnych symptomów udaru niedokrwiennego 
+mózgu; rozpoznanie stref niedokrwienia ma ułatwić decyzję dotyczącą konieczności 
+wykonania w trybie pilnym leczenia ratującego w postaci trombolizy (ewentualnie 
+trombektomii)  
+• pakiet ImageJ umożliwiający różnorakie formy przetwarzania i analizy obrazów 
+ułatwiających i wspierających interpretacje informacji obrazowej w konkretnym 
+zastosowaniu 
+ 
+

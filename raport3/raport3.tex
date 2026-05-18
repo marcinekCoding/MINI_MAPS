@@ -1,0 +1,138 @@
+\documentclass[14pt,a4paper]{extarticle}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\pgfplotsset{compat=1.18}
+\geometry{margin=2.5cm}
+\setlength{\headheight}{17pt}
+
+\begin{document}
+
+% Front page
+\begin{titlepage}
+    \thispagestyle{empty}
+    \centering
+
+    \vspace*{1.1cm}
+    \includegraphics[width=0.82\textwidth]{logo_mini.png}\par
+
+    \vspace{1.7cm}
+    {\fontsize{20}{24}\selectfont\textsc{Podstawy Teorii Informacji}\par}
+
+    \vspace{1.0cm}
+    {\Large Laboratorium 3\par}
+
+    \vspace{0.25cm}
+    {\large Raport projektowy MiniInfo\par}
+
+    \vspace{1.1cm}
+    \rule{0.9\textwidth}{0.5pt}
+    \vspace{0.55cm}
+
+    {\LARGE\bfseries
+    MiniInfo - Raport 3: Ekstrakcja informacji
+    \par}
+
+    \vspace{0.55cm}
+    \rule{0.9\textwidth}{0.5pt}
+
+    \vfill
+    {\Large \textbf{Autorzy}\par}
+    \vspace{0.25cm}
+    {\large
+    Goran Pangełow\par
+    Marcin Pawlak\par
+    Mikołaj Pesta\par
+    Ignacy Drężek\par
+    Iga Oleksiewicz\par
+    Maks Młynarczyk\par}
+
+    \vspace{0.45cm}
+    {\large \today\par}
+\end{titlepage}
+
+% Contents page
+\tableofcontents
+\clearpage
+
+% Header and footer style (excluding title page)
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize Podstawy Teorii Informacji}
+\rhead{\footnotesize ETAP III}
+\lfoot{\footnotesize Wydział Matematyki i Nauk Informacyjnych}
+\rfoot{\footnotesize \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\section{Sprostowanie i poprawa Raportu 2}
+
+% TODO dla jednej z osób: Odnieść się do uwag z Raportu 2 i napisać, co zostało poprawione w założeniach systemu.
+W związku z konstruktywnymi uwagami uzyskanymi po ocenie drugiego raportu, dokonaliśmy niezbędnych korekt i doprecyzowań w przyjętym modelu ewaluacji i definicji semantycznej danych... [DO UZUPEŁNIENIA: Należy tutaj krótko opisać, jakie błędy/nieścisłości wytknął prowadzący w Raporcie 2 i jak naprawiliście te kwestie przed przejściem do badań z Raportu 3].
+
+\section{Wstęp do etapu trzeciego: Potok ekstrakcji informacji}
+
+W Raporcie 2 zdefiniowaliśmy syntaktyczne oraz semantyczne ramy systemu „MINI Info”, którego zadaniem jest dostarczanie pragmatycznej wiedzy o zajętości stref nauki (np. pokoju JetBrains) na ekrany w lobby. Potwierdziliśmy skuteczność wykorzystania czujników fal milimetrowych (mmWave) ze względu na ochronę prywatności (brak danych RODO) w porównaniu do kamer CCTV. Obliczyliśmy także entropię układu oraz zaprojektowaliśmy system transmisji oparty o MQTT.
+
+Niniejszy raport (Etap 3) stanowi bezpośrednią kontynuację naszych prac i skupia się na procesie zdefiniowanym jako \textbf{Ekstrakcja informacji}. O ile Raport 2 określał, *dlaczego* zbieramy takie a nie inne sygnały, o tyle Raport 3 analizuje wnikliwie, *w jaki sposób* nasz system technicznie wydobywa wartość z chaosu surowych odczytów radiowych. Aby zrealizować to zadanie rzetelnie i zminimalizować interferencje między poszczególnymi metodami obliczeniowymi, zaprojektowaliśmy ścisły potok przetwarzania danych (ang. \textit{data pipeline}). 
+
+Rozdziały w tym raporcie to w rzeczywistości kolejne węzły tego potoku: począwszy od sprzętowej filtracji szumów wejściowych radaru, przez przestrzenną ekstrakcję sylwetek studentów, aż po bezstratną kompresję ostatecznej wiedzy z użyciem algorytmów strumieniowych.
+
+\section{Symulacja zakłóceń i filtracja sygnałów z czujników mmWave (Przetwarzanie celem ekstrakcji)}
+
+\subsection{Charakterystyka szumu w detekcji radiowej na Wydziale MiNI}
+% TODO dla Osoby 1: Opisać, skąd w ogóle biorą się błędne odczyty.
+% Wskazówki: Wentylatory z laptopów, ruch gałęzi za oknem, mikro-odkształcenia strukturalne szafek, nakładanie się na siebie ludzi. 
+W środowisku rzeczywistym, takim jak sale nauki na Wydziale, sprzęt zbierający dane nigdy nie dostarcza sygnału idealnego. Radary mmWave działają w oparciu o efekt Dopplera i mapowanie chmury punktów (point cloud), co czyni je wrażliwymi na... [DO UZUPEŁNIENIA].
+
+\subsection{Symulacja zniekształceń sygnału wejściowego}
+% TODO dla Osoby 1: Wygenerowanie sztucznego szumu na przygotowanym, idealnym sygnale bazowym.
+Na potrzeby eksperymentalne zdefiniowaliśmy bazowy strumień danych dla sali JetBrains reprezentujący 10 osób siedzących w bezruchu przez 60 minut. Następnie na sygnał nałożono losowy szum gaussowski oraz symulowane szpilki błędów (artefakty), imitujące... [DO UZUPEŁNIENIA: wzory lub opis, wykres zaszumionego sygnału].
+
+\subsection{Metody redukcji i filtry wygładzające}
+% TODO dla Osoby 1: Opis i testowanie filtrów. Np. filtr medianowy do usuwania szpilek, filtr dolnoprzepustowy.
+W celu estymacji zakłóceń zastosowano filtrację. Odrzucono krótkotrwałe skoki odczytów powyżej 500\% różnicy (artefakty). Dla łagodnego szumu tła zaimplementowano... [DO UZUPEŁNIENIA]. Uzyskany w ten sposób oczyszczony ciąg syntaktyczny przekazywany jest do kolejnej warstwy analitycznej.
+
+\section{Segmentacja przestrzeni i ekstrakcja obiektów zainteresowania (Aproksymacja treści)}
+
+\subsection{Założenia segmentacji obszarowej w sali}
+% TODO dla Osoby 2: Opisać, w jaki sposób dzielicie fizyczny pokój (np. na krzesła i ciąg pieszy).
+Oczyszczony strumień danych fizycznych to wciąż jedynie zbiór odbić przestrzennych, który sam w sobie nie informuje o zajętości miejsc pracy. Aby dokonać poprawnej aproksymacji treści, należy zdefiniować regiony zainteresowania (ang. \textit{Region of Interest - ROI}). W modelu pokoju JetBrains wydzielono... [DO UZUPEŁNIENIA].
+
+\subsection{Algorytm ekstrakcji sylwetek}
+% TODO dla Osoby 2: Jak zamienić odbicia radiowe w oznaczonych ROI na liczbę studentów?
+Mając wyznaczone strefy, system dokonuje ekstrakcji lokalnych skupisk punktów. Wykorzystano tutaj aproksymację nieliniową, która polega na... [DO UZUPEŁNIENIA: np. algorytmy klasteryzacji DBSCAN / k-means lub proste progi gęstości w danym obszarze].
+
+\subsection{Interpretacja sceny na potrzeby użytkownika}
+% TODO dla Osoby 2: Wynik końcowy - ostateczna liczba studentów w danej minucie.
+W wyniku segmentacji udaje się wykluczyć przemieszczającego się korytarzem wykładowcę, skupiając się wyłącznie na obiektach, których cechy (brak translacji, obecność mikroruchów oddychania) pasują do siedzącego studenta. Na tym etapie wiedza staje się liczbą całkowitą, np. 14 studentów.
+
+\section{Selektywny przesył i kompresja informacji (Kompresja z selekcją)}
+
+\subsection{Uwarunkowania przesyłu i redundancja stanów}
+% TODO dla Osoby 3: Odwołanie się do Raporu 2 (ok 75% nadmiarowości w ujęciu entropii Shannona). Cel: wysyłać tylko to co niezbędne.
+Wyekstrahowana wiedza o zajętości musi ostatecznie trafić na główny serwer MQTT połączony z wyświetlaczami w budynku. Jak wykazano w Raporcie 2, przy statycznych godzinach nauki, stany (np. Zielony, Żółty) mogą utrzymywać się przez dziesiątki minut, co generuje ogromną nadmiarowość. W tym kroku następuje organizacja indeksu i optymalizacja struktury danych [DO UZUPEŁNIENIA].
+
+\subsection{Metody kompresji bezstratnej sygnałów dyskretnych}
+% TODO dla Osoby 3: Zastosowanie kodowania strumieniowego lub słownikowego (Huffman / arytmetyczne / LZW) do spakowania bazy logów dziennych dla administratora wydziału.
+Dla celów archiwizacji logów dobowych z całego wydziału (istotne dla analiz długoterminowych) system kompresuje wynikowe raporty z użyciem kodu... [DO UZUPEŁNIENIA: wybór i krótki opis kodu, np. algorytm Huffmana dopasowany do prawdopodobieństw stanów wyliczonych w reporcie 2].
+
+\subsection{Eksperymentalna ocena wydajności (Rate-Distortion)}
+% TODO dla Osoby 3: Porównanie wagi logów przed kompresją i po kompresji na serwerze Raspberry Pi, ewentualnie ocena ile pakietów MQTT udaje się obciąć dzięki inteligentnemu odpytywaniu.
+Ostateczna efektywność potoku została zweryfikowana empirycznie. Dzięki zastosowaniu selektywnego informowania tylko o zmianach krytycznych oraz dzięki wysokiej kompresji plików archiwizacyjnych, dobowy rozmiar wygenerowanych danych dla całego budynku zmniejszono o... [DO UZUPEŁNIENIA].
+
+\section{Podsumowanie i wnioski z etapu trzeciego}
+W toku realizacji laboratoriów trzecich udowodniono, że użyteczna wartość pragmatyczna (kolorowy kafelek na ekranie monitora) nie jest procesem bezpośrednim, a wymaga wdrożenia wieloetapowego filtru analitycznego. Podział zagadnień ekstrakcji danych na trzy wyspecjalizowane kroki (filtracja falowa, segmentacja i aproksymacja treści, optymalna pod kątem entropii sieć dystrybucyjna) tworzy potok przetwarzania pozwalający uzyskać czystą wiedzę decyzyjną, oferując jednocześnie znacząco niższe obciążenie sieciowe niż systemy wideo, z którymi MiniInfo konkurencyjnie się zestawia.
+
+\end{document}
