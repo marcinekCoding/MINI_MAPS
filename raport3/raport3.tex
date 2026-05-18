@@ -133,16 +133,66 @@ W celu estymacji zakłóceń zastosowano filtrację. Odrzucono krótkotrwałe sk
 \section{Segmentacja przestrzeni i ekstrakcja obiektów zainteresowania (Aproksymacja treści)}
 
 \subsection{Założenia segmentacji obszarowej w sali}
-% TODO dla Osoby 2: Opisać, w jaki sposób dzielicie fizyczny pokój (np. na krzesła i ciąg pieszy).
-Oczyszczony strumień danych fizycznych to wciąż jedynie zbiór odbić przestrzennych, który sam w sobie nie informuje o zajętości miejsc pracy. Aby dokonać poprawnej aproksymacji treści, należy zdefiniować regiony zainteresowania (ang. \textit{Region of Interest - ROI}). W modelu pokoju JetBrains wydzielono... [DO UZUPEŁNIENIA].
+W systemie opartym na radarach fal milimetrowych (mmWave), sygnał oznaczający obecność osób nie jest standardowym obrazem wideo. Czujnik zwraca jedynie przestrzenną chmurę punktów (odbitych mikrofal). Aby wydobyć z niej użyteczną informację, dzielimy fizyczną przestrzeń pokoju (np. Strefę JetBrains) na zdefiniowane wcześniej regiony zainteresowania (ang. \textit{Regions of Interest} – ROI).
+
+Dzięki temu nie musimy śledzić każdego ruchu w całej sali. System skupia się tylko na tych strefach, które definiują "zajęte miejsce" (krzesła, biurka, kanapy), a ignoruje ciągi komunikacyjne (np. środek pokoju czy korytarz wejściowy). Takie podejście pozwala już na najniższym poziomie odrzucić niepotrzebne tło i skupić się na właściwej informacji.
 
 \subsection{Algorytm ekstrakcji sylwetek}
-% TODO dla Osoby 2: Jak zamienić odbicia radiowe w oznaczonych ROI na liczbę studentów?
-Mając wyznaczone strefy, system dokonuje ekstrakcji lokalnych skupisk punktów. Wykorzystano tutaj aproksymację nieliniową, która polega na... [DO UZUPEŁNIENIA: np. algorytmy klasteryzacji DBSCAN / k-means lub proste progi gęstości w danym obszarze].
+Mając przygotowaną mapę ROI, urządzenie przechodzi do właściwej ekstrakcji danych. Zamiast skomplikowanego rozpoznawania obrazu, system po prostu grupuje przestrzenne odbicia radarowe, które zachowują się jak ludzka sylwetka (wykrywa m.in. rytmiczne mikro-ruchy klatki piersiowej przy oddychaniu, co pozwala odróżnić żywego człowieka od pracującego wentylatora).
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=10cm, height=6.5cm,
+            xlabel={Współrzędna X [m]},
+            ylabel={Współrzędna Y [m]},
+            grid=both,
+            legend pos=outer north east,
+            scatter/classes={
+                osoba1={mark=*,blue},
+                osoba2={mark=square*,red},
+                szum={mark=x,gray}
+            }
+        ]
+        \addplot[scatter,only marks,scatter src=explicit symbolic]
+        coordinates {
+            (1.0, 2.0) [osoba1] (1.1, 2.1) [osoba1] (0.9, 1.9) [osoba1] (1.05, 1.95) [osoba1] (0.95, 2.05) [osoba1]
+        };
+        \addplot[scatter,only marks,scatter src=explicit symbolic]
+        coordinates {
+            (-1.5, 3.0) [osoba2] (-1.4, 3.1) [osoba2] (-1.6, 2.9) [osoba2] (-1.45, 2.95) [osoba2] (-1.55, 3.05) [osoba2]
+        };
+        \addplot[scatter,only marks,scatter src=explicit symbolic]
+        coordinates {
+            (0, 1) [szum] (2, 3) [szum] (-2, 1) [szum] (1.5, 4) [szum] (-1, 0.5) [szum] (0.5, 2.5) [szum] (2.5, 1.5) [szum] (-2.5, 3.5) [szum]
+        };
+        \legend{Osoba 1, Osoba 2, Szum tła}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Wizualizacja ekstrakcji sylwetek: grupowanie zagęszczonych odbić radarowych na tle rzadkiego szumu otoczenia.}
+    \label{fig:mmwave_clusters}
+\end{figure}
+
+Z punktu widzenia Teorii Informacji jest to proces silnej selekcji danych. Sensor mmWave odfiltrowuje szum oraz tzw. efekt pustego przelotu (np. rzucony plecak lub osobę tylko przechodzącą przez salę). Na wyjściu otrzymujemy po prostu dyskretną wartość liczbową, która mówi nam, ile sylwetek znajduje się aktualnie w oznaczonych strefach ROI.
 
 \subsection{Interpretacja sceny na potrzeby użytkownika}
-% TODO dla Osoby 2: Wynik końcowy - ostateczna liczba studentów w danej minucie.
-W wyniku segmentacji udaje się wykluczyć przemieszczającego się korytarzem wykładowcę, skupiając się wyłącznie na obiektach, których cechy (brak translacji, obecność mikroruchów oddychania) pasują do siedzącego studenta. Na tym etapie wiedza staje się liczbą całkowitą, np. 14 studentów.
+Sama wyekstrahowana liczba osób (np. 15 stabilnych detekcji w ROI) to jeszcze nie jest końcowa wiedza dla użytkownika. Trzeba ją zinterpretować pod kątem potrzeb studentów na Wydziale MiNI. System nie analizuje dokładnych pozycji ludzi (byłoby to nadmiarowe i naruszało prywatność), lecz skupia się na stopniu zapełnienia sali.
+
+Interpretacja polega na odniesieniu liczby wykrytych sylwetek do maksymalnej pojemności danego pomieszczenia. Zajętość względna $O$ wyraża się wzorem:
+\begin{equation}
+    O = \frac{N_{\text{detekcji}}}{C_{\text{max}}} \cdot 100\%
+\end{equation}
+gdzie $N_{\text{detekcji}}$ to liczba osób zmierzona przez radar, a $C_{\text{max}}$ to pojemność udostępnionych stref ROI. To zestawienie pozwala systemowi wygenerować ostateczny komunikat dla studenta, mapując procenty za pomocą prostej funkcji progowej:
+\begin{equation}
+    \text{Status} = 
+    \begin{cases} 
+    \text{Wolne}, & \text{dla } O < 30\% \\
+    \text{Umiarkowany ruch}, & \text{dla } 30\% \le O < 75\% \\
+    \text{Prawie pełny}, & \text{dla } O \ge 75\% 
+    \end{cases}
+\end{equation}
+W ten sposób mocno rozproszone dane z czujników mikrofalowych są kompresowane do pojedynczego, użytecznego komunikatu pragmatycznego, który można wyświetlić na monitorach w holu.
 
 \section{Selektywny przesył i kompresja informacji (Kompresja z selekcją)}
 
