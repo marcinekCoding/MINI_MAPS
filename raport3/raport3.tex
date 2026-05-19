@@ -177,8 +177,7 @@ Wizualizację wygenerowanego sygnału referencyjnego na tle zaszumionych odczyt�
 % [MIEJSCE NA WYKRES 1: SYGNAŁ ZASZUMIONY]
 \begin{figure}[H]
     \centering
-    % TODO: Podmienić poniższą linijkę na właściwy wykres, gdy zostanie dostarczony (np. \includegraphics[width=0.8\textwidth]{wykres1.png})
-    \fbox{\rule{0pt}{6cm}\rule{10cm}{0pt}}
+    \includegraphics[width=1.0\textwidth]{Analiza Syntaktyczna - Salka 15os.png}
     \caption{Zamodelowany sygnał referencyjny $x_{\text{ideal}}[n]$ oraz wygenerowany sygnał zaszumiony $x_{\text{raw}}[n]$ z widocznymi fluktuacjami i błędami grubymi.}
     \label{fig:sygnal_zaszumiony}
 \end{figure}
@@ -208,8 +207,7 @@ Z perspektywy ekstrakcji obiektów zainteresowania z danych radaru mmWave, jest 
 % [MIEJSCE NA WYKRES 2: WYNIKI FILTRACJI]
 \begin{figure}[H]
     \centering
-    % TODO: Podmienić poniższą linijkę na właściwy wykres, gdy zostanie dostarczony (np. \includegraphics[width=0.8\textwidth]{wykres2.png})
-    \fbox{\rule{0pt}{6cm}\rule{10cm}{0pt}}
+    \includegraphics[width=1.0\textwidth]{Porównanie Filtrów - Ekstrakcja.png}
     \caption{Porównanie działania filtru średniej kroczącej oraz filtru medianowego na zaszumionym sygnale.}
     \label{fig:wyniki_filtracji}
 \end{figure}
@@ -242,7 +240,14 @@ Filtr Medianowy 1D & 5 próbek & 0.33 & 20.03 \\ \hline
 \end{tabular}
 \end{table}
 
-Jak wynika z analizy metryk, oba filtry znacząco zredukowały błąd pomiarowy względem surowego odczytu z czujników. W ogólnym rozrachunku średniokwadratowym (MSE) filtr średniej kroczącej uzyskał wynik nieznacznie lepszy, co jest zasługą idealnego niwelowania szumu o rozkładzie normalnym w długim oknie czasowym. Filtr medianowy zachował jednak wysoką skuteczność eliminacji artefaktów punktowych, co w dziedzinie czasu i interpretacji dynamiki przepływu osób jest kluczowe, mimo nieznacznie niższego stosunku sygnału do szumu (SNR). Wnioskujemy zatem, że w dalszych pracach projektowych docelowym wdrożeniem optymalizacyjnym (pod kątem pragmatyki użytkownika końcowego) powinno stać się rozwiązanie hybrydowe, wykorzystujące szeregowe połączenie obu tych metod.
+Jak wynika z analizy metryk, oba filtry znacząco zredukowały błąd pomiarowy względem surowego odczytu z czujników. W ogólnym rozrachunku średniokwadratowym (MSE) filtr średniej kroczącej uzyskał wynik nieznacznie lepszy, co jest zasługą idealnego niwelowania szumu o rozkładzie normalnym w długim oknie czasowym. Filtr medianowy zachował jednak wysoką skuteczność eliminacji artefaktów punktowych, co w dziedzinie czasu i interpretacji dynamiki przepływu osób jest kluczowe, mimo nieznacznie niższego stosunku sygnału do szumu (SNR). Wnioskujemy zatem, że w dalszych pracach projektowych docelowym wdrożeniem optymalizacyjnym (pod kątem pragmatyki użytkownika końcowego) powinno stać się rozwiązanie hybrydowe, wykorzystujące szeregowe połączenie obu tych metod. Wynik działania takiej kaskadowej filtracji (filtr medianowy usuwający "szpilki", a następnie średnia ruchoma wygładzająca resztę) wizualizuje Rysunek \ref{fig:filtracja_kaskadowa}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Filtracja Kaskadowa.png}
+    \caption{Proponowane hybrydowe rozwiązanie optymalizacyjne: filtracja kaskadowa łącząca zalety filtru medianowego i średniej kroczącej.}
+    \label{fig:filtracja_kaskadowa}
+\end{figure}
 
 \section{Segmentacja przestrzeni i ekstrakcja obiektów zainteresowania (Aproksymacja treści)}
 
