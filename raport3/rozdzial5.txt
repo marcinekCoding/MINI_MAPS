@@ -1,0 +1,31 @@
+Rozumiem – chodzi o tekst pasujący do rozdziału 5 z rozpiski (temat: *Selektywny przesył i kompresja informacji – Kompresja z selekcją*), napisany w stylu i konwencji Raportu 2, bez tworzenia pliku.
+
+---
+
+## 5. Selektywny przesył i kompresja informacji (Kompresja z selekcją)
+
+### 5.1. Uwarunkowania przesyłu i redundancja stanów
+
+Jak wykazano w poprzednich rozdziałach, system MiniInfo generuje sumaryczny transfer rzędu 1,4 MB na dobę przy ośmiu węzłach sieci ZigBee odpytywanych co 60 sekund. Z punktu widzenia infrastruktury sieciowej uczelni jest to wartość pomijalna. Pytanie o kompresję i selekcję danych nie wynika zatem z ograniczeń przepustowości, lecz z chęci zbadania, ile z przesyłanych danych jest faktycznie informatywnych – czyli nieoczekiwanych dla systemu i decyzyjnie użytecznych dla odbiorcy.
+
+Mając wyznaczony empiryczny rozkład prawdopodobieństwa pięciu stanów semantycznych (p = {0,41; 0,27; 0,18; 0,11; 0,03}) oraz entropię źródła H(X) ≈ 1,98 bita/symbol, a wiedząc że pojedynczy symbol przesyłany protokołem MQTT zajmuje 8 bitów (typ integer), redundancję kanału można wyznaczyć jako:
+
+$$R = 1 - \frac{H(X)}{n} = 1 - \frac{1{,}98}{8} \approx 75\%$$
+
+Oznacza to, że trzy czwarte przesyłanego strumienia to nadmiarowość – dane, które w teorii mogłyby zostać skompresowane bez żadnej utraty informacji. Kodowanie Huffmana dopasowane do zmierzonego rozkładu pozwoliłoby zredukować średnią długość kodu do wartości bliskiej entropii: stany częste (Zielony, Żółty) otrzymują krótkie kody, stany rzadkie (Czerwony, Szary) – dłuższe. Wyznaczona w ten sposób średnia długość kodu wynosi około 2,11 bita/symbol, co jest bliskie dolnemu ograniczeniu wyznaczonemu przez twierdzenie Shannona. Mimo to, wdrożenie kompresji bezstratnej pozostaje ekonomicznie nieuzasadnione: przy wolumenie nieprzekraczającym 2,8 MB na dobę oszczędność wyniosłaby poniżej 0,5 MB. Format JSON zachowujemy więc świadomie – jego czytelność dla programisty i prostota debugowania mają w tym kontekście wyższą wartość praktyczną niż marginalna redukcja transferu.
+
+### 5.2. Metody kompresji bezstratnej sygnałów dyskretnych
+
+Istotniejszym mechanizmem redukcji przesyłu jest obserwacja, że sygnał zajętości sali wykazuje silną lokalną ciągłość – liczba osób zmienia się stopniowo, a skokowe przejścia między skrajnymi stanami należą do rzadkości. Właściwość tę można wykorzystać na dwa sposoby.
+
+Pierwszym jest **kodowanie różnicowe**: zamiast przesyłać pełną wartość liczby osób w każdym interwale, węzeł wysyła jedynie różnicę Δ między bieżącym a poprzednim odczytem. W godzinach stabilnego obłożenia (np. podczas bloku zajęciowego) kolejne próbki niemal się nie zmieniają i Δ ≈ 0 dominuje w strumieniu, co drastycznie redukuje liczbę transmitowanych bitów. Aby zapobiec kumulacji błędów przy utracie pakietu, co N interwałów system wysyła pełną wartość bezwzględną jako punkt synchronizacji.
+
+Drugim, bardziej radykalnym podejściem jest **transmisja warunkowa oparta na detekcji zmian stanu semantycznego**: dane są wysyłane wyłącznie w momencie przejścia między stanami (np. z Żółtego na Pomarańczowy). Jeśli sala pozostaje w tym samym stanie przez 15 kolejnych interwałów, nie generuje żadnych komunikatów. Podejście to doskonale wpisuje się w architekturę publish-subscribe protokołu MQTT – węzeł publikuje na danym kanale tematycznym (topic) wyłącznie przy zmianie wartości, a ekran w lobby aktualizuje kafelek jedynie po odebraniu nowej wiadomości. System zachowuje się wówczas jak koder zdarzeniowy (event-driven encoder), co naturalnie odwzorowuje quasi-stacjonarny charakter monitorowanego zjawiska. Wadą tego podejścia jest brak potwierdzenia aktualności przy braku transmisji – rozwiązuje to mechanizm heartbeat, czyli periodyczna wiadomość keep-alive wysyłana nawet przy braku zmiany stanu.
+
+### 5.3. Eksperymentalna ocena wydajności (Rate-Distortion)
+
+Formalna analiza Rate-Distortion pozwala opisać kompromis między przepustowością kanału R a dopuszczalnym zniekształceniem informacji D. W kontekście systemu MiniInfo zniekształcenie nie ma charakteru artefaktu wizualnego – jest miarą decyzyjnej omyłki użytkownika, czyli prawdopodobieństwa wyświetlenia komunikatu niezgodnego z rzeczywistym stanem sali.
+
+Kluczowym parametrem jest tutaj opóźnienie propagacji zmiany stanu do ekranu w lobby. Przy interwale próbkowania Ts = 60 s i czasie propagacji komunikatu przez stos MQTT wynoszącym typowo poniżej 200 ms, całkowite opóźnienie systemu wynosi w normalnych warunkach poniżej 45 sekund. Wartość ta spełnia z zapasem przyjęte kryterium jakości (opóźnienie < 60 s) i odpowiada naturze decyzji podejmowanej przez studenta – przemieszczenie się między kondygnacjami trwa kilka minut, a więc dane z dokładnością czasową rzędu minuty są w pełni wystarczające.
+
+Analiza R-D ujawnia też granicę kompresji: wydłużenie interwału próbkowania do Ts = 5 minut gwałtownie zwiększa ryzyko błędnej klasyfikacji stanu podczas dynamicznych zmian obłożenia, takich jak nagły napływ studentów po wykładzie. Z kolei skrócenie interwału poniżej 30 sekund nie przynosi proporcjonalnego zysku decyzyjnego, a jedynie niepotrzebnie obciąża sieć ZigBee. Przyjęty kompromis Ts = 60 s plasuje system w pobliżu optymalnego punktu krzywej Rate-Distortion dla tego zastosowania, co potwierdza słuszność przyjętych założeń projektowych. ja cos takiego

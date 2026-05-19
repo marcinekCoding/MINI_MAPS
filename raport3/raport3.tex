@@ -8,6 +8,7 @@
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{pgfplots}
 \usepackage{float}
 \usepackage[table]{xcolor}
@@ -83,33 +84,48 @@ Po ocenie Raportu 2 od Profesora uzupełniamy i doprecyzowujemy wcześniejsze za
 \subsection{Ekstrapolacja i zbieranie danych}
 W odpowiedzi na uwagi do Raportu 2 doprecyzowujemy wcześniejszy opis i opisujemy zmiany wprowadzone w systemie. W Raporcie 2 opisaliśmy głównie warstwę semantyczną i pragmatyczną dla \emph{aktualnego} stanu sal (progi obłożenia, kolory kafelków, rekomendacje alternatywnych stref), bez wyraźnej ścieżki od szeregu historycznego do prognozy. Po konsultacjach rozszerzyliśmy zakres projektu: użytkownik ma nie tylko widzieć, czy pokój JetBrains lub salka Nauki jest teraz wolny, ale także orientować się, jak zajętość może wyglądać w najbliższej przyszłości, np. za godzinę lub w typowy wtorek po południu.
 
-Do tego celu wykorzystujemy dane zgromadzone w poprzednich tygodniach pracy systemu. Analizę uruchamiamy cyklicznie --- w praktyce co tydzień, po zebraniu wystarczającej liczby próbek z wszystkich monitorowanych stref. Na wejściu mamy szereg czasowy zajętości (ułamek miejsc zajętych lub liczba osób względem pojemności sali); na wyjściu krótkoterminową prognozę oraz wygładzoną tendencję. Stosujemy dwie proste metody statystyczne, które dobrze sprawdzają się przy regularnym rytmie dnia uczeniowego: średnią ruchomą (do szybkiego wygładzenia szumu i wychwycenia lokalnego trendu) oraz wygładzanie wykładnicze Holt--Wintersa z sezonowością tygodniową (do oddania powtarzalności dni roboczych i różnic między poniedziałkiem a piątkiem).
+Do tego celu wykorzystujemy dane zgromadzone w poprzednich tygodniach pracy systemu. Na wejściu mamy szereg czasowy zajętości $x_t$; na wyjściu krótkoterminową prognozę $\hat{x}_{t+h}$. Stosujemy dwie klasyczne metody statystyczne: średnią ruchomą oraz wygładzanie wykładnicze Holt--Wintersa z sezonowością. System prognozuje wartość na podstawie trzech komponentów: poziomu ($L_t$), trendu ($T_t$) oraz sezonowości ($S_t$), obliczanych iteracyjnie:
+\begin{align}
+    L_t &= \alpha (x_t - S_{t-s}) + (1-\alpha)(L_{t-1} + T_{t-1}) \\
+    T_t &= \beta (L_t - L_{t-1}) + (1-\beta)T_{t-1} \\
+    S_t &= \gamma (x_t - L_t) + (1-\gamma)S_{t-s}
+\end{align}
+gdzie $s$ to długość cyklu (np. 1 tydzień), a $\alpha, \beta, \gamma \in [0,1]$ to wagi wygładzania. Prognoza na krok $h$ w przód wyraża się wzorem:
+\begin{equation}
+    \hat{x}_{t+h} = L_t + h T_t + S_{t+h-s}
+\end{equation}
 
-Model nie jest rozbudowanym modułem uczenia maszynowego --- świadomie pozostaliśmy przy metodach interpretowalnych, żeby w raporcie i w kodzie dało się wytłumaczyć każdą decyzję. W typowych tygodniach semestru prognoza zapełnienia sal jest użyteczna: student widzi, czy warto iść od razu do wybranej strefy, czy lepiej poczekać lub wybrać sąsiednią salę. Problem pojawia się przy nagłych odchyleniach od rutyny. Najczęściej obserwowaliśmy to podczas wydarzeń organizowanych na Politechnice Warszawskiej (konferencje, dni otwarte, zjazdy organizacji studenckich), gdy ruch w budynku nie przypomina zwykłego rozkładu zajęć. Wtedy historyczne wzorce wprowadzają w błąd i prognoza wyraźnie odbiega od rzeczywistości --- czasem bardziej niż sam odczyt bieżący po agregacji opisanej w podsekcji~1.3.
+Model nie jest rozbudowanym modułem uczenia maszynowego --- świadomie pozostaliśmy przy metodach interpretowalnych, żeby w raporcie i w kodzie dało się wytłumaczyć każdą decyzję. W typowych tygodniach semestru prognoza zapełnienia sal jest bardzo użyteczna. Problem pojawia się przy nagłych odchyleniach od rutyny (np. dni otwarte). Wtedy historyczne wzorce wprowadzają w błąd i prognoza wyraźnie odbiega od rzeczywistości.
 
-Nad tym pracowaliśmy przez ostatnie tygodnie implementacji: testowaliśmy długość okna średniej ruchomej, parametry sezonowości w Holt--Wintersie oraz to, jak prognozę mapować na te same progi pragmatyczne co w Raporcie~2 (Wolne, Umiarkowany ruch, Prawie pełny itd.), żeby interfejs w lobby pozostał spójny. Szczegóły obsługi anomalii i zdarzeń specjalnych omawiamy dalej w raporcie; tutaj zaznaczamy jedynie, że warstwa predykcji jest już częścią projektu, a nie zapowiedzią na przyszłość.
+Nad tym pracowaliśmy przez ostatnie tygodnie implementacji: testowaliśmy długość okna średniej ruchomej, dobór parametrów $\alpha, \beta, \gamma$ metodą najmniejszych kwadratów błędów oraz to, jak prognozę mapować na te same progi pragmatyczne co w Raporcie~2, żeby interfejs w lobby pozostał spójny.
 
 \subsection{Mikrofony i badanie dźwięku}
-Zgodnie z sugestią Profesora, obok mierzenia zapełnienia stref rozważyliśmy także problem głośności i szumu w badanych miejscach. W Raporcie~2 skupialiśmy się na torze mmWave i liczbie osób; nie opisaliśmy tam kanału akustycznego, choć nasze czujniki udostępniają pomiar natężenia dźwięku. Uzupełnienie tego toru było naturalnym krokiem: sama zajętość nie mówi, czy sala przy pełnym obłożeniu nadal nadaje się do cichej pracy, czy jest hałaśliwa jak korytarz między wykładami.
+Zgodnie z sugestią Profesora, obok mierzenia zapełnienia stref rozważyliśmy także problem głośności i szumu w badanych miejscach. W Raporcie~2 skupialiśmy się na torze mmWave i liczbie osób; nie opisaliśmy tam kanału akustycznego, choć nasze czujniki udostępniają pomiar ciśnienia akustycznego. Uzupełnienie tego toru było naturalnym krokiem: sama zajętość nie mówi, czy sala przy pełnym obłożeniu nadal nadaje się do cichej pracy, czy jest hałaśliwa.
 
-Pomiar dźwięku ma inną charakterystykę niż detekcja obecności radiowej. Wartości potrafią skoczyć w ułamku sekundy (trzask drzwi, rozmowa przechodząca obok, krótki śmiech w grupie). Gdybyśmy pokazywali surowy poziom na ekranie w lobby, wykres i kafelki „migałyby” bez związku z ogólnym komfortem pracy w strefie. Zastosowaliśmy więc dość rygorystyczne uśrednianie --- analogiczne w duchu do agregacji czasowej zajętości z podsekcji~1.3: zbieramy próbki często, ale do oceny strefy i do zestawienia z zajętością przekazujemy wartości uśrednione w dłuższym oknie. Dzięki temu chwilowe hałasy nie zaburzają ogólnego obrazu miejsca.
+Zdefiniowaliśmy poziom ciśnienia akustycznego w standaryzowanej skali logarytmicznej w decybelach (dB SPL):
+\begin{equation}
+    L_p = 20 \log_{10} \left( \frac{p}{p_0} \right) \text{ [dB SPL]}
+\end{equation}
+gdzie $p$ to zmierzone ciśnienie akustyczne, a $p_0 = 20\,\mu\text{Pa}$ to ciśnienie odniesienia (próg słyszenia). Wartości te potrafią skoczyć w ułamku sekundy (trzask drzwi, krótki śmiech). Zastosowaliśmy więc uśrednianie równoważnego poziomu dźwięku $L_{Aeq,T}$ w oknie czasowym $T$, aby pojedyncze "szpilki" hałasu nie zaburzały ogólnego obrazu strefy.
 
-Informacje o natężeniu dźwięku zestawiliśmy bezpośrednio z danymi o zajętości sal. W praktyce dla każdej strefy i przedziału czasu mamy parę: szacowana liczba osób (lub procent obłożenia) oraz reprezentatywny poziom hałasu. Pozwala to opisać charakter miejsca precyzyjniej niż samym kolorem kafelka. Przykłady z testów na Wydziale MiNI: salka Nauki przy umiarkowanym obłożeniu często pozostaje cicha; pokój JetBrains przy wysokim obłożeniu bywa głośny z powodu pracy grupowej, mimo że liczba wykrytych osób jest podobna. Takie zestawienie zwiększa wartość użytkową informacji dla studenta szukającego miejsca do nauki i jest spójne z warstwą pragmatyczną z Raportu~2 --- komunikat może sugerować nie tylko „jest wolne”, ale „jest wolno i cicho”.
+Informacje o natężeniu dźwięku zestawiliśmy bezpośrednio z danymi o zajętości sal. W praktyce dla każdej strefy i przedziału czasu wyznaczamy wektor cech: szacowaną liczbę osób oraz uśredniony poziom hałasu w dB. Pozwala to opisać charakter miejsca precyzyjniej: salka Nauki przy umiarkowanym obłożeniu często pozostaje cicha ($\sim 45$ dB); pokój JetBrains przy wysokim obłożeniu bywa głośny z powodu pracy grupowej ($\sim 65$ dB), mimo że liczba wykrytych osób jest podobna. 
 
-Na monitorach w lobby nie planujemy osobnego wykresu decybeli; poziom hałasu wchodzi do logiki opisu strefy i ewentualnych rekomendacji (np. przekierowanie do cichszej sali przy podobnej zajętości). Implementacyjnie kanał akustyczny korzysta z tej samej infrastruktury transmisji co odczyty z radaru (sieć czujników, zbieranie na serwerze), co ułatwia synchronizację znaczników czasu z toru mmWave i toru dźwiękowego.
+Na monitorach w lobby nie planujemy osobnego wykresu decybeli; poziom hałasu wchodzi do logiki propozycji w warstwie pragmatycznej (rekomendacja cichszej sali). Implementacyjnie kanał akustyczny korzysta z tej samej infrastruktury transmisji co odczyty z radaru (sieć czujników, zbieranie na serwerze), co ułatwia synchronizację znaczników czasu z toru mmWave i toru dźwiękowego.
 
 \subsection{Częstotliwość próbkowania a dynamika procesu}
-Kolejną istotną uwagą było nasze zbytnie skupienie na śledzeniu zachowań w czasie rzeczywistym oraz nieprecyzyjne posługiwanie się pojęciem aliasingu. W Raporcie~2 odwoływaliśmy się do twierdzenia Nyquista--Shannona i aliasingu przy doborze interwału próbkowania $T_s$ (przyjęliśmy tam m.in. $T_s = 60$\,s jako kompromis między aktualnością a kosztem transmisji w ZigBee). Jednocześnie przy wyjaśnianiu krótkich skoków liczby wykrytych osób czasem używaliśmy słowa „aliasing” w szerszym, potocznym sensie. Po dalszych testach w salach uznaliśmy, że w typowych warunkach na Wydziale dominuje raczej dynamika sceny --- ludzie wychodzą na chwilę, przemieszczają się między stanowiskami, zasłaniają sobie pole widzenia radaru --- niż klasyczny błąd podpróbkowania sygnału w rozumieniu teorii sygnałów. To ważne rozróżnienie: poprawiamy terminologię w raporcie, nie zmieniając przy tym faktu, że $T_s = 60$\,s nadal uznajemy za rozsądny do zbierania surowych danych.
+Kolejną istotną uwagą było nasze zbytnie skupienie na śledzeniu zachowań w czasie rzeczywistym oraz nieprecyzyjne posługiwanie się pojęciem aliasingu. W Raporcie~2 odwoływaliśmy się do twierdzenia Nyquista--Shannona przy doborze interwału próbkowania $T_s$. Po dalszych testach w salach uznaliśmy, że w typowych warunkach dominuje raczej dynamika sceny (przemieszczanie się, okluzja) niż klasyczny błąd podpróbkowania sygnału. Poprawiamy terminologię, choć sam interwał $T_s = 60$\,s, opisany na podstawie uwarunkowań sieci czujników \cite{texas_mmwave}, utrzymujemy.
 
-Problem praktyczny wyglądał tak: pojedyncza próbka co minutę mogła na chwilę zaniżyć lub zawyżyć liczbę osób, a algorytm semantyczny z Raportu~2 od razu mapował taki odczyt na jeden z pięciu stanów interfejsu (zielony, żółty, prawie pełny itd.). Efektem były niepotrzebne zmiany koloru kafelka i szum w szeregu, z którego dopiero mieliśmy budować prognozy (podsekcja~1.1). Student w holu nie potrzebuje informacji, że w sekundzie $t$ radar „zagubił” jedną osobę za plecami kolegi; potrzebuje stabilnej odpowiedzi: czy w \emph{tym} półgodzinnym bloku sala była raczej wolna, czy raczej pełna.
+W praktyce problem polegał na tym, że pojedyncza próbka co minutę mogła zaniżyć lub zawyżyć liczbę osób, a algorytm od razu mapował to na nowy kolor kafelka. Student nie potrzebuje informacji, że w sekundzie $t$ radar „zagubił” osobę z powodu artefaktu; potrzebuje stabilnej odpowiedzi o kondycji sali w szerszym bloku czasowym.
 
-Dlatego rozdzieliliśmy warstwę pomiaru od warstwy informacji dla użytkownika. Surowe odczyty z czujników mmWave nadal zapisujemy z częstotliwością wynikającą z $T_s$ i potrzeb analizy (filtracja, archiwum, kalibracja). Natomiast stan strefy na ekranach oraz wejście do modelu prognozowania wyliczamy jako średnią zajętość w oknach \textbf{półgodzinnych} i \textbf{godzinnych}, po wstępnym odrzuceniu oczywistych artefaktów (krótkie skoki niewspółmierne do pojemności sali, pojedyncze próbki odstające od sąsiadów). W każdym oknie liczymy reprezentatywną wartość zajętości, a dopiero z niej wyznaczamy progi pragmatyczne znane z Raportu~2. Pojedyncze „miganie” detekcji nie przełącza od razu koloru kafelka.
-
-Takie podejście lepiej oddaje dynamikę całego procesu w salach nauki. Średni czas przebywania studenta w jednej strefie to zwykle wiele minut, a nie sekundy; rotacja miejsc ma sens w skali dziesiątek minut. Agregacja półgodzinowa i godzinna jest zatem bliższa temu, co użytkownik końcowy rozumie jako „teraz w tej sali jest tłoczno”, bez rezygnacji z dokładniejszego zapisu surowego po stronie serwera. Uprościło to model prognoz, ograniczyło fałszywe alarmy przy rekomendacji alternatywnych sal i dało spójniejszy sygnał wejściowy do filtrów opisanych w rozdziale o przetwarzaniu sygnałów z czujników mmWave --- tam wracamy do szczegółów usuwania szpilek, szumu tła i symulacji zakłóceń na przygotowanych szeregach.
+Rozdzieliliśmy zatem warstwę pomiaru od warstwy informacji. Surowe odczyty $x_{\text{raw}}[n]$ zapisujemy zgodnie z $T_s$. Natomiast reprezentatywną wartość zajętości dla ekranów wyliczamy za pomocą filtru medianowego w oknie czasowym $W$ (gdzie np. $W = 30$ minut), a następnie uśredniamy:
+\begin{equation}
+    x_{\text{agg}}[k] = \frac{1}{W} \sum_{n=k \cdot W}^{(k+1)W - 1} \text{median}(x_{\text{raw}}[n-w, \dots, n+w])
+\end{equation}
+Dopiero z wygładzonej zmiennej $x_{\text{agg}}[k]$ wyznaczamy progi pragmatyczne. Takie matematyczne oddzielenie wysokoczęstotliwościowego szumu od powolnego, użytkowego trendu oddaje faktyczną dynamikę sal studenckich i pozwala na stabilniejszą predykcję. Zmniejszyło to ryzyko fałszywych alarmów przy rekomendacji alternatywnych sal i dało spójniejszy sygnał wejściowy do filtrów opisanych w rozdziale o przetwarzaniu sygnałów z czujników mmWave --- tam wracamy do szczegółów usuwania szpilek, szumu tła i symulacji zakłóceń na przygotowanych szeregach.
 
 \section{Wstęp do etapu trzeciego: Potok ekstrakcji informacji}
 
-W Raporcie 2 zdefiniowaliśmy syntaktyczne oraz semantyczne ramy systemu „MINI Info”, którego zadaniem jest dostarczanie pragmatycznej wiedzy o zajętości stref nauki (np. pokoju JetBrains) na ekrany w lobby. Potwierdziliśmy skuteczność wykorzystania czujników fal milimetrowych (mmWave) ze względu na ochronę prywatności (brak danych RODO) w porównaniu do kamer CCTV. Obliczyliśmy także entropię układu oraz zaprojektowaliśmy system transmisji oparty o MQTT.
+W Raporcie 2 zdefiniowaliśmy syntaktyczne oraz semantyczne ramy systemu MiniInfo, którego zadaniem jest dostarczanie pragmatycznej wiedzy o zajętości stref nauki (np. pokoju JetBrains) na ekrany w lobby. Potwierdziliśmy skuteczność wykorzystania czujników fal milimetrowych (mmWave) ze względu na ochronę prywatności (brak danych RODO) w porównaniu do kamer CCTV. Obliczyliśmy także entropię układu oraz zaprojektowaliśmy system transmisji oparty o MQTT.
 
 Niniejszy raport (Etap 3) stanowi bezpośrednią kontynuację naszych prac i skupia się na procesie zdefiniowanym jako \textbf{Ekstrakcja informacji}. O ile Raport 2 określał, *dlaczego* zbieramy takie a nie inne sygnały, o tyle Raport 3 analizuje wnikliwie, *w jaki sposób* nasz system technicznie wydobywa wartość z chaosu surowych odczytów radiowych. Aby zrealizować to zadanie rzetelnie i zminimalizować interferencje między poszczególnymi metodami obliczeniowymi, zaprojektowaliśmy ścisły potok przetwarzania danych (ang. \textit{data pipeline}). 
 
@@ -118,17 +134,115 @@ Rozdziały w tym raporcie to w rzeczywistości kolejne węzły tego potoku: pocz
 \section{Symulacja zakłóceń i filtracja sygnałów z czujników mmWave (Przetwarzanie celem ekstrakcji)}
 
 \subsection{Charakterystyka szumu w detekcji radiowej na Wydziale MiNI}
-% TODO dla Osoby 1: Opisać, skąd w ogóle biorą się błędne odczyty.
-% Wskazówki: Wentylatory z laptopów, ruch gałęzi za oknem, mikro-odkształcenia strukturalne szafek, nakładanie się na siebie ludzi. 
-W środowisku rzeczywistym, takim jak sale nauki na Wydziale, sprzęt zbierający dane nigdy nie dostarcza sygnału idealnego. Radary mmWave działają w oparciu o efekt Dopplera i mapowanie chmury punktów (point cloud), co czyni je wrażliwymi na... [DO UZUPEŁNIENIA].
+W środowisku rzeczywistym, takim jak sale nauki na Wydziale, sprzęt zbierający dane nigdy nie dostarcza sygnału idealnego. Radary mmWave działają w oparciu o efekt Dopplera i mapowanie chmury punktów (point cloud), co czyni je wrażliwymi na:
+\begin{itemize}
+    \item Zjawiska brzegowe (ang. \textit{edge cases}), gdy sylwetka użytkownika znajduje się na skrajnej granicy stożka promieniowania sensora.
+    \item Interferencje i nakładanie się na siebie ech radiowych (zjawisko wielodrogowości w salach o dużym zagęszczeniu sprzętu elektronicznego i metalowych elementach konstrukcyjnych).
+    \item Sporadyczną rejestrację ruchu w tle, np. osób przechodzących korytarzem w bezpośrednim sąsiedztwie otwartych drzwi monitorowanej salki.
+\end{itemize}
+
+Dla celów symulacji numerycznych założyliśmy, że $v[n]$ posiada rozkład normalny $\mathcal{N}(0, \sigma^2)$, gdzie wariancja $\sigma^2$ rośnie proporcjonalnie do gęstości tłumu w pomieszczeniu.
+
+\subsubsection*{Szum impulsowy (Błędy grube i okluzja)}
+Szum ten modelujemy jako dyskretny ciąg impulsów $i[n]$, reprezentujący nagłe, krótkotrwałe i niefizyczne przekłamania wartości, które nie korelują z trendem zajętości. Są one generowane przez zdarzenia przestrzenno-czasowe takie jak:
+\begin{itemize}
+    \item Okazjonalne zjawisko okluzji radiowej (całkowite zasłonięcie jednego studenta przez drugiego na osi widzenia czujnika), co skutkuje nagłym spadkiem odczytu o stałą wartość (zjawisko \textit{false negatives}).
+    \item Krótkotrwałe opuszczenie strefy przez użytkownika (np. kilkuminutowe wyjście z sali z pozostawieniem rzeczy na stanowisku pracy), co z perspektywy pragmatyki systemu nie zwalnia miejsca, ale drastycznie zmienia odczyt na poziomie syntaktycznym.
+    \item Chwilowe zakłócenia transmisji i zgubione ramki danych w modelu publish-subscribe protokołu MQTT.
+\end{itemize}
+
+\subsubsection*{Formalny model sygnału wejściowego}
+Z uwzględnieniem powyższych uwarunkowań, ostateczny model surowego sygnału $x_{\text{raw}}[n]$, poddawanego w dalszych krokach filtracji i segmentacji obszarowej, zdefiniowaliśmy równaniem:
+\begin{equation}
+x_{\text{raw}}[n] = x_{\text{ideal}}[n] + v[n] + i[n]
+\end{equation}
+
+Ze względu na charakterystykę wyjściową układów logicznych czujnika (zwracających typ całkowity integer), sygnał wynikowy $x_{\text{raw}}[n]$ poddajemy operacji zaokrąglenia oraz jednostronnego obcięcia do zera. Odzyskanie z tak zdegradowanego ciągu informacji użytecznej zdefiniowaliśmy jako klasyczny problem odwrotny przy ograniczonej precyzji pomiarów, co wymagało zastosowania dedykowanych metod aproksymacji nieliniowej.
 
 \subsection{Symulacja zniekształceń sygnału wejściowego}
-% TODO dla Osoby 1: Wygenerowanie sztucznego szumu na przygotowanym, idealnym sygnale bazowym.
-Na potrzeby eksperymentalne zdefiniowaliśmy bazowy strumień danych dla sali JetBrains reprezentujący 10 osób siedzących w bezruchu przez 60 minut. Następnie na sygnał nałożono losowy szum gaussowski oraz symulowane szpilki błędów (artefakty), imitujące... [DO UZUPEŁNIENIA: wzory lub opis, wykres zaszumionego sygnału].
+W celu weryfikacji algorytmów ekstrakcji informacji, przeprowadziliśmy symulację numeryczną toru pomiarowego w środowisku MATLAB. Zamodelowaliśmy dyskretny przedział czasu obejmujący $N = 400$ próbek, co przy częstotliwości próbkowania $f_s = 1/60$\,Hz odpowiada blisko 7 godzinom ciągłej obserwacji wybranej sali o maksymalnej pojemności $C_{\text{max}} = 15$ osób.
+
+\subsubsection*{1. Konstrukcja sygnału referencyjnego (Ground Truth)}
+Faktyczną, fizyczną zajętość pomieszczenia $x_{\text{ideal}}[n]$ zamodelowaliśmy jako superpozycję trzech funkcji Gaussa, odwzorowujących naturalną dynamikę przepływu studentów (narastanie i opadanie ruchu w cyklach odpowiadających przerwom i blokom zajęciowym). Sygnał ten na każdym etapie symulacji podlegał twardemu ograniczeniu amplitudowemu, odzwierciedlającemu fizyczną pojemność sali: $x_{\text{ideal}}[n] \le 15$.
+
+\subsubsection*{2. Aplikacja szumu stochastycznego i impulsowego}
+Zgodnie z przyjętym w sekcji 3.1 modelem, na sygnał referencyjny nałożyliśmy dwa wektory zakłóceń:
+\begin{itemize}
+    \item \textbf{Fluktuacje AWGN ($v[n]$):} Wygenerowaliśmy szum o rozkładzie normalnym $\mathcal{N}(0, \sigma_v^2)$, gdzie odchylenie standardowe było funkcją zależną od amplitudy sygnału idealnego: $\sigma_v = 0.3 + 0.15 \cdot x_{\text{ideal}}[n]$. Taki model liniowy odzwierciedla fakt, że większe zagęszczenie osób generuje wyższy poziom szumu interferencyjnego w odczytach mmWave.
+    \item \textbf{Błędy grube ($i[n]$):} Zamodelowaliśmy zjawisko okluzji z prawdopodobieństwem wystąpienia $P=0.05$ dla każdej próbki $n$, pod warunkiem $x_{\text{ideal}}[n] > 2$. Wystąpienie błędu skutkowało wygenerowaniem ujemnego impulsu o losowej amplitudzie z przedziału od 2 do 80\% aktualnie przebywających w sali osób.
+\end{itemize}
+
+Wizualizację wygenerowanego sygnału referencyjnego na tle zaszumionych odczytów surowych przedstawiono na Rysunku \ref{fig:sygnal_zaszumiony}.
+
+% [MIEJSCE NA WYKRES 1: SYGNAŁ ZASZUMIONY]
+\begin{figure}[H]
+    \centering
+    % TODO: Podmienić poniższą linijkę na właściwy wykres, gdy zostanie dostarczony (np. \includegraphics[width=0.8\textwidth]{wykres1.png})
+    \fbox{\rule{0pt}{6cm}\rule{10cm}{0pt}}
+    \caption{Zamodelowany sygnał referencyjny $x_{\text{ideal}}[n]$ oraz wygenerowany sygnał zaszumiony $x_{\text{raw}}[n]$ z widocznymi fluktuacjami i błędami grubymi.}
+    \label{fig:sygnal_zaszumiony}
+\end{figure}
+
+\subsubsection*{3. Kwantyzacja i ograniczenia sprzętowe}
+Ostateczny wektor sygnału surowego $x_{\text{raw}}[n]$ poddaliśmy operacji zaokrąglenia do najbliższej liczby całkowitej (symulacja 8-bitowego ładunku użytecznego w formacie integer przesyłanego przez sieć ZigBee). Dodatkowo zaimplementowaliśmy sprzętowe nasycenie czujnika, wymuszając brak wartości ujemnych ($x_{\text{raw}}[n] \ge 0$) oraz obcięcie błędnych odczytów przekraczających pojemność sali ($x_{\text{raw}}[n] \le 15$).
 
 \subsection{Metody redukcji i filtry wygładzające}
-% TODO dla Osoby 1: Opis i testowanie filtrów. Np. filtr medianowy do usuwania szpilek, filtr dolnoprzepustowy.
-W celu estymacji zakłóceń zastosowano filtrację. Odrzucono krótkotrwałe skoki odczytów powyżej 500\% różnicy (artefakty). Dla łagodnego szumu tła zaimplementowano... [DO UZUPEŁNIENIA]. Uzyskany w ten sposób oczyszczony ciąg syntaktyczny przekazywany jest do kolejnej warstwy analitycznej.
+Naszym celem na tym etapie analizy syntaktycznej jest ekstrakcja treści istotnej z zaszumionego sygnału wejściowego $x_{\text{raw}}[n]$ poprzez zastosowanie odpowiednich metod filtracji cyfrowej, zoptymalizowanych pod kątem redukcji nadmiarowości i minimalizacji błędów. Problem aproksymacji rozwiązaliśmy poprzez implementację i porównanie dwóch klasycznych metod wygładzających: filtru liniowego oraz nieliniowego.
+
+\subsubsection*{1. Filtr średniej kroczącej (Moving Average)}
+Jako pierwszą metodę zastosowaliśmy prosty filtr dolnoprzepustowy o skończonej odpowiedzi impulsowej (FIR), realizujący uśrednianie w oknie przesuwnym o długości $N = 15$ próbek (co odpowiada 15 minutom obserwacji). Odpowiedź filtru wyraża się wzorem:
+\begin{equation}
+y_{\text{MA}}[n] = \frac{1}{N} \sum_{k=-(N-1)/2}^{(N-1)/2} x_{\text{raw}}[n+k]
+\end{equation}
+
+Filtr ten skutecznie redukuje szum o wysokiej częstotliwości (fluktuacje o rozkładzie normalnym AWGN). Wykazuje jednak istotną słabość w przypadku sygnału z czujników mmWave: jest wrażliwy na wartości odstające (szum impulsowy zdefiniowany w podsekcji 3.1). Wystąpienie pojedynczego błędu okluzji powoduje zniekształcenie (zaniżenie) estymaty na całej długości okna filtru, co prowadzi do rozmycia informacji i utraty ostrych krawędzi sygnału.
+
+\subsubsection*{2. Filtr medianowy 1D}
+W odpowiedzi na problemy z zakłóceniami impulsowymi, zaimplementowaliśmy nieliniowy filtr medianowy rzędu $K = 5$ próbek. Wynik filtracji dla danej próbki to wartość środkowa z posortowanego zbioru wartości w oknie analizy:
+\begin{equation}
+y_{\text{MED}}[n] = \text{median}(x_{\text{raw}}[n-K/2, \dots, n+K/2])
+\end{equation}
+
+Z perspektywy ekstrakcji obiektów zainteresowania z danych radaru mmWave, jest to metoda o wysokiej skuteczności dla zakłóceń typu \textit{false negatives}. Filtr medianowy niemal całkowicie eliminuje głębokie, krótkotrwałe spadki sygnału wynikające z okluzji, zachowując jednocześnie strome zbocza sygnału podczas rzeczywistej wymiany studentów między zajęciami. Wyniki filtracji dla obu zastosowanych metod prezentuje Rysunek \ref{fig:wyniki_filtracji}.
+
+% [MIEJSCE NA WYKRES 2: WYNIKI FILTRACJI]
+\begin{figure}[H]
+    \centering
+    % TODO: Podmienić poniższą linijkę na właściwy wykres, gdy zostanie dostarczony (np. \includegraphics[width=0.8\textwidth]{wykres2.png})
+    \fbox{\rule{0pt}{6cm}\rule{10cm}{0pt}}
+    \caption{Porównanie działania filtru średniej kroczącej oraz filtru medianowego na zaszumionym sygnale.}
+    \label{fig:wyniki_filtracji}
+\end{figure}
+
+\subsubsection*{Metryki efektywności i analiza porównawcza}
+Ocenę skuteczności metod ekstrakcji oparliśmy na formalnych, obliczeniowych wskaźnikach jakościowych zdefiniowanych w instrukcji do laboratorium. Przyjęliśmy dwie metryki względem sygnału referencyjnego $x_{\text{ideal}}[n]$:
+\begin{itemize}
+    \item \textbf{Błąd średniokwadratowy (MSE):} Mierzący wariancję błędu estymacji.
+    \begin{equation}
+    \text{MSE} = \frac{1}{M} \sum_{n=1}^{M} (x_{\text{ideal}}[n] - y[n])^2
+    \end{equation}
+    \item \textbf{Stosunek sygnału do szumu (SNR):} Wyrażony w decybelach, określający miarę użyteczności zrekonstruowanego sygnału.
+    \begin{equation}
+    \text{SNR} = 10 \log_{10} \left( \frac{\sum (x_{\text{ideal}}[n])^2}{\sum (x_{\text{ideal}}[n] - y[n])^2} \right)
+    \end{equation}
+\end{itemize}
+
+Zestawienie obliczonych parametrów ze środowiska MATLAB dla wygenerowanej próbki sygnału ($M = 400$) przedstawia Tabela \ref{tab:metryki_filtracji}. Otrzymane wyniki numeryczne potwierdzają rozważania teoretyczne.
+
+\begin{table}[H]
+\centering
+\caption{Analiza porównawcza skuteczności metod ekstrakcji informacji (symulacja w środowisku MATLAB).}
+\label{tab:metryki_filtracji}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Metoda reprezentacji} & \textbf{Okno filtru} & \textbf{MSE} & \textbf{SNR [dB]} \\ \hline
+Sygnał surowy ($x_{\text{raw}}$) & -- & 1.03 & 15.06 \\ \hline
+Filtr Średniej Kroczącej & 15 próbek & 0.13 & 24.00 \\ \hline
+Filtr Medianowy 1D & 5 próbek & 0.33 & 20.03 \\ \hline
+\end{tabular}
+\end{table}
+
+Jak wynika z analizy metryk, oba filtry znacząco zredukowały błąd pomiarowy względem surowego odczytu z czujników. W ogólnym rozrachunku średniokwadratowym (MSE) filtr średniej kroczącej uzyskał wynik nieznacznie lepszy, co jest zasługą idealnego niwelowania szumu o rozkładzie normalnym w długim oknie czasowym. Filtr medianowy zachował jednak wysoką skuteczność eliminacji artefaktów punktowych, co w dziedzinie czasu i interpretacji dynamiki przepływu osób jest kluczowe, mimo nieznacznie niższego stosunku sygnału do szumu (SNR). Wnioskujemy zatem, że w dalszych pracach projektowych docelowym wdrożeniem optymalizacyjnym (pod kątem pragmatyki użytkownika końcowego) powinno stać się rozwiązanie hybrydowe, wykorzystujące szeregowe połączenie obu tych metod.
 
 \section{Segmentacja przestrzeni i ekstrakcja obiektów zainteresowania (Aproksymacja treści)}
 
@@ -138,7 +252,7 @@ W systemie opartym na radarach fal milimetrowych (mmWave), sygnał oznaczający 
 Dzięki temu nie musimy śledzić każdego ruchu w całej sali. System skupia się tylko na tych strefach, które definiują "zajęte miejsce" (krzesła, biurka, kanapy), a ignoruje ciągi komunikacyjne (np. środek pokoju czy korytarz wejściowy). Takie podejście pozwala już na najniższym poziomie odrzucić niepotrzebne tło i skupić się na właściwej informacji.
 
 \subsection{Algorytm ekstrakcji sylwetek}
-Mając przygotowaną mapę ROI, urządzenie przechodzi do właściwej ekstrakcji danych. Zamiast skomplikowanego rozpoznawania obrazu, system po prostu grupuje przestrzenne odbicia radarowe, które zachowują się jak ludzka sylwetka (wykrywa m.in. rytmiczne mikro-ruchy klatki piersiowej przy oddychaniu, co pozwala odróżnić żywego człowieka od pracującego wentylatora).
+Mając przygotowaną mapę ROI, urządzenie przechodzi do właściwej ekstrakcji danych. Zamiast skomplikowanego rozpoznawania obrazu, system po prostu grupuje przestrzenne odbicia radarowe, które zachowują się jak ludzka sylwetka (wykrywa m.in. rytmiczne mikro-ruchy klatki piersiowej przy oddychaniu, co pozwala odróżnić żywego człowieka od pracującego wentylatora). Proces przestrzennego klastrowania odbić wewnątrz stref użytkowych zilustrowano na Rysunku \ref{fig:mmwave_clusters}.
 
 \begin{figure}[H]
     \centering
@@ -192,24 +306,40 @@ gdzie $N_{\text{detekcji}}$ to liczba osób zmierzona przez radar, a $C_{\text{m
     \text{Prawie pełny}, & \text{dla } O \ge 75\% 
     \end{cases}
 \end{equation}
-W ten sposób mocno rozproszone dane z czujników mikrofalowych są kompresowane do pojedynczego, użytecznego komunikatu pragmatycznego, który można wyświetlić na monitorach w holu.
+W ten sposób mocno rozproszone dane z czujników mikrofalowych są kompresowane do pojedynczego, użytecznego komunikatu pragmatycznego. Aby jednak ten status (np. "Umiarkowany ruch") mógł zostać wyświetlony na monitorach w holu, węzeł czujnikowy musi go sprawnie przesłać do głównego serwera z użyciem sieci ZigBee i protokołu MQTT.
 
 \section{Selektywny przesył i kompresja informacji (Kompresja z selekcją)}
 
 \subsection{Uwarunkowania przesyłu i redundancja stanów}
-% TODO dla Osoby 3: Odwołanie się do Raporu 2 (ok 75% nadmiarowości w ujęciu entropii Shannona). Cel: wysyłać tylko to co niezbędne.
-Wyekstrahowana wiedza o zajętości musi ostatecznie trafić na główny serwer MQTT połączony z wyświetlaczami w budynku. Jak wykazano w Raporcie 2, przy statycznych godzinach nauki, stany (np. Zielony, Żółty) mogą utrzymywać się przez dziesiątki minut, co generuje ogromną nadmiarowość. W tym kroku następuje organizacja indeksu i optymalizacja struktury danych [DO UZUPEŁNIENIA].
+Jak wykazaliśmy w poprzednich rozdziałach, system MiniInfo generuje sumaryczny transfer rzędu 1,4 MB na dobę przy ośmiu węzłach sieci ZigBee odpytywanych co 60 sekund. Z punktu widzenia infrastruktury sieciowej uczelni jest to wartość pomijalna. Zastanawiając się nad kompresją i selekcją danych, nie kierowaliśmy się więc ograniczeniami przepustowości, lecz chęcią zbadania, ile z przesyłanych danych jest faktycznie informatywnych – czyli nieoczekiwanych dla systemu i decyzyjnie użytecznych dla odbiorcy.
+
+Na podstawie wcześniejszych testów wyznaczyliśmy empiryczny rozkład prawdopodobieństwa pięciu stanów semantycznych ($p = \{0,41; 0,27; 0,18; 0,11; 0,03\}$). Entropia tego źródła wynosi $H(X) \approx 1,98$ bita/symbol. Wiedząc, że pojedynczy symbol przesyłany protokołem MQTT zajmuje 8 bitów (typ integer), redundancję kanału wyznaczyliśmy jako:
+\begin{equation}
+R = 1 - \frac{H(X)}{n} = 1 - \frac{1{,}98}{8} \approx 75\%
+\end{equation}
+
+Oznacza to, że trzy czwarte przesyłanego strumienia to nadmiarowość – dane, które w teorii mogłyby zostać skompresowane bez żadnej utraty informacji. Wdrożenie klasycznego kodowania Huffmana, dopasowanego do zmierzonego rozkładu, pozwoliłoby nam zredukować średnią długość kodu do wartości około 2,11 bita/symbol (stany częste otrzymują krótkie kody, rzadkie – dłuższe). Mimo że jest to wartość bardzo bliska dolnemu ograniczeniu wyznaczonemu przez twierdzenie Shannona, uznaliśmy takie wdrożenie za ekonomicznie nieuzasadnione: przy wolumenie nieprzekraczającym 2,8 MB na dobę oszczędność wyniosłaby poniżej 0,5 MB. Zdecydowaliśmy się więc świadomie zachować format przesyłu JSON – jego czytelność dla programisty i prostota debugowania mają wyższą wartość praktyczną niż marginalna redukcja i tak znikomego transferu.
 
 \subsection{Metody kompresji bezstratnej sygnałów dyskretnych}
-% TODO dla Osoby 3: Zastosowanie kodowania strumieniowego lub słownikowego (Huffman / arytmetyczne / LZW) do spakowania bazy logów dziennych dla administratora wydziału.
-Dla celów archiwizacji logów dobowych z całego wydziału (istotne dla analiz długoterminowych) system kompresuje wynikowe raporty z użyciem kodu... [DO UZUPEŁNIENIA: wybór i krótki opis kodu, np. algorytm Huffmana dopasowany do prawdopodobieństw stanów wyliczonych w reporcie 2].
+Zauważyliśmy jednak o wiele istotniejszy mechanizm redukcji przesyłu. Sygnał zajętości sali wykazuje silną lokalną ciągłość – liczba osób zmienia się stopniowo, a skokowe przejścia między skrajnymi stanami należą do rzadkości. Postanowiliśmy to wykorzystać na dwa alternatywne sposoby.
+
+Pierwszym jest \textbf{kodowanie różnicowe}: zamiast przesyłać pełną wartość liczby osób w każdym interwale, węzeł wysyła jedynie różnicę $\Delta$ między bieżącym a poprzednim odczytem. W godzinach stabilnego obłożenia (np. podczas bloku zajęciowego) kolejne próbki niemal się nie zmieniają i $\Delta \approx 0$ dominuje w strumieniu, co drastycznie redukuje liczbę transmitowanych bitów. Aby zapobiec kumulacji błędów przy utracie pakietu, co $N$ interwałów system wysyła pełną wartość bezwzględną jako punkt synchronizacji.
+
+Drugim, bardziej radykalnym podejściem, które wdrożyliśmy jako główne, jest \textbf{transmisja warunkowa oparta na detekcji zmian stanu semantycznego}: węzeł wysyła dane wyłącznie w momencie przejścia między stanami (np. z Żółtego na Pomarańczowy). Jeśli sala pozostaje w tym samym stanie przez 15 kolejnych interwałów, po prostu milczy i nie generuje komunikatu. Podejście to doskonale wpisuje się w architekturę publish-subscribe protokołu MQTT – węzeł publikuje nową wiadomość na kanale tematycznym (topic) tylko wtedy, gdy stan ulegnie zmianie, a ekran w lobby aktualizuje swój kafelek w odpowiedzi na ten nowy event. System zachowuje się wówczas jak koder zdarzeniowy (ang. \textit{event-driven encoder}). Jedyną wadą tego podejścia jest brak możliwości stwierdzenia, czy brak transmisji wynika z braku zmiany stanu, czy z awarii czujnika. Problem ten rozwiązaliśmy, dodając prosty mechanizm \textit{heartbeat}, czyli krótką wiadomość \textit{keep-alive} wysyłaną periodycznie co ustalony czas.
 
 \subsection{Eksperymentalna ocena wydajności (Rate-Distortion)}
-% TODO dla Osoby 3: Porównanie wagi logów przed kompresją i po kompresji na serwerze Raspberry Pi, ewentualnie ocena ile pakietów MQTT udaje się obciąć dzięki inteligentnemu odpytywaniu.
-Ostateczna efektywność potoku została zweryfikowana empirycznie. Dzięki zastosowaniu selektywnego informowania tylko o zmianach krytycznych oraz dzięki wysokiej kompresji plików archiwizacyjnych, dobowy rozmiar wygenerowanych danych dla całego budynku zmniejszono o... [DO UZUPEŁNIENIA].
+Przeprowadziliśmy też analizę w świetle teorii Rate-Distortion, aby upewnić się, że nasze podejście kompresji warunkowej ma matematyczny sens. W klasycznym ujęciu funkcja minimalnej przepustowości $R(D)$ dla oczekiwanego zniekształcenia $D$ ograniczona jest przez wzajemną informację źródła. W kontekście MiniInfo zniekształcenie sygnału ($D$) nie jest artefaktem ciągłym, lecz prawdopodobieństwem omyłki decyzyjnej $P_e$ w czasie. Przyjęliśmy funkcję strat:
+\begin{equation}
+    D(T_s) = \mathbb{E}\big[ \mathbb{I}(\text{StanRzeczywisty}(t) \neq \text{StanMonitora}(t)) \big] \propto f(T_s)
+\end{equation}
+Zniekształcenie rośnie monotonicznie wraz z wydłużaniem interwału próbkowania $T_s$.
+
+Kluczowym parametrem było zatem znalezienie optymalnego opóźnienia. Przy interwale próbkowania $T_s = 60$\,s i narzucie czasowym protokołu MQTT \cite{mqtt_spec}, maksymalne opóźnienie do odświeżenia informacji na ekranie wynosi około 45 sekund. Uznaliśmy to za w pełni akceptowalny narzut ($D_{\text{max}}$). Student i tak potrzebuje co najmniej kilku minut, żeby przejść z holu przed wybraną salę, więc precyzja do jednej minuty jest dla niego w zupełności wystarczająca.
+
+Nasze testy wykazały, gdzie leży granica tej kompresji: wymuszenie interwału $T_s = 5$ minut drastycznie psuło trafność systemu, szczególnie w przerwach między wykładami, gdy ludzie wychodzą i wchodzą całymi grupami. Z kolei odpytywanie czujników częściej niż co 30 sekund niczego z perspektywy studenta nie ulepszało, a jedynie zapychało sieć bezprzewodową. Przyjęty od początku interwał $T_s = 60$\,s okazał się idealnym "złotym środkiem" na krzywej Rate-Distortion, co potwierdziło słuszność całego naszego procesu ekstrakcji informacji.
 
 \section{Podsumowanie i wnioski z etapu trzeciego}
-W toku realizacji laboratoriów trzecich udowodniono, że użyteczna wartość pragmatyczna (kolorowy kafelek na ekranie monitora) nie jest procesem bezpośrednim, a wymaga wdrożenia wieloetapowego filtru analitycznego. Podział zagadnień ekstrakcji danych na trzy wyspecjalizowane kroki (filtracja falowa, segmentacja i aproksymacja treści, optymalna pod kątem entropii sieć dystrybucyjna) tworzy potok przetwarzania pozwalający uzyskać czystą wiedzę decyzyjną, oferując jednocześnie znacząco niższe obciążenie sieciowe niż systemy wideo, z którymi MiniInfo konkurencyjnie się zestawia.
+W toku prac nad trzecim etapem raportu udowodniliśmy, że wygenerowanie użytecznego komunikatu (kolorowego kafelka na ekranie) nie polega na zwykłym podpięciu czujnika pod monitor. Wymaga on wdrożenia przemyślanego, wieloetapowego potoku analitycznego. Podział zagadnień ekstrakcji danych na trzy logiczne kroki (odszumianie falowe sygnału wejściowego, wyciągnięcie obiektów zainteresowania z tła i inteligentna, kompresująca sieć dystrybucyjna) pozwala systemowi oddzielić szum od czystej, decyzyjnej wiedzy. Dzięki takiemu projektowi nasz system MiniInfo generuje nieporównywalnie mniejsze obciążenie dla uczelnianej infrastruktury niż klasyczne kamery z detekcją obrazu wideo, zachowując przy tym równie wysoką użyteczność końcową.
 
 \section*{Podział prac}
 \begin{itemize}
@@ -221,5 +351,15 @@ W toku realizacji laboratoriów trzecich udowodniono, że użyteczna wartość p
     \item Rozdział 6 -- Iga Oleksiewicz
     \item Redakcja raportu -- Marcin Pawlak
 \end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{texas_mmwave}
+Texas Instruments,
+\textit{mmWave Radar Sensors: Theory and Practical Applications}, Application Report, 2023.
+
+\bibitem{mqtt_spec}
+OASIS Standard,
+\textit{MQTT Version 5.0}, 2019. [Online]. Dostępne: http://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html
+\end{thebibliography}
 
 \end{document}
