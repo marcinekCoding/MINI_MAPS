@@ -71,33 +71,37 @@
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{\footnotesize Podstawy Teorii Informacji}
-\rhead{\footnotesize ETAP IV}
+\rhead{\footnotesize ETAP 4}
 \lfoot{\footnotesize Wydział Matematyki i Nauk Informacyjnych}
 \rfoot{\footnotesize \thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 
-\section{Konfrontacja z potrzebami odbiorcy -- zmiana paradygmatu zajętości}
+\section{Odpowiedź na uwagi do Raportu 3 i kierunek Etapu 4}
 
-Niniejsza sekcja stanowi podsumowanie i przełożenie uwag zebranych podczas konsultacji z profesorem oraz oficjalnych wytycznych laboratoryjnych na praktyczną architekturę systemu.
+Po ocenie Raportu 3 uzupełniamy założenia projektu MiniInfo przed opisem semantycznego wyszukiwania informacji w Etapie~4. Poniższe podsekcje odnoszą się do uwag Pana Profesora: rozszerzenie predykcji obłożenia w perspektywie najbliższych godzin, rozdzielenie modelu zachowań od jakości rejestrowanych sygnałów, krytyczne spojrzenie na samą definicję zajętości sali oraz przejście od abstrakcyjnych rozważań do konkretnych mechanizmów opisanych w dalszych rozdziałach niniejszego raportu (profilowanie odbiorcy, hybrydowe deskryptory, procedury wyszukiwania i sprzężenie zwrotne).
 
-\subsection*{1. Co należy zebrać / pomierzyć (Dane wejściowe)}
-\begin{itemize}
-    \item \textbf{Grupy odbiorców:} Zdefiniowanie 3 konkretnych grup użytkowników na Wydziale MiNI PW (np. \textit{Student szukający absolutnej ciszy}, \textit{Grupa projektowa potrzebująca miejsca do dyskusji}, \textit{Pracownik naukowy szukający wolnej sali na konsultacje}).
-    \item \textbf{Scenariusze użytkowe:} Zebranie realnych, życiowych opisów zachowań studentów (np. nauka do kolokwium z Analizy Matematycznej 2, zespołowe kodowanie projektu z PTI, krótki odpoczynek i zjedzenie posiłku).
-\end{itemize}
+\subsection{Predykcja obłożenia w szerszej perspektywie czasowej}
+W Raporcie 3 doprecyzowaliśmy prognozowanie na podstawie szeregów historycznych (średnia ruchoma, wygładzanie Holt--Wintersa) oraz zastosowaliśmy medianowe uśrednianie zajętości w oknie czasowym, co --- zgodnie z oceną --- uznajemy za właściwy kierunek stabilizacji odczytów. Pan Profesor zasugerował jednak, aby szerzej przedyskutować predykcję \emph{następnych godzin}, a nie wyłącznie interpretację stanu bieżącego na monitorach w lobby.
 
-\subsection*{2. O czym pisać (Wskazówki merytoryczne)}
-\begin{itemize}
-    \item \textbf{Zmiana paradygmatu:} Ewolucja projektu MiniInfo ze zwykłego „systemu monitorowania danych fizycznych” (zajętość jako liczba osób) do poziomu semantycznego wyszukiwania informacji i doradztwa przestrzennego.
-    \item \textbf{Semantyczna pustka surowych liczb:} Wyjaśnienie, dlaczego informacja typu „w sali 107 przebywa 12 osób” jest bezużyteczna bez kontekstu. Sprzeczność potrzeb: dla cichej nauki 12 milczących osób to wciąż dobra sala, a dla grupy projektowej 4 głośno rozmawiające osoby blokują przestrzeń, pomimo niższej liczby osób.
-\end{itemize}
+W Etapie~4 nie rozbudowujemy osobnego modułu szeregów czasowych; zakładamy natomiast, że warstwa prognozy z Raportu~3 pozostaje źródłem składowej $O_i(t)$ w wektorze cech sali, a użytkownik mobilny otrzymuje rekomendację uwzględniającą zarówno \emph{teraz}, jak i \emph{za chwilę}. Przykładowo: student szukający ciszy o 14:15 może dostać salę 329 z niskim hałasem obecnie, ale z prognozą wzrostu obłożenia o 14:45 w związku z końcem wykładu na piętrze --- wtedy system podnosi wagę parametru obłożenia w wektorze zapytania. W podsumowaniu raportu wracamy do perspektywy integracji z planem zajęć USOS; tutaj podkreślamy jedynie, że predykcja godzinowa i semantyczne wyszukiwanie nie są sprzeczne --- pierwsza dostarcza trend, druga --- kontekst użyteczności dla konkretnego odbiorcy.
 
-\subsection*{3. Na czym się skupić (Kluczowe uwagi Profesora)}
-\begin{itemize}
-    \item \textbf{Uczciwość naukowa i ograniczenia:} Profesor wyraźnie zaznaczył, że nie ma systemów idealnych. Należy wprost opisać ograniczenia technologii (np. bezwładność czasowa czujników, zakłócenia mikrofonu szumem tła) oraz ich zalety.
-    \item \textbf{Rzeczywiste obserwacje:} Kategoryczny zakaz opierania się na sztucznie wygenerowanych (syntetycznych) danych. Cała analiza musi bazować na realnych pomiarach z wydziału.
-\end{itemize}
+\subsection{Model zachowań, dynamika sali i ograniczenia pomiaru}
+Kolejna uwaga dotyczyła możliwości omawiania \textbf{modelu zachowań niezależnie od jakości sygnałów}. W poprzednich raportach mieszaliśmy ograniczenia sprzętowe (okluzja radaru, szum tła mikrofonu) z wnioskami o tym, czego student faktycznie potrzebuje --- stąd wrażenie nadmiernego „filozofowania” przy zbyt małej liczbie operacyjnych pomysłów.
+
+W niniejszym etapie rozdzielamy te warstwy świadomie. \textbf{Warstwa pomiarowa} rejestruje surowe próbki: obecność i mikroruch z mmWave, poziom dB i cechy widma z mikrofonu --- z opisanymi ograniczeniami (bezwładność czasowa, fałszywe detekcje, brak identyfikacji pojedynczej osoby). \textbf{Warstwa informacyjna} buduje deskryptor sali $\vec{v}_i = [O_i, S_i, D_i]^T$: znormalizowane obłożenie, hałas i dynamika przemieszczeń w oknie czasowym. Problem definiowania zajętości przestaje być pytaniem „ile jest studentów”, a staje się pytaniem o \textbf{charakter aktywności} w pomieszczeniu --- czy dominuje cisza biblioteczna, gwar grup projektowych czy ciągły przepływ osób przez drzwi.
+
+Pan Profesor pytał także o efektywność wyznaczania liczby realnych obiektów oraz o alternatywy (kamery termiczne, wilgotność, podczerwień, widmo dźwięku). Nie wdrażamy pełnej identyfikacji każdej osoby --- to drobna wyjątkowość poznawcza, której koszt jest nieproporcjonalny do korzyści w sali wykładowej. Zamiast tego przyjmujemy, że dla studenta często \textbf{kluczowszy jest poziom hałasu i dynamika sceny niż sama liczba głów}. W dalszych rozdziałach pokazujemy, jak ankieta oczekiwań (profile „Cichy Badacz”, „Głośny Projektant”, „Szybki Konsultant”) mapuje te preferencje na wagi $w_O$, $w_S$, $w_D$ bez udawania precyzji, jakiej nie daje tor mmWave.
+
+\subsection{Od monitorowania liczb do semantycznego doradztwa przestrzennego}
+Trzecia grupa uwag dotyczyła \textbf{filozofii zajętości} i semantycznej pustki surowych liczb. Informacja „w sali 107 przebywa 12 osób” bywa bezużyteczna: dla cichej nauki dwanaście milczących osób może być akceptowalne, dla grupy projektowej cztery głośno rozmawiające osoby blokują przestrzeń mimo niższej liczby. Zamiast kolejnej dyskusji o sensorach proponujemy rozwiązania weryfikowalne w kodzie i w danych z wydziału.
+
+Na potrzeby Etapu~4 zdefiniowaliśmy trzy modele odbiorcy odpowiadające realnym scenariuszom na MiNI PW: student szukający absolutnej ciszy (np. przed kolokwium z Analizy), grupa projektowa potrzebująca miejsca do dyskusji (PTI), oraz krótki odpoczynek między wykładami. Każdy scenariusz ma inny wektor zapytania $\vec{q}$ i inne priorytety w metryce ważonej odległości Euklidesowej oraz podobieństwie kosinusowym (Rozdziały~2--4). Opieramy się wyłącznie na \textbf{rzeczywistych pomiarach} z sal 107, 329 i salki w bibliotece --- bez danych syntetycznych --- oraz wprost opisujemy ograniczenia technologii, bo --- jak podkreślił Pan Profesor --- systemów idealnych nie ma.
+
+\subsection{Konkretne mechanizmy zamiast kolejnej warstwy filozofii}
+Na koniec Pan Profesor zwrócił uwagę, że w Raporcie 3 było \textbf{za dużo filozofowania, a za mało ciekawych pomysłów}. W odpowiedzi w tym raporcie ograniczamy teorię do minimum niezbędnego dla PTI i przenosimy ciężar na implementowalne elementy: dynamiczną ankietę w aplikacji, kalibrację subiektywną z grupą 15 testerów, indeks hybrydowych deskryptorów w pamięci, prezentację wyników jako procent dopasowania zrozumiały dla człowieka oraz adaptację zapytania algorytmem Rocchio po negatywnym sprzężeniu zwrotnym („Tu jest za głośno”). To nie jest kolejna definicja „czym jest sala”, lecz odpowiedź na pytanie: \emph{która sala na MiNI teraz najlepiej pasuje do mojego celu wizyty} --- z możliwością korekty po wejściu do środka.
+
+W kolejnych rozdziałach rozwijamy powyższe założenia: profilowanie użytkownika i wyniki ankiety (Rozdział~2), konstrukcję wektora $\vec{v}_i$ i indeksu (Rozdział~3), procedury wyszukiwania z metrykami Precision/Recall (Rozdział~4), interaktywne sprzężenie zwrotne (Rozdział~5) oraz podsumowanie etapu z perspektywą USOS (Rozdział~6).
 
 \section{Profilowanie użytkownika: Ankieta oczekiwań (Modele Odbiorcy)}
 
@@ -201,7 +205,7 @@ Na bazie najczęstszych kombinacji odpowiedzi, system automatycznie definiuje tr
 \end{itemize}
 
 \subsection{Subiektywna skala semantyczna oraz kalibracja z udziałem testerów}
-Podczas konsultacji naukowych profesor zwrócił szczególną uwagę na konieczność zakotwiczenia modeli matematycznych w subiektywnej percepcji człowieka. Aby to osiągnąć, w systemie MiniInfo zaimplementowano standardową, zorientowaną semantycznie skalę oceniania w przedziale $[0, 10]$, gdzie $0$ oznacza całkowity brak badanej cechy (np. cisza absolutna), a $10$ reprezentuje jej maksymalne, uciążliwe natężenie.
+Podczas konsultacji naukowych Pan Profesor zwrócił szczególną uwagę na konieczność zakotwiczenia modeli matematycznych w subiektywnej percepcji człowieka. Aby to osiągnąć, w systemie MiniInfo zaimplementowano standardową, zorientowaną semantycznie skalę oceniania w przedziale $[0, 10]$, gdzie $0$ oznacza całkowity brak badanej cechy (np. cisza absolutna), a $10$ reprezentuje jej maksymalne, uciążliwe natężenie.
 
 Definicja poziomów semantycznych dla szumu środowiskowego ($S$) przedstawia się następująco:
 \begin{itemize}
@@ -212,7 +216,7 @@ Definicja poziomów semantycznych dla szumu środowiskowego ($S$) przedstawia si
 \end{itemize}
 
 \textbf{Kalibracja z udziałem grupy testowej:} \\
-Zgodnie z zaleceniami profesora, w celu weryfikacji przydatności modeli przeprowadzono eksperymenty z reprezentatywną grupą 15 studentów-testerów Wydziału MiNI PW. Testerzy odwiedzali wybrane sale wydziałowe (np. salę 107, salę 329, salki w bibliotece) w różnych porach dnia i oceniali swoje subiektywne odczucia hałasu oraz ruchu w skali $0-10$. W tym samym czasie rejestrowano surowe dane fizyczne z czujników (mikrofonu i radaru mmWave). 
+Zgodnie z zaleceniami Pana Profesora, w celu weryfikacji przydatności modeli przeprowadzono eksperymenty z reprezentatywną grupą 15 studentów-testerów Wydziału MiNI PW. Testerzy odwiedzali wybrane sale wydziałowe (np. salę 107, salę 329, salki w bibliotece) w różnych porach dnia i oceniali swoje subiektywne odczucia hałasu oraz ruchu w skali $0-10$. W tym samym czasie rejestrowano surowe dane fizyczne z czujników (mikrofonu i radaru mmWave). 
 
 Porównanie subiektywnych ocen ludzkich z obiektywnymi wartościami pomiarowymi pozwoliło na przeprowadzenie nieliniowej kalibracji wag i funkcji normalizujących w bazie danych. Wykazano m.in., że ludzka percepcja hałasu w salach wykazuje charakterystykę logarytmiczną, co zostało bezpośrednio uwzględnione przy konstrukcji deskryptorów hybrydowych (por. Rozdział 3). Dzięki temu dopasowanie wyników wyszukiwania do realnych oczekiwań studentów wzrosło o ponad 28\% w stosunku do bazowego modelu liniowego.
 
@@ -246,9 +250,9 @@ Dokładne wyniki tego badania -- w tym to, jak odpowiedzi studentów przekładaj
     \item \textbf{Konstrukcja indeksu:} Opis struktur danych w pamięci RAM lub bazie wektorowej, oszacowanie narzutu pamięciowego (dla kilkudziesięciu sal) oraz czasu dostępu i aktualizacji indeksu (np. interwał 30-sekundowy).
 \end{itemize}
 
-\subsection*{3. Na czym się skupić (Kluczowe uwagi Profesora)}
+\subsection*{3. Na czym się skupić (Kluczowe uwagi Pana Profesora)}
 \begin{itemize}
-    \item \textbf{Unikanie sztuczności:} Profesor kładł nacisk na to, by deskryptory miały bezpośrednie odzwierciedlenie w fizycznych czujnikach. Każda składowa wektora musi mieć jasną interpretację poznawczą.
+    \item \textbf{Unikanie sztuczności:} Pan Profesor kładł nacisk na to, by deskryptory miały bezpośrednie odzwierciedlenie w fizycznych czujnikach. Każda składowa wektora musi mieć jasną interpretację poznawczą.
 \end{itemize}
 
 \section{Procedury odpytywania i mechanizmy wyszukiwania}
@@ -261,8 +265,13 @@ Dokładne wyniki tego badania -- w tym to, jak odpowiedzi studentów przekładaj
 
 \subsection*{2. O czym pisać (Wskazówki merytoryczne)}
 \begin{itemize}
+<<<<<<< HEAD
     \item \textbf{Wektor zapytania:} Konwersja profilu użytkownika na wektor zapytania $\vec{q} = [q_O, q_S, q_D]^T$ (np. profil „Cicha nauka” $\rightarrow \vec{q} = [0.1, 0.0, 0.1]^T$).
     \item \textbf{Ważona odległość Euklidesowa:}
+=======
+    \item \textbf{Wektor zapytania:} Konwersja profilu użytkownika na wektor zapytania $\vec{q} = [q_O, q_S, q_D]^T$ (np. profil „Cichy Badacz” $\rightarrow \vec{q} = [0.1, 0.0, 0.1]^T$).
+    \item \textbf{Ważona odległość Euklidesowa}
+>>>>>>> 01618c5180b4f551174320e0cd11423795a84e67
     \begin{equation}
     d_W(\vec{q}, \vec{v}_i) = \sqrt{w_O(q_O - O_i)^2 + w_S(q_S - S_i)^2 + w_D(q_D - D_i)^2}
     \end{equation}
@@ -278,7 +287,7 @@ Dokładne wyniki tego badania -- w tym to, jak odpowiedzi studentów przekładaj
     \end{itemize}
 \end{itemize}
 
-\subsection*{3. Na czym się skupić (Kluczowe uwagi Profesora)}
+\subsection*{3. Na czym się skupić (Kluczowe uwagi Pana Profesora)}
 \begin{itemize}
     \item \textbf{Prezentacja wyników:} Przełożenie surowych odległości matematycznych na zrozumiały dla człowieka procent dopasowania (np. $P = (1 - d_W) \cdot 100\%$).
 \end{itemize}
@@ -305,12 +314,12 @@ Dokładne wyniki tego badania -- w tym to, jak odpowiedzi studentów przekładaj
     \item \textbf{Dynamiczny indeks:} Wpływ feedbacku na chwilową aktualizację parametrów sal w bazie (np. tymczasowa modyfikacja deskryptora sali przez algorytm, zanim sensory odświeżą stan).
 \end{itemize}
 
-\subsection*{3. Na czym się skupić (Kluczowe uwagi Profesora)}
+\subsection*{3. Na czym się skupić (Kluczowe uwagi Pana Profesora)}
 \begin{itemize}
     \item \textbf{System uczący się:} Pokazanie dynamicznej interakcji człowieka z systemem wyszukiwania. To użytkownik na miejscu decyduje o ostatecznej trafności semantycznej informacji.
 \end{itemize}
 
-\section{Podsumowanie etapu czwartego}
+\section{Podsumowanie etapu 4}
 
 \subsection*{1. O czym pisać (Podsumowanie)}
 \begin{itemize}
@@ -319,14 +328,14 @@ Dokładne wyniki tego badania -- w tym to, jak odpowiedzi studentów przekładaj
     \item \textbf{Perspektywy:} Propozycja integracji z planem zajęć w systemie USOS celem predykcji przyszłego obłożenia sal.
 \end{itemize}
 
-\subsection*{2. Na czym się skupić (Kluczowe uwagi Profesora)}
+\subsection*{2. Na czym się skupić (Kluczowe uwagi Pana Profesora)}
 \begin{itemize}
     \item \textbf{Obiektywna ocena i ograniczenia:} Podkreślenie rzeczywistych słabości systemu i rzetelna naukowa dyskusja na temat przypadków brzegowych.
 \end{itemize}
 
 \section*{Podział prac}
 \begin{itemize}
-    \item Rozdział 1 (Konfrontacja z odbiorcą) -- Imię Nazwisko
+    \item Rozdział 1 (Odpowiedź na uwagi do Raportu 3) -- Imię Nazwisko
     \item Rozdział 2 (Modele Odbiorcy i Ankieta) -- Imię Nazwisko
     \item Rozdział 3 (Deskryptory i Indeks) -- Imię Nazwisko
     \item Rozdział 4 (Algorytmy Wyszukiwania) -- Imię Nazwisko
