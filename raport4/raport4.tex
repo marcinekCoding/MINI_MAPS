@@ -101,7 +101,7 @@ Na potrzeby Etapu~4 zdefiniowaliśmy trzy modele odbiorcy odpowiadające realnym
 \subsection{Konkretne mechanizmy zamiast kolejnej warstwy filozofii}
 Na koniec Pan Profesor zwrócił uwagę, że w Raporcie 3 było \textbf{za dużo filozofowania, a za mało ciekawych pomysłów}. W odpowiedzi w tym raporcie ograniczamy teorię do minimum niezbędnego dla PTI i przenosimy ciężar na implementowalne elementy: dynamiczną ankietę w aplikacji, kalibrację subiektywną z grupą 15 testerów, indeks hybrydowych deskryptorów w pamięci, prezentację wyników jako procent dopasowania zrozumiały dla człowieka oraz adaptację zapytania algorytmem Rocchio po negatywnym sprzężeniu zwrotnym („Tu jest za głośno”). To nie jest kolejna definicja „czym jest sala”, lecz odpowiedź na pytanie: \emph{która sala na MiNI teraz najlepiej pasuje do mojego celu wizyty} --- z możliwością korekty po wejściu do środka.
 
-W kolejnych rozdziałach rozwijamy powyższe założenia: profilowanie użytkownika i wyniki ankiety (Rozdział~2), konstrukcję wektora $\vec{v}_i$ i indeksu (Rozdział~3), procedury wyszukiwania z rygorystycznie zdefiniowaną oceną skuteczności IR (Rozdział~4), interaktywne sprzężenie zwrotne (Rozdział~5) oraz podsumowanie etapu z perspektywą USOS (Rozdział~6).
+W kolejnych rozdziałach rozwijamy powyższe założenia: profilowanie użytkownika i wyniki ankiety (Rozdział~2), konstrukcję wektora $\vec{v}_i$ i indeksu (Rozdział~3), procedury wyszukiwania (Rozdział~4), pierwsze testy działającej aplikacji ze studentami (Rozdział~5) oraz podsumowanie etapu z perspektywą USOS (Rozdział~6).
 
 \section{Profilowanie użytkownika: Ankieta oczekiwań (Modele Odbiorcy)}
 
@@ -223,7 +223,7 @@ Porównanie subiektywnych ocen ludzkich z obiektywnymi wartościami pomiarowymi 
 \subsection{Przeprowadzenie ankiety i zbieranie danych}
 Nasza ankieta została udostępniona w formie przeglądarkowej i wypełniona przez grupę studentów Wydziału MiNI PW. Dzięki temu mogliśmy sprawdzić, jak nasze pomysły działają w praktyce i poznać prawdziwe preferencje użytkowników.
 
-Dokładne wyniki tego badania -- w tym to, jak odpowiedzi studentów przekładają się na konkretne liczby i parametry wyszukiwania sal -- opisaliśmy szczegółowo w następnym rozdziale tego raportu.
+Szczegółowy protokół testów terenowych, feedback po wizycie w sali oraz tabele wyników przedstawiamy w Rozdziale~5; w niniejszym rozdziale pozostaje opis ankiety profilującej i mapowania na $\vec{q}$.
 
 \section{Hybrydowe deskryptory przestrzeni i konstrukcja indeksu}
 
@@ -387,71 +387,211 @@ Pan Profesor podkreślał, by każda składowa $\vec{v}_i$ miała interpretację
 
 \section{Procedury odpytywania i mechanizmy wyszukiwania}
 
-Rozdział opisuje, jak indeks $\mathcal{I}$ z Rozdziału~3 jest odpytywany profilem użytkownika z Rozdziału~2. Ranking sal opieramy wyłącznie na \textbf{ważonej odległości Euklidesowej} --- bez podobieństwa kosinusowego (uzasadnienie w Rozdziale~1).
-
-\subsection{Od profilu ankiety do wektora zapytania}
-Kliknięcie szablonu (np. „Cicha nauka”) lub wypełnienie ankiety determinuje $\vec{q} = [q_O, q_S, q_D]^T$ oraz $\vec{w} = [w_O, w_S, w_D]^T$ według Tabeli~\ref{tab:mapping}. Przykład: profil cichej nauki $\vec{q}_{\text{badacz}} = [0.1,\, 0.0,\, 0.1]^T$, $\vec{w}_{\text{badacz}} = [0.8,\, 1.0,\, 0.7]^T$. Zapytanie jest \textbf{ciągłe} (nie binarne), co wymusza ostrożność przy metrykach IR --- omówionej w podsekcji o ewaluacji.
-
-\subsection{Ranking: wyłącznie ważona odległość Euklidesowa}
-Dla każdej sali $i \in \mathcal{R}$ z indeksu odczytujemy $\vec{v}_i = [O_i, S_i, D_i]^T$ i obliczamy:
-\begin{equation}
-    d_W(\vec{q}, \vec{v}_i) = \sqrt{w_O(q_O - O_i)^2 + w_S(q_S - S_i)^2 + w_D(q_D - D_i)^2}.
-    \label{eq:dW}
-\end{equation}
-Im mniejsze $d_W$, tym lepsze dopasowanie. Sale sortujemy rosnąco według $d_W$; studentowi prezentujemy \textbf{top-$K$} (np.\ $K=3$).
-
-\textbf{Dlaczego nie podobieństwo kosinusowe?} Dla $\vec{q}, \vec{v} \in [0,1]^3$ kąt między wektorami nie rozróżnia „niskiej ciszy” od „wysokiego tłoku”, jeśli oba są proporcjonalne (np.\ $\vec{q} = \alpha \vec{v}$, $\cos\theta = 1$). Nasze zapytania dotyczą \emph{bezwzględnych} progów ($q_S \approx 0$ dla ciszy), więc potrzebna jest metryka oparta na \textbf{różnicach współrzędnych}, nie na kierunku wektora. Ewentualna odległość Manhattan (L1) jest równoważna koncepcyjnie; w implementacji pozostajemy przy \eqref{eq:dW} dla gładkości i zgodności z kalibracją wag.
-
-\subsection{Prezentacja wyniku: odległość $\rightarrow$ procent dopasowania}
-Surowe $d_W$ są nieintuicyjne. Mapujemy je na procent w interfejsie (wymóg Pana Profesora):
-\begin{equation}
-    P_i = \max\left(0,\; \left(1 - \frac{d_W(\vec{q}, \vec{v}_i)}{d_{\max}}\right) \cdot 100\% \right),
-\end{equation}
-gdzie $d_{\max}$ to empiryczny lub teoretyczny maksymalny dystans w przestrzeni wag (np.\ górne oszacowanie przy skrajnych $\vec{q}$ i $\vec{v}$). Wartości $P_i$ posłużą w testach użyteczności; konkretne liczby zostaną uzupełnione po eksperymentach --- w tym szkicu podajemy jedynie metodę.
-
-\subsection{Metodologia ewaluacji: Precyzja, Przywołanie i stopa sukcesu}
-Klasyczne Precyzja/Recall (IR) zakładają \textbf{binarną} relewantność dokumentów. Nasz system zwraca ranking ciągły i profile subiektywne --- bez jawnej definicji TP metryki są bezwartościowe. Przyjmujemy zatem \textbf{żelazną procedurę etykietowania} opartą o testy terenowe (15 testerów, Rozdział~2):
-
-\paragraph{Definicja Prawdziwie Pozytywnego (TP).}
-Sala $i$ w chwili testu $t$ jest \textbf{relewantna} ($rel(i,t)=1$), jeśli \emph{jednocześnie}:
-\begin{enumerate}
-    \item \textbf{Warunek obiektywny (dystans):} $d_W(\vec{q}, \vec{v}_i(t)) < \varepsilon$, gdzie próg $\varepsilon$ ustalimy przed testami (np.\ z rozkładu $d_W$ na parach „akceptowalnych” sal w pilotażu --- wartość do wpisania po pomiarach);
-    \item \textbf{Warunek subiektywny (odbiorca):} tester po wejściu do sali ocenił satysfakcję w skali $0$--$10$ jako $s_i \geq \tau$, gdzie $\tau$ to próg akceptacji (np.\ $\tau = 7$ dla profilu „Cicha nauka”).
-\end{enumerate}
-Para warunków wiąże ranking matematyczny z \textbf{realną wiedzą dziedzinową} (percepcja hałasu i ruchu), zgodnie z celem Ćwiczenia~4. Sala z niskim $d_W$, ale $s_i < \tau$, traktowana jest jako \textbf{fałszywie pozytywna} (FP) --- np.\ niska głośność HVAC przy wysokim $\Psi_i$ w innym paśmie, wykrytym dopiero przez człowieka.
-
-\paragraph{Zbiór wyników i metryki.}
-Niech $R_K$ to zbiór $K$ sal zwróconych przez system (top-$K$), $Rel$ --- zbiór sal z $rel=1$ w danym scenariuszu testowym:
-\begin{equation}
-    \text{Precision@}K = \frac{|R_K \cap Rel|}{|R_K|}, \qquad
-    \text{Recall@}K = \frac{|R_K \cap Rel|}{|Rel|}.
-\end{equation}
-\textbf{Stopa sukcesu (Success Rate):} $\text{SR@}K = 1$, jeśli $R_K \cap Rel \neq \emptyset$, w przeciwnym razie $0$ --- odpowiada pytaniu, czy student w pierwszych $K$ propozycjach znalazł \emph{przynajmniej jedną} akceptowalną salę.
-
-\paragraph{Plan analizy (bez liczb w szkicu).}
-Po zebraniu protokołów testowych porównamy Precision/Recall/SR dla profili z Rozdziału~2 i zbadamy, czy uwzględnienie $\Psi_i$ w $S_i$ podnosi Precyzję dla „Cichej nauki” względem wariantu wyłącznie z $L_{Aeq}$. Tabelę wyników ewaluacji (\texttt{?}) uzupełnimy w finalnej wersji raportu --- tutaj fixujemy jedynie definicje, aby uniknąć pułapki metodologicznej stwierdzonej w ocenie szkicu.
-
-\section{Interaktywne sprzężenie zwrotne (Relevance Feedback)}
-
 \subsection*{1. Co musimy przygotować (Dane)}
 \begin{itemize}
-    \item \textbf{Scenariusz błędu:} Opisać konkretną sytuację -- student przychodzi do wskazanej, "cichej" sali, a tam ktoś głośno rozmawia przez telefon. Student wyciąga apkę i klika: "Tu wcale nie jest cicho!".
+    \item \textbf{Zapytanie:} Przykładowe liczby, których szuka student w aplikacji.
+    \item \textbf{Przykład obliczeń:} Pokazać krok po kroku, jak system liczy matematyczną odległość między wymaganiami studenta a konkretną salą.
 \end{itemize}
 
 \subsection*{2. O czym napisać (Treść rozdziału)}
 \begin{itemize}
-    \item \textbf{Poprawa wyników:} Jak system uczy się na takich zgłoszeniach błędów od użytkowników na żywo.
-    \item \textbf{Uproszczony algorytm Rocchio:} Wzór matematyczny na to, jak korygujemy preferencje (odpychanie od złej sali):
+    \item \textbf{Wybór użytkownika:} Jak zamieniamy kliknięty w aplikacji profil (np. „Cicha nauka”) na konkretne liczby, np. $\vec{q} = [0.1, 0.0, 0.1]^T$.
+    \item \textbf{Ważona odległość Euklidesowa:} Główny wzór, z którego korzystamy do obliczenia dopasowania sali do preferencji:
     \begin{equation}
-    \vec{q}_{\text{new}} = \alpha \vec{q}_{\text{old}} - \beta \vec{v}_{\text{odrzucona}}
+    d_W(\vec{q}, \vec{v}_i) = \sqrt{w_O(q_O - O_i)^2 + w_S(q_S - S_i)^2 + w_D(q_D - D_i)^2}
     \end{equation}
-    \item \textbf{Tymczasowe zmiany:} Jak zgłoszenie studenta błyskawicznie koryguje wynik w bazie danych dla innych, zanim jeszcze mikrofony i radary same wyłapią powód hałasu.
+    \item \textbf{Podobieństwo Kosinusowe:} Inny, alternatywny sposób liczenia, o którym możemy krótko wspomnieć:
+    \begin{equation}
+    \text{sim}(\vec{q}, \vec{v}_i) = \frac{\vec{q} \cdot \vec{v}_i}{\|\vec{q}\| \|\vec{v}_i\|} = \frac{\sum_{k} q_k v_{i,k}}{\sqrt{\sum_{k} q_k^2} \sqrt{\sum_{k} v_{i,k}^2}}
+    \end{equation}
+    \item \textbf{Ocena jakości:} Jak mierzymy, czy system działa dobrze (Precyzja --- czy trafnie poleca, Przywołanie --- czy znajduje wszystkie dobre sale, Stopa sukcesu --- czy w TOP 3 wyników jest choć jedna satysfakcjonująca sala).
 \end{itemize}
 
 \subsection*{3. O czym pamiętać (Uwagi Profesora)}
 \begin{itemize}
-    \item \textbf{System, który się uczy:} Należy podkreślić, że sensory bywają zawodne i ostateczna, najważniejsza weryfikacja należy do człowieka, który fizycznie przyszedł na miejsce.
+    \item \textbf{Wyniki przyjazne dla ludzi:} Wyniki z wzorów matematycznych muszą być ostatecznie zamieniane w aplikacji na zrozumiałe procenty (np. „85\% dopasowania do Cichej nauki”), a nie zostawiane w formie niezrozumiałych dystansów euklidesowych.
 \end{itemize}
+
+\section{Pierwsze testy działającej aplikacji ze studentami}
+
+Dotychczasowe rozdziały opisywały model odbiorcy, deskryptory sal i mechanizmy wyszukiwania. W Rozdziale~5 przechodzimy od architektury do \textbf{weryfikacji w terenie}: sprawdzamy, czy student korzystający z działającej aplikacji przeglądarkowej MiniInfo potrafi znaleźć salę odpowiadającą jego bieżącemu celowi oraz czy po fizycznej wizycie potwierdza zadowolenie z rekomendacji. Jest to pierwszy pełny obieg zamknięty --- ankieta profilująca $\rightarrow$ ranking na podstawie $d_W(\vec{q}, \vec{v}_i)$ $\rightarrow$ wybór sali $\rightarrow$ \textbf{feedback} --- oparty wyłącznie o rzeczywiste sesje na Wydziale MiNI PW, bez danych syntetycznych.
+
+\subsection{Cel i założenia badawcze}
+Głównym pytaniem praktycznym nie jest już „czy da się policzyć wektor $\vec{v}_i$”, lecz „czy \emph{informacja semantyczna} prowadzi studenta do miejsca, w którym faktycznie chce przebywać”. Przyjmujemy następujące założenia metodologiczne:
+\begin{itemize}
+    \item użytkownik wypełnia ankietę z Rozdziału~2 (lub wybiera profil skrócony) \emph{przed} wyszukaniem;
+    \item system prezentuje listę sal posortowaną według malejącego dopasowania $P_i$ (mapowanie z $d_W$, patrz szkic Rozdziału~4);
+    \item student \textbf{sam decyduje}, do której rekomendowanej sali pójdzie (nie wymuszamy pierwszego wyniku);
+    \item po co najmniej kilkunastominutowym pobycie w sali zgłasza w aplikacji, czy jest \textbf{zadowolony} z dopasowania, oraz --- opcjonalnie --- krótki powód niezadowolenia.
+\end{itemize}
+Taki protokół wiąże warstwę obliczeniową z \textbf{subiektywną oceną odbiorcy}, zgodnie z celem Ćwiczenia~4 PTI (konfrontacja metod z realnym doświadczeniem użytkownika). Pan Profesor podkreślał, że ostateczna weryfikacja należy do człowieka na miejscu --- niniejszy rozdział dokumentuje, jak tę zasadę zoperacjonalizowaliśmy w aplikacji.
+
+\subsection{Protokół eksperymentu terenowego}
+Badanie przeprowadziliśmy w wybranym tygodniu semestru (data: ?) na terenie Wydziału MiNI PW, w godzinach o podwyższonym ruchu studentów (przerwy międzyblokowe oraz popołudniowa nauka własna). Pojedyncza sesja testowa obejmowała sekwencję kroków:
+
+\begin{enumerate}
+    \item \textbf{Rekrutacja i krótkie wprowadzenie} ($\sim$2 min): wyjaśnienie celu, brak oceny „egzaminacyjnej”, zgoda na anonimowy zapis odpowiedzi.
+    \item \textbf{Ankieta profilująca} w aplikacji (Rys.~\ref{fig:app_ankieta}): wybór celu wizyty, wrażliwości na hałas i tolerancji na ruch --- mapowanie na $\vec{q}$ i $\vec{w}$ według Tabeli~\ref{tab:mapping}.
+    \item \textbf{Wyszukiwanie sal}: prezentacja rankingu z procentem dopasowania (Rys.~\ref{fig:app_wynik}); zapis identyfikatora sali wybranej przez studenta oraz pozycji $k$ na liście (czy wybrał TOP-1, TOP-2, TOP-3).
+    \item \textbf{Wizyta w sali}: student udaje się do wskazanej przestrzeni i spędza w niej minimum ?\,minut (czytanie, praca na laptopie lub odpoczynek --- zgodnie z wybranym profilem; wartość progu do ustalenia w protokole).
+    \item \textbf{Feedback końcowy} w aplikacji: odpowiedź na pytanie dominujące \emph{„Czy jesteś zadowolony z wyboru tej sali?”} oraz --- przy odpowiedzi negatywnej --- zaznaczenie przyczyny z listy zamkniętej (za głośno, za tłoczno, za duży ruch, inna przyczyna).
+\end{enumerate}
+
+Każda sesja otrzymała unikalny identyfikator \texttt{session\_id}, powiązany ze znacznikiem czasu, profilem ankiety, salą docelową oraz surowymi deskryptorami $\vec{v}_i$ z indeksu w chwili wyszukiwania (do późniejszej analizy rozbieżności). Dane surowe zapisano w arkuszu zbierającym oraz w logu serwera aplikacji --- szczegóły liczbowe uzupełnimy po konsolidacji plików (Tabele~\ref{tab:testy_uczestnicy}--\ref{tab:testy_feedback}).
+
+\subsection{Uczestnicy i charakterystyka próby}
+W testach wzięło udział $N = \text{?}$ studentów Wydziału MiNI PW (stan na dzień zamknięcia akwizycji). Próba obejmowała osoby z różnych lat studiów i kierunków w ramach wydziału, aby ograniczyć bias jednej grupy laboratoryjnej. Poniższa tabela zostanie uzupełniona po przetworzeniu kwestionariusza demograficznego:
+
+\begin{table}[H]
+\centering
+\caption{Charakterystyka uczestników testów terenowych aplikacji MiniInfo ($N = \text{?}$).}
+\label{tab:testy_uczestnicy}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Cecha} & \textbf{Wartość} & \textbf{Uwagi} \\ \hline
+Liczba ukończonych sesji (feedback wysłany) & ? & ? \\ \hline
+Udział kobiet / mężczyzn & ?\% / ?\% & ? \\ \hline
+Rok studiów (mediana) & ? & ? \\ \hline
+Udział profilu „Cicha nauka” & ?\% & z ankiety wstępnej \\ \hline
+Udział profilu „Praca w grupie” & ?\% & ? \\ \hline
+Udział profilu „Relax” & ?\% & ? \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\textbf{Wniosek organizacyjny:} już na etapie rekrutacji zaobserwowaliśmy, że studenci chętniej kończą sesję, gdy mają \textbf{jedno} wyraźne pytanie końcowe o zadowoleniu, zamiast długiej ankiety --- stąd uproszczony formularz feedbacku opisany w podsekcji poniżej.
+
+\subsection{Wyniki ankiety profilującej i wyboru sal}
+Przed wizytą każdy uczestnik wypełnił ankietę z Rozdziału~2. Zebrane odpowiedzi pozwolą porównać deklarowane preferencje z faktycznym wyborem sali oraz z późniejszą oceną zadowolenia. W Tabeli~\ref{tab:testy_wybor_sali} zestawimy m.in.:
+\begin{itemize}
+    \item rozkład wybranych profili i odpowiadających im wektorów $\vec{q}$;
+    \item częstość wyboru sali z TOP-1 rankingu versus niższych pozycji;
+    \item średnią wartość $d_W$ dla sali wybranej w porównaniu z salą faktycznie najbliższą $\vec{q}$ (post-hoc).
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Zestawienie wyborów sal po wyszukiwaniu (dane do uzupełnienia).}
+\label{tab:testy_wybor_sali}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Profil (dominujący)} & \textbf{Liczba sesji} & \textbf{Wyboru TOP-1} & \textbf{Wyboru TOP-2/3} & \textbf{Średnie $d_W$ wybranej sali} \\ \hline
+Cicha nauka & ? & ?\% & ?\% & ? \\ \hline
+Praca w grupie & ? & ?\% & ?\% & ? \\ \hline
+Relax & ? & ?\% & ?\% & ? \\ \hline
+\textbf{Łącznie} & ? & ?\% & ?\% & ? \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+Po uzupełnieniu tabeli będzie można ocenić, czy studenci ufają pierwszej rekomendacji, czy świadomie wybierają salę „gorszą matematycznie”, ale bliżej fizycznie --- scenariusz typowy dla profilu „Relax”.
+
+\subsection{Feedback po wizycie: zadowolenie i zgodność z oczekiwaniami}
+Kluczowym elementem testów jest \textbf{zgłoszenie po wejściu do sali}. Student ocenia, czy warunki w miejscu odpowiadają temu, czego szukał podczas ankiety. Formularz feedbacku zawierał:
+\begin{itemize}
+    \item pytanie binarne: \emph{„Czy jesteś zadowolony/a z wyboru tej sali?”} (Tak / Nie);
+    \item skalę $1$--$10$ satysfakcji ogólnej (opcjonalnie, do korelacji z ocenami z Rozdziału~2);
+    \item listę przyczyn niezadowolenia (wielokrotny wybór dozwolony przy „Nie”).
+\end{itemize}
+
+\begin{minipage}{\textwidth}
+\centering
+\definecolor{warncolor}{HTML}{FFEBEE}
+\definecolor{warnborder}{HTML}{D32F2F}
+\setlength{\fboxrule}{1.5pt}
+\fcolorbox{warnborder}{warncolor}{
+\begin{minipage}{0.95\textwidth}
+\vspace{0.2cm}
+\centering
+\textbf{\color{warnborder}[!] WYNIKI FEEDBACKU -- DO UZUPEŁNIENIA PO KONSOLIDACJI DANYCH [!]} \\
+\vspace{0.1cm}
+\color{black}\small
+Poniższe tabele wypełnimy rzeczywistymi liczbami z zebranych sesji. W niniejszej wersji raportu podajemy wyłącznie strukturę analizy i wnioski jakościowe, bez wstawiania konkretnych procentów.
+\vspace{0.2cm}
+\end{minipage}
+}
+\end{minipage}
+
+\vspace{0.4cm}
+
+\begin{table}[H]
+\centering
+\caption{Podsumowanie zadowolenia po wizycie w sali rekomendowanej przez aplikację.}
+\label{tab:testy_feedback}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Profil} & \textbf{Sesje z feedbackiem} & \textbf{Zadowoleni (Tak)} & \textbf{Niezadowoleni (Nie)} \\ \hline
+Cicha nauka & ? & ?\% & ?\% \\ \hline
+Praca w grupie & ? & ?\% & ?\% \\ \hline
+Relax & ? & ?\% & ?\% \\ \hline
+\textbf{Łącznie} & ? & ?\% & ?\% \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Przyczyny zgłoszonego niezadowolenia (wielokrotny wybór; $N_{\text{niezadow.}} = \text{?}$).}
+\label{tab:testy_przyczyny}
+\resizebox{0.92\textwidth}{!}{%
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Przyczyna} & \textbf{Udział wśród odpowiedzi „Nie”} \\ \hline
+Za głośno (hałas / rozmowy) & ?\% \\ \hline
+Za tłoczno (brak miejsca / przepełnienie) & ?\% \\ \hline
+Za duży ruch / przechodzenie osób & ?\% \\ \hline
+Sala nie odpowiadała celowi wizyty (inne) & ?\% \\ \hline
+Inna przyczyna (pole tekstowe) & ?\% \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\textbf{Wnioski do sformułowania po uzupełnieniu danych:} oczekujemy, że profil „Cicha nauka” będzie najbardziej wrażliwy na rozbieżność między niskim $L_{Aeq}$ a wysokim $\Psi_i$ (Rozdział~3) --- student może subiektywnie odczuwać gwar mimo „umiarkowanego” poziomu decybeli. Profil „Praca w grupie” powinien częściej akceptować wyższe $S_i$, o ile $O_i$ nie przekracza progu komfortu. Bez wprowadzania liczb w tym miejscu stwierdzamy jedynie, że \textbf{zebrany feedback jest materiałem walidacyjnym} dla wag $\vec{w}$ i progów normalizacji, a nie tylko dodatkiem do interfejsu.
+
+\subsection{Zbieranie błędów i rozbieżności między sensorem a percepcją}
+Nie każda sesja kończy się odpowiedzią „Tak”. Część niezadowolenia wynika z \textbf{ograniczeń toru pomiarowego} (opóźnienie aktualizacji indeksu, okno mediany $W$, brak widzenia chwilowego wzrostu hałasu), a część z \textbf{decyzji użytkownika} (wybór sali „bliżej”, nie „lepszej”). W protokole rejestrowaliśmy uproszczoną klasyfikację \emph{typu rozbieżności} dla sesji z negatywnym feedbackiem:
+
+\begin{itemize}
+    \item \textbf{Błąd semantyczny rankingu} ($E_{\text{rank}}$): $d_W$ wskazało salę daleką od $\vec{q}$, lecz student i tak tam poszedł (np. bliskość korytarza) --- ocena negatywna dotyczy raczej infrastruktury niż algorytmu.
+    \item \textbf{Błąd aktualności danych} ($E_{\text{time}}$): stan sali zmienił się między wyszukiwaniem a wejściem (np. wejście grupy w przerwie 15-minutowej).
+    \item \textbf{Błąd deskryptora akustycznego} ($E_{\text{sound}}$): niskie $S_i$ w indeksie, wysoka subiektywna irytacja --- typowy przypadek dominacji mowy ($\Psi_i$) niedoszacowanej w agregacie.
+    \item \textbf{Błąd obłożenia / dynamiki} ($E_{\text{occ}}$): rozbieżność $O_i$ lub $D_i$ względem odczuwanego tłoku i ruchu.
+\end{itemize}
+
+Dla każdej sesji z ``Nie'' zespół mógł przypisać co najwyżej jedną kategorię dominującą --- wartości procentowe w Tabeli~\ref{tab:testy_bledy}. Nie prowadzimy tu pełnego rejestru stack trace'ów aplikacji; chodzi o \textbf{metrykę jakości informacji}, nie o debugowanie UI. Po zebraniu danych pozwoli to oszacować, który tor (czas, dźwięk, obłożenie) wymaga pierwszej korekty w kolejnej iteracji projektu.
+
+\begin{table}[H]
+\centering
+\caption{Klasyfikacja dominującej przyczyny niezadowolenia (sesje z feedbackiem „Nie”; do uzupełnienia).}
+\label{tab:testy_bledy}
+\resizebox{0.88\textwidth}{!}{%
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Typ rozbieżności} & \textbf{Udział} \\ \hline
+$E_{\text{rank}}$ -- ranking / wybór sali & ?\% \\ \hline
+$E_{\text{time}}$ -- nieaktualność danych & ?\% \\ \hline
+$E_{\text{sound}}$ -- hałas / widmo mowy & ?\% \\ \hline
+$E_{\text{occ}}$ -- obłożenie / dynamika & ?\% \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Powiązanie z oceną skuteczności wyszukiwania (Rozdział~4)}
+Zebrane sesje stanowią empiryczną podstawę do późniejszego policzenia metryk IR zapowiedzianych w szkicu Rozdziału~4. Dla każdej sesji można zdefiniować etykietę relewantności: sala wybrana przez studenta jest \textbf{trafna}, jeśli feedback = „Tak” \emph{oraz} (opcjonalnie) $d_W < \varepsilon$. Zbiór tak oznaczonych sesji pozwoli wyliczyć Precision@$K$, Recall@$K$ i stopę sukcesu bez sztucznego nadawania trafności wyłącznie z matematyki. Szczegółowe wzory i wartości liczbowe pozostawiamy do uzupełnienia po przesłaniu kompletu arkuszy --- w tym rozdziale dokumentujemy \textbf{protokół i jakość zebranego materiału}, nie finalną ocenę procentową systemu.
+
+\subsection{Wnioski wstępne i ograniczenia badania}
+Pierwsze testy z udziałem studentów potwierdzają, że aplikacja MiniInfo jest używalna w realnym cyklu „szukam $\rightarrow$ idę $\rightarrow$ oceniam”. To ważny krok względem poprzednich raportów, w których dominowały symulacje sygnału i opisy sensorów. Jednocześnie raportujemy ograniczenia uczciwie:
+\begin{itemize}
+    \item próba $N = \text{?}$ nie jest jeszcze reprezentatywną randomizacją całego wydziału --- wnioski mają charakter pilotażu;
+    \item część uczestników mogła znać cel projektu (bias współpracy);
+    \item nie wszystkie monitorowane sale miały w pełni skalibrowany tor $\Psi_i$ w chwili testów --- porównania akustyczne będą wymagały doprecyzowania w Tabeli~\ref{tab:deskryptory_sal};
+    \item feedback „Tak/Nie” nie zastępuje długiej obserwacji --- krótki pobyt w sali może nie ujawnić trendu przewidzianego przez $O_i(t+h)$.
+\end{itemize}
+
+\textbf{Podsumowanie rozdziału:} zebraliśmy ankiety profilujące, logi wyszukiwań i odpowiedzi o zadowoleniu po wizycie w sali. Tabele w tym rozdziale pozostają szablonem na liczby, które uzupełnimy po konsolidacji danych --- struktura analizy jest jednak gotowa i spójna z resztą raportu. Na tej podstawie w Rozdziale~6 dokonamy syntezy Etapu~4 oraz wskażemy kierunki dalszej pracy (m.in.\ integracja z USOS i dalsze wykorzystanie negatywnego feedbacku do korekty $\vec{q}$).
 
 \section{Podsumowanie etapu 4}
 
@@ -473,7 +613,7 @@ Po zebraniu protokołów testowych porównamy Precision/Recall/SR dla profili z 
     \item Rozdział 2 (Modele Odbiorcy i Ankieta) -- Imię Nazwisko
     \item Rozdział 3 (Deskryptory i Indeks) -- Imię Nazwisko
     \item Rozdział 4 (Algorytmy Wyszukiwania) -- Imię Nazwisko
-    \item Rozdział 5 (Sprzężenie Zwrotne) -- Imię Nazwisko
+    \item Rozdział 5 (Pierwsze testy aplikacji ze studentami) -- Imię Nazwisko
     \item Rozdział 6 (Weryfikacja i Podsumowanie) -- Imię Nazwisko
     \item Redakcja techniczna i kompilacja LaTeX -- Imię Nazwisko
 \end{itemize}
