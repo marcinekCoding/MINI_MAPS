@@ -1,0 +1,99 @@
+Laboratorium PTI
+Ćwiczenie 4: SEMANTYKA INFORMACJI (koncentracja na treści/znaczeniu pozyskiwanej
+informacji, odniesienia do realnej wiedzy, ale też doświadczeń i subiektywnych opinii
+użytkowników, opis/deskryptory treści, przeszukiwanie opisanych znaczeniowo zasobów
+referencyjnych, definiowanie/profilowanie, konkretyzacja modelu odbiorcy/użytkownika,
+udoskonalenia finalnych metod ekstrakcji kluczowej informacji)
+Tematyka: konfrontacja wykorzystanych dotąd metod przetwarzania/analizy danych oraz kryteriów
+oceny skuteczności ich analizy i wnioskowania z realną wiedzą oraz doświadczeniami potencjalnych
+odbiorców; analiza uzyskanych efektów ekstrakcji i opisu informacji z referencyjnymi źródłami wiedzy
+dziedzinowej/specjalistycznej (modele wiedzy, ontologie, taksonomie) oraz najlepszymi
+metodami/modelami opisu treści celem finalnej inżyniersko optymalizacji opracowanej
+metody/narzędzia; wiarygodny, finalny opis/model (charakterystyka) istoty informacji ze względu na
+określony profil użytkownika, ocena wstępna realnej przydatności opracowanych metod/narzędzi w
+kontekście aktualnych osiągnięć (publikacje, narzędzia, wyniki eksperymentów); przeglądanie
+rozległych zasobów celem wyszukania kluczowych informacji w określonym zastosowaniu,
+indeksowanie danych (na poziomie treści) – atrybuty, cechy, listy obiektów, mechanizmy skutecznego
+wyszukiwania danych (obrazy/dźwięk/multimedia etc.) o określonej treści; dyskusja istotnych
+elementów systemów wyszukiwania, takich jak deskryptory semantyczne, miary podobieństwa,
+selektywność wyszukiwania: precyzja, przywołanie, stopa sukcesu, przeglądarki, testy wyszukiwania.
+Cel: optymalna ekstrakcja - na podstawie zgromadzonych, uporządkowanych i zweryfikowanych
+zasobów -
+‘istoty’ informacji (kluczowa treść) w danym zastosowaniu na bazie możliwie
+wiarygodnej, reprezentatywnej, wyczerpującej, kompletnej i specyficznej charakterystyki
+badanego zjawiska- problem rozumienia w kontekście poznania; zasadniczo chodzi o realne
+potwierdzenie pozyskania/wydobycia/aproksymację kluczowej treści o możliwie pełnej
+reprezentatywności i klarownej interpretacyjności, która najlepiej służy ustalonemu odbiorcy w
+kontekście realnego zastosowania; na tym etapie więc klarownie definiujemy odbiorcę, i sposób
+wykorzystania zgromadzonych danych, przypuszczalne obszary i formy zastosowań, zakładaną
+przydatność metody; należy dobrać właściwe kryteria i sposoby oceny uzyskanych wyników –
+powinny być realne (np. z dyskusją realnych scenariuszy użytkowych), mogą być subiektywne,
+wiarygodne obliczeniowo, dostosowane do specyfiki problemu etc.
+Teoria: zbiory slajdów: PTI4
+_ekstrakcja, PTI5_
+zarzadzanie
+Wybrane aktywności:
+• aproksymacja treści
+• poprawa jakości percepcji treści określanego rodzaju informacji metodami
+aproksymacji nieliniowej, z wykorzystaniem rozwinięć w różnych bazach, słownikach
+• opis informacji : porządkowanie i zarządzenia treścią informacji gromadzonej
+• analiza scen, różnicowanie cech jakościowych, semantycznych, poznawczych dla
+wybranych zbiorów danych o określonej semantyce; wybrane formy anotacji,
+hybrydowe opisy danych itp.
+• wyróżnianie obszarów zainteresowania, określonych obiektów, scen, wybranych cech
+• deskryptory opisu treści (wybrane)
+• deskryptory obrazów (kolor, tekstura, histogram, krawędzie, lokalne-globalne),
+dźwięku (spektrum, częstotliwości dominujące, spektrogram, rozkłady
+wielorozdzielcze), wektorowe, hybrydowe, inne
+• porządkowanie, integracja i optymalizacja zespołu deskryptorów
+• konstrukcja indeksu, procedury wyszukiwania treści, kryteria oceny znaczeń
+• definicje atrybutów skalarnych, wektorowych, organizacja indeksu, jego
+implementacje, struktury, wymagania wydajnościowe, ograniczenia pamięciowe
+• organizacja danych i zasobów (pamięć, czas), listy obiektowe, rozmieszczenie i
+kontrola dostępu do zasobów, aktualizacja zasobów, ich specjalistyczny opis,
+alternatywne formy przeszukiwania indeksu/odpytywania, dostosowanie indeksu do
+specyfiki danych i gromadzonej informacji
+• dostosowanie schematów wyszukiwania do modelu użytkowego
+• modele użytkownika, interfejsy wyszukiwarek, ocena skuteczności, formy sprzężenia
+zwrotnego doskonalące odpowiedzi systemu zarządzania informacją, interaktywne
+protokoły wyszukiwania, analiza kryteriów i form podobieństwa wyszukiwanej treści
+• procedury odpytywania/wyszukiwania po kategoriach, opisie, adnotacjach, słowach
+kluczowych, językowe, po zawartości/treści; zapytania przez przykład, klasyfikacja
+zapytań na podstawie charakterystyki wyszukanych obiektów, interpretacja treści i
+wspomaganie decyzji
+Przykładowe formy realizacji:
+a) analiza rodzaju i formy opisywanej i wyszukiwanej informacji zależnie od rodzaju danych, ich
+przeznaczenia, formy wykorzystania; użycie wcześniej zdobytej wiedzy nt. ekstrakcji i
+charakterystyki informacji w określonej formie danych/sygnałów oraz wobec potrzeb odbiorcy
+informacji; wybór konkretnego zastosowania i realnych postaci zarządzanych danych, zdobycie
+możliwie reprezentatywnych i różnorodnych zasobów; określenie oczekiwań użytkownika
+systemu wyszukiwania informacji
+b) określenie relacji pomiędzy strukturą i formą implementacji indeksu, a rodzajem
+przeglądanych danych, specyfiką wyszukiwanej informacji, oczekiwaną postacią interfejsu oraz
+scenariuszem pracy użytkownika; uwzględnienie możliwości doboru parametrów wyszukiwania
+(adaptacja indeksu), sprzężeniem zwrotnym (relevance feedback) i zawartością bazy danych
+(kontrola zasobów, rozbudowa, preselekcja, redundancja itp.)
+c) przegląd i charakterystyka możliwych do wykorzystania deskryptorów, zależnie od
+zdefiniowanego przedmiotu i celu indeksowania, organizujących indeks i decydujących o
+poznawczych walorach wyszukiwania; dobór i weryfikacja deskryptorów zgodnie z przyjętymi
+kryteriami wyszukiwania, rodzajem informacji, specyfiką zróżnicowań treści, a także według
+zdefiniowanej/dopasowanej miary (funkcji) podobieństwa treści/obiektów etc.
+d) testowanie różnych scenariuszy wyszukiwania (głównie zapytanie przez przykład), ocena i
+ewentualnej korekta dostępnych parametrów indeksowania i przeszukiwania (deskryptory,
+reprezentacje obiektów bazodanowych – np. normalizacja), mechanizmy przeglądarki, analiza
+podobieństwa, zasady porządkowania treści, wyliczanie efektywności wyszukiwania (stopa
+sukcesu, precyzja, przywołanie itd.) zależnie od przyjętej organizacji zapytań itp.
+Przykładowe narzędzia (dostępne w podkatologu lab4):
+- wybrane funkcje i biblioteki Matlaba (Signal Processing Toolbox, Image Processing Toolbox,
+Optimization Toolbox, Statistics and Machine Learning Toolbox)
+- matlabowy framework do wyszukiwania obrazów:
+https://www.mathworks.com/help/vision/ug/image-retrieval-using-customized-bag-of-features.html
+(można testować różne deskryptory i funkcje podobieństwa)
+- https://www.mathworks.com/help/vision/ug/image-retrieval-with-bag-of-visual-words.html
+- https://www.mathworks.com/matlabcentral/fileexchange/42008-content-based-image-retrieval
+- https://www.mathworks.com/help/vision/ref/evaluateimageretrieval.html
+-https://medium.com/sicara/keras-tutorial-content-based-image-retrieval-convolutional-denoising-
+autoencoder-dc91450cc511
+- http://orpheus.ee.duth.gr/anaktisi/
+- http://www.akiwi.eu/
+- https://en.wikipedia.org/wiki/List_of_CBIR_engines

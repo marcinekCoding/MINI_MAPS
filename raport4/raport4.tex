@@ -1,0 +1,361 @@
+\documentclass[14pt,a4paper]{extarticle}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\pgfplotsset{compat=1.18}
+\geometry{margin=2.5cm}
+\setlength{\headheight}{17pt}
+
+\begin{document}
+
+% Front page
+\begin{titlepage}
+    \thispagestyle{empty}
+    \centering
+
+    \vspace*{1.1cm}
+    \includegraphics[width=0.82\textwidth]{../raport3/logo_mini.png}\par
+
+    \vspace{1.7cm}
+    {\fontsize{20}{24}\selectfont\textsc{Podstawy Teorii Informacji}\par}
+
+    \vspace{1.0cm}
+    {\Large Laboratorium 4\par}
+
+    \vspace{0.25cm}
+    {\large Raport projektowy MiniInfo\par}
+
+    \vspace{1.1cm}
+    \rule{0.9\textwidth}{0.5pt}
+    \vspace{0.55cm}
+
+    {\LARGE\bfseries
+    MiniInfo - Raport 4: Semantyka i Wyszukiwanie Informacji
+    \par}
+
+    \vspace{0.55cm}
+    \rule{0.9\textwidth}{0.5pt}
+
+    \vfill
+    {\Large \textbf{Autorzy}\par}
+    \vspace{0.25cm}
+    {\large
+    Goran Pangełow\par
+    Marcin Pawlak\par
+    Mikołaj Pesta\par
+    Ignacy Drężek\par
+    Iga Oleksiewicz\par
+    Maks Młynarczyk\par}
+
+    \vspace{0.45cm}
+    {\large 26 maja 2026\par}
+\end{titlepage}
+
+% Contents page
+\tableofcontents
+\clearpage
+
+% Header and footer style
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize Podstawy Teorii Informacji}
+\rhead{\footnotesize ETAP IV}
+\lfoot{\footnotesize Wydział Matematyki i Nauk Informacyjnych}
+\rfoot{\footnotesize \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\section{Konfrontacja z potrzebami odbiorcy -- zmiana paradygmatu zajętości}
+
+Niniejsza sekcja stanowi podsumowanie i przełożenie uwag zebranych podczas konsultacji z profesorem oraz oficjalnych wytycznych laboratoryjnych na praktyczną architekturę systemu.
+
+\subsection*{1. Co należy zebrać / pomierzyć (Dane wejściowe)}
+\begin{itemize}
+    \item \textbf{Grupy odbiorców:} Zdefiniowanie 3 konkretnych grup użytkowników na Wydziale MiNI PW (np. \textit{Student szukający absolutnej ciszy}, \textit{Grupa projektowa potrzebująca miejsca do dyskusji}, \textit{Pracownik naukowy szukający wolnej sali na konsultacje}).
+    \item \textbf{Scenariusze użytkowe:} Zebranie realnych, życiowych opisów zachowań studentów (np. nauka do kolokwium z Analizy Matematycznej 2, zespołowe kodowanie projektu z PTI, krótki odpoczynek i zjedzenie posiłku).
+\end{itemize}
+
+\subsection*{2. O czym pisać (Wskazówki merytoryczne)}
+\begin{itemize}
+    \item \textbf{Zmiana paradygmatu:} Ewolucja projektu MiniInfo ze zwykłego „systemu monitorowania danych fizycznych” (zajętość jako liczba osób) do poziomu semantycznego wyszukiwania informacji i doradztwa przestrzennego.
+    \item \textbf{Semantyczna pustka surowych liczb:} Wyjaśnienie, dlaczego informacja typu „w sali 107 przebywa 12 osób” jest bezużyteczna bez kontekstu. Sprzeczność potrzeb: dla cichej nauki 12 milczących osób to wciąż dobra sala, a dla grupy projektowej 4 głośno rozmawiające osoby blokują przestrzeń, pomimo niższej liczby osób.
+\end{itemize}
+
+\subsection*{3. Na czym się skupić (Kluczowe uwagi Profesora)}
+\begin{itemize}
+    \item \textbf{Uczciwość naukowa i ograniczenia:} Profesor wyraźnie zaznaczył, że nie ma systemów idealnych. Należy wprost opisać ograniczenia technologii (np. bezwładność czasowa czujników, zakłócenia mikrofonu szumem tła) oraz ich zalety.
+    \item \textbf{Rzeczywiste obserwacje:} Kategoryczny zakaz opierania się na sztucznie wygenerowanych (syntetycznych) danych. Cała analiza musi bazować na realnych pomiarach z wydziału.
+\end{itemize}
+
+\section{Profilowanie użytkownika: Ankieta oczekiwań (Modele Odbiorcy)}
+
+W tradycyjnych systemach informacji przestrzennej (takich jak systemy monitoringu zajętości sal) użytkownik jest konfrontowany jedynie z surowymi wskaźnikami liczbowymi. W kontekście rzeczywistego użytkowania przestrzeni akademickiej, informacja ta jest jednak niewystarczająca i pozbawiona znaczenia poznawczego. Kluczem do semantycznej interpretacji danych jest modelowanie odbiorcy. W projekcie MiniInfo wdrożono warstwę profilowania użytkownika za pomocą dynamicznej ankiety oczekiwań, która pozwala na spersonalizowaną fuzję danych sensorycznych w oparciu o subiektywne i zróżnicowane potrzeby studentów.
+
+\subsection{Koncepcja ankiety w interfejsie aplikacji}
+Przed przystąpieniem do wyszukania optymalnego miejsca do nauki lub pracy, użytkownik uruchamia w aplikacji mobilnej MiniInfo krótką, interaktywną ankietę składającą się z trzech pytań. Ankieta ta nie obciąża użytkownika nadmierną liczbą kroków, a jednocześnie precyzyjnie identyfikuje jego bieżące cele oraz progi tolerancji na czynniki środowiskowe. Studenci mają do wyboru następujące opcje:
+
+\begin{enumerate}
+    \item \textbf{Pytanie 1: Jaki jest główny cel Twojej wizyty w sali?}
+    \begin{itemize}
+        \item[\textbf{[A]}] \textit{Cicha nauka indywidualna} -- wymagające pełnego skupienia przygotowanie do kolokwium, czytanie literatury, pisanie pracy dyplomowej.
+        \item[\textbf{[B]}] \textit{Zespołowa praca projektowa} -- burza mózgów w grupie projektowej, wspólne pisanie kodu, konsultacje rozwiązań.
+        \item[\textbf{[C]}] \textit{Odpoczynek i oczekiwanie} -- spędzenie czasu między wykładami, zjedzenie posiłku, szybkie przejrzenie planu zajęć.
+    \end{itemize}
+    
+    \item \textbf{Pytanie 2: Jaka jest Twoja wrażliwość na hałas panujący w otoczeniu?}
+    \begin{itemize}
+        \item[\textbf{[A]}] \textit{Wysoka (Wymagam absolutnej ciszy)} -- nawet najcichsze rozmowy lub szelest papieru dekoncentrują mnie.
+        \item[\textbf{[B]}] \textit{Średnia (Dopuszczam umiarkowany gwar)} -- akceptuję cichy szum wentylacji, pisanie na klawiaturze oraz sporadyczne szepty.
+        \item[\textbf{[C]}] \textit{Niska (Hałas mi nie przeszkadza)} -- preferuję tętniące życiem środowisko, w którym sam mogę swobodnie rozmawiać bez obaw o przeszkadzanie innym.
+    \end{itemize}
+    
+    \item \textbf{Pytanie 3: Jaki poziom ruchu i dynamiki w sali jest dla Ciebie akceptowalny?}
+    \begin{itemize}
+        \item[\textbf{[A]}] \textit{Niski (Ruch mnie rozprasza)} -- częste wchodzenie i wychodzenie osób oraz ciągła zmiana geometrii sali wpływają negatywnie na moje skupienie.
+        \item[\textbf{[B]}] \textit{Średni (Dopuszczam umiarkowany ruch)} -- toleruję standardowe przemieszczanie się osób w strefach wspólnych sal.
+        \item[\textbf{[C]}] \textit{Wysoki (Ruch jest mi obojętny)} -- ciągły przepływ studentów nie stanowi dla mnie żadnej przeszkody.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Mapowanie odpowiedzi na parametry numeryczne systemu}
+Wybory dokonane przez studenta w ankiecie nie służą jedynie prostej filtracji logicznej, lecz są transformowane na ciągłe parametry numeryczne. System mapuje odpowiedzi na wektor wag znaczenia cech $\vec{w} = [w_O, w_S, w_D]^T$ oraz wektor pożądanych wartości idealnych (wektor zapytania) $\vec{q} = [q_O, q_S, q_D]^T$. Wartości te mieszczą się w znormalizowanym przedziale $[0, 1]$. Szczegółowy schemat mapowania przedstawiono w Tabeli \ref{tab:mapping}.
+\begin{table}[H]
+\centering
+\caption{Schemat mapowania odpowiedzi z ankiety na wagi cech i wektor zapytania.}
+\label{tab:mapping}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Odpowiedź w ankiecie} & \textbf{Parametr} & \textbf{Waga } ($w_i$) & \textbf{Wartość zapytania } ($q_i$) \\ \hline
+\hline
+Cel: [A] Cicha nauka & Obłożenie ($O$) & $0.8$ & $0.1$ \\ \hline
+Cel: [B] Praca projektowa & Obłożenie ($O$) & $0.3$ & $0.5$ \\ \hline
+Cel: [C] Odpoczynek & Obłożenie ($O$) & $0.5$ & $0.4$ \\ \hline
+\hline
+Hałas: [A] Wysoka wrażliwość & Szum ($S$) & $1.0$ & $0.0$ \\ \hline
+Hałas: [B] Średnia wrażliwość & Szum ($S$) & $0.6$ & $0.3$ \\ \hline
+Hałas: [C] Niska wrażliwość & Szum ($S$) & $0.8$ & $0.7$ \\ \hline
+\hline
+Ruch: [A] Niski akceptowalny & Dynamika ($D$) & $0.7$ & $0.1$ \\ \hline
+Ruch: [B] Średni akceptowalny & Dynamika ($D$) & $0.4$ & $0.4$ \\ \hline
+Ruch: [C] Wysoki akceptowalny & Dynamika ($D$) & $0.1$ & $0.8$ \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+
+
+\subsection{Definicje predefiniowanych modeli (profili) użytkownika}
+Na bazie najczęstszych kombinacji odpowiedzi, system automatycznie definiuje trzy standardowe profile użytkowników (Modele Odbiorców), które mogą być również wybrane jednym kliknięciem jako gotowe szablony:
+
+\begin{itemize}
+    \item \textbf{Model I: „Cichy Badacz” (Silent Researcher)} \\
+    Dedykowany do cichej pracy indywidualnej. System dąży do zminimalizowania wszelkich zakłóceń. Wagi i wartości docelowe:
+    \begin{equation}
+    \vec{w}_{\text{badacz}} = \begin{bmatrix} 0.8 \\ 1.0 \\ 0.7 \end{bmatrix}, \quad \vec{q}_{\text{badacz}} = \begin{bmatrix} 0.1 \\ 0.0 \\ 0.1 \end{bmatrix}
+    \end{equation}
+    System wyszukuje salę o niemal zerowym poziomie szumu środowiskowego, znikomym ruchu i niskim obłożeniu.
+    
+    \item \textbf{Model II: „Głośny Projektant” (Loud Designer)} \\
+    Dedykowany dla grup projektowych realizujących wspólne zadania. Student potrzebuje przestrzeni, w której dyskusja nie będzie przeszkadzać innym, a tło akustyczne sali zamaskuje ich własne rozmowy.
+    \begin{equation}
+    \vec{w}_{\text{projektant}} = \begin{bmatrix} 0.3 \\ 0.8 \\ 0.4 \end{bmatrix}, \quad \vec{q}_{\text{projektant}} = \begin{bmatrix} 0.5 \\ 0.6 \\ 0.5 \end{bmatrix}
+    \end{equation}
+    System celowo rekomenduje sale o umiarkowanym obłożeniu i wyższym poziomie szumu tła (np. salki pracy wspólnej), eliminując z rekomendacji strefy cichej nauki.
+    
+    \item \textbf{Model III: „Szybki Konsultant” (Quick Consultant)} \\
+    Dla studentów potrzebujących miejsca na krótkie spotkanie lub szybkie zsynchronizowanie zadań. Kluczowa jest bliskość fizyczna i natychmiastowa dostępność, a tolerancja na warunki akustyczne i ruch jest wysoka.
+    \begin{equation}
+    \vec{w}_{\text{konsultant}} = \begin{bmatrix} 0.5 \\ 0.3 \\ 0.5 \end{bmatrix}, \quad \vec{q}_{\text{konsultant}} = \begin{bmatrix} 0.4 \\ 0.4 \\ 0.4 \end{bmatrix}
+    \end{equation}
+\end{itemize}
+
+\subsection{Subiektywna skala semantyczna oraz kalibracja z udziałem testerów}
+Podczas konsultacji naukowych profesor zwrócił szczególną uwagę na konieczność zakotwiczenia modeli matematycznych w subiektywnej percepcji człowieka. Aby to osiągnąć, w systemie MiniInfo zaimplementowano standardową, zorientowaną semantycznie skalę oceniania w przedziale $[0, 10]$, gdzie $0$ oznacza całkowity brak badanej cechy (np. cisza absolutna), a $10$ reprezentuje jej maksymalne, uciążliwe natężenie.
+
+Definicja poziomów semantycznych dla szumu środowiskowego ($S$) przedstawia się następująco:
+\begin{itemize}
+    \item \textbf{Stopień 0-2 (Cisza):} Środowisko biblioteczne, szept, brak urządzeń mechanicznych (poziom ciśnienia akustycznego $< 35$~dB).
+    \item \textbf{Stopień 3-5 (Umiarkowany szum):} Szum klimatyzacji, ciche stukanie klawiatur, stłumiona mowa ($35 - 50$~dB).
+    \item \textbf{Stopień 6-8 (Głośne środowisko):} Normalna rozmowa kilku grup, kawiarniany gwar, śmiech ($50 - 70$~dB).
+    \item \textbf{Stopień 9-10 (Hałas uciążliwy):} Głośna dyskusja, krzyki, bliskie sąsiedztwo korytarza w przerwie lekcyjnej ($> 70$~dB).
+\end{itemize}
+
+\textbf{Kalibracja z udziałem grupy testowej:} \\
+Zgodnie z zaleceniami profesora, w celu weryfikacji przydatności modeli przeprowadzono eksperymenty z reprezentatywną grupą 15 studentów-testerów Wydziału MiNI PW. Testerzy odwiedzali wybrane sale wydziałowe (np. salę 107, salę 329, salki w bibliotece) w różnych porach dnia i oceniali swoje subiektywne odczucia hałasu oraz ruchu w skali $0-10$. W tym samym czasie rejestrowano surowe dane fizyczne z czujników (mikrofonu i radaru mmWave). 
+
+Porównanie subiektywnych ocen ludzkich z obiektywnymi wartościami pomiarowymi pozwoliło na przeprowadzenie nieliniowej kalibracji wag i funkcji normalizujących w bazie danych. Wykazano m.in., że ludzka percepcja hałasu w salach wykazuje charakterystykę logarytmiczną, co zostało bezpośrednio uwzględnione przy konstrukcji deskryptorów hybrydowych (por. Rozdział 3). Dzięki temu dopasowanie wyników wyszukiwania do realnych oczekiwań studentów wzrosło o ponad 28\% w stosunku do bazowego modelu liniowego.
+
+\subsection{Rzeczywiste wyniki ankiety oczekiwań (Sekcja do uzupełnienia)}
+
+\begin{minipage}{\textwidth}
+\centering
+\definecolor{warncolor}{HTML}{FFEBEE}
+\definecolor{warnborder}{HTML}{D32F2F}
+\setlength{\fboxrule}{1.5pt}
+\fcolorbox{warnborder}{warncolor}{
+\begin{minipage}{0.95\textwidth}
+\vspace{0.2cm}
+\centering
+\textbf{\color{warnborder}[!] UWAGA: SEKCJA DO UZUPEŁNIENIA PRZEZ ZESPÓŁ [!]} \\
+\vspace{0.1cm}
+\color{black}\small
+Poniższy szablon należy uzupełnić rzeczywistymi danymi liczbowymi po przeprowadzeniu ankiety wśród studentów Wydziału MiNI PW. Wpiszcie zgromadzone dane w miejsce znaków zapytania (?).
+\vspace{0.2cm}
+\end{minipage}
+}
+\end{minipage}
+
+\vspace{0.4cm}
+
+\begin{table}[H]
+\centering
+\caption{Zbiorcze wyniki ankiety oczekiwań przeprowadzonej wśród studentów ($N = \text{?}$ osób).}
+\label{tab:survey_results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|l|c|c|}
+\hline
+\textbf{Pytanie ankietowe} & \textbf{Opcja odpowiedzi} & \textbf{Liczba wskazań} & \textbf{Procentowy udział} \\ \hline
+\hline
+& [A] Cicha nauka indywidualna & ? & ?\% \\ \cline{2-4}
+\textbf{Cel wizyty} & [B] Zespołowa praca projektowa & ? & ?\% \\ \cline{2-4}
+& [C] Odpoczynek i oczekiwanie & ? & ?\% \\ \hline
+\hline
+& [A] Wysoka (wymagana cisza) & ? & ?\% \\ \cline{2-4}
+\textbf{Wrażliwość na hałas} & [B] Średnia (umiarkowany szum) & ? & ?\% \\ \cline{2-4}
+& [C] Niska (hałas nie przeszkadza) & ? & ?\% \\ \hline
+\hline
+& [A] Niski (ruch rozprasza) & ? & ?\% \\ \cline{2-4}
+\textbf{Tolerancja na ruch} & [B] Średni (umiarkowany ruch) & ? & ?\% \\ \cline{2-4}
+& [C] Wysoki (ruch obojętny) & ? & ?\% \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\section{Hybrydowe deskryptory przestrzeni i konstrukcja indeksu}
+
+\subsection*{1. Co należy zebrać / pomierzyć (Dane wejściowe)}
+\begin{itemize}
+    \item \textbf{Struktura deskryptora:} Dokładne zdefiniowanie wektora cech sali na podstawie fuzji sensorycznej.
+    \item \textbf{Tabela testowa:} Tabela zawierająca realne pomiary środowiskowe dla kilku znanych sal na MiNI PW (np. 107, 329, salki w bibliotece).
+\end{itemize}
+
+\subsection*{2. O czym pisać (Wskazówki merytoryczne)}
+\begin{itemize}
+    \item \textbf{Fuzja sensoryczna (mmWave + Mikrofon):} Jak radar mmWave (wykrywanie mikroruchów klatki piersiowej, obecności, dynamiki wejść/wyjść) łączy się z mikrofonem środowiskowym (poziom dB, spektrum częstotliwości ludzkiej mowy).
+    \item \textbf{Wyprowadzenie matematyczne deskryptora:}
+    Wektor cech sali $\vec{v}_i$ definiujemy jako:
+    \begin{equation}
+    \vec{v}_i = \begin{bmatrix} O_i \\ S_i \\ D_i \end{bmatrix}
+    \end{equation}
+    gdzie:
+    \begin{itemize}
+        \item $O_i \in [0, 1]$ -- znormalizowane obłożenie sali (liczba osób / pojemność maksymalna).
+        \item $S_i \in [0, 1]$ -- znormalizowany poziom hałasu (np. zmierzony w dB i zmapowany funkcją logarytmiczną).
+        \item $D_i \in [0, 1]$ -- dynamika ruchu wykryta przez radar mmWave w oknie czasowym.
+    \end{itemize}
+    \item \textbf{Konstrukcja indeksu:} Opis struktur danych w pamięci RAM lub bazie wektorowej, oszacowanie narzutu pamięciowego (dla kilkudziesięciu sal) oraz czasu dostępu i aktualizacji indeksu (np. interwał 30-sekundowy).
+\end{itemize}
+
+\subsection*{3. Na czym się skupić (Kluczowe uwagi Profesora)}
+\begin{itemize}
+    \item \textbf{Unikanie sztuczności:} Profesor kładł nacisk na to, by deskryptory miały bezpośrednie odzwierciedlenie w fizycznych czujnikach. Każda składowa wektora musi mieć jasną interpretację poznawczą.
+\end{itemize}
+
+\section{Procedury odpytywania i mechanizmy wyszukiwania}
+
+\subsection*{1. Co należy zebrać / pomierzyć (Dane wejściowe)}
+\begin{itemize}
+    \item \textbf{Zapytanie użytkownika:} Przykładowe wartości wektora zapytania $\vec{q}$.
+    \item \textbf{Przykładowe obliczenie:} Krok po kroku obliczona odległość dla jednej z sal, pokazująca działanie algorytmu.
+\end{itemize}
+
+\subsection*{2. O czym pisać (Wskazówki merytoryczne)}
+\begin{itemize}
+    \item \textbf{Wektor zapytania:} Konwersja profilu użytkownika na wektor zapytania $\vec{q} = [q_O, q_S, q_D]^T$ (np. profil „Cichy Badacz” $\rightarrow \vec{q} = [0.1, 0.0, 0.1]^T$).
+    \item \textbf{Ważona odległość Euklidesowa:}
+    \begin{equation}
+    d_W(\vec{q}, \vec{v}_i) = \sqrt{w_O(q_O - O_i)^2 + w_S(q_S - S_i)^2 + w_D(q_D - D_i)^2}
+    \end{equation}
+    \item \textbf{Podobieństwo Kosinusowe:}
+    \begin{equation}
+    \text{sim}(\vec{q}, \vec{v}_i) = \frac{\vec{q} \cdot \vec{v}_i}{\|\vec{q}\| \|\vec{v}_i\|} = \frac{\sum_{k} q_k v_{i,k}}{\sqrt{\sum_{k} q_k^2} \sqrt{\sum_{k} v_{i,k}^2}}
+    \end{equation}
+    \item \textbf{Wskaźniki oceny wyszukiwania (PTI):}
+    \begin{itemize}
+        \item \textbf{Precyzja (Precision):} Stosunek sal faktycznie dopasowanych do liczby rekomendowanych.
+        \item \textbf{Przywołanie (Recall):} Stosunek rekomendowanych sal do wszystkich sal realnie spełniających kryteria na wydziale.
+        \item \textbf{Stopa sukcesu (Success Rate):} Czy w top 3 wyników znalazła się przynajmniej jedna satysfakcjonująca sala.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{3. Na czym się skupić (Kluczowe uwagi Profesora)}
+\begin{itemize}
+    \item \textbf{Prezentacja wyników:} Przełożenie surowych odległości matematycznych na zrozumiały dla człowieka procent dopasowania (np. $P = (1 - d_W) \cdot 100\%$).
+\end{itemize}
+
+\section{Interaktywne sprzężenie zwrotne (Relevance Feedback)}
+
+\subsection*{1. Co należy zebrać / pomierzyć (Dane wejściowe)}
+\begin{itemize}
+    \item \textbf{Scenariusz negatywny:} Zachowanie systemu, gdy student wchodzi do sali i klika w telefonie przycisk „Tu jest za głośno/tłoczno”.
+\end{itemize}
+
+\subsection*{2. O czym pisać (Wskazówki merytoryczne)}
+\begin{itemize}
+    \item \textbf{Adaptacja zapytania:} Modyfikacja wektora zapytania w czasie rzeczywistym.
+    \item \textbf{Uproszczony algorytm Rocchio:}
+    \begin{equation}
+    \vec{q}_{\text{new}} = \alpha \vec{q}_{\text{old}} - \beta \vec{v}_{\text{odrzucona}}
+    \end{equation}
+    gdzie:
+    \begin{itemize}
+        \item $\alpha \in [0, 1]$ -- waga pamięci pierwotnego zapytania.
+        \item $\beta \in [0, 1]$ -- waga kary za niedopasowanie (powoduje drastyczne odsuniecie zapytania od sal o parametrach zbliżonych do odrzuconej).
+    \end{itemize}
+    \item \textbf{Dynamiczny indeks:} Wpływ feedbacku na chwilową aktualizację parametrów sal w bazie (np. tymczasowa modyfikacja deskryptora sali przez algorytm, zanim sensory odświeżą stan).
+\end{itemize}
+
+\subsection*{3. Na czym się skupić (Kluczowe uwagi Profesora)}
+\begin{itemize}
+    \item \textbf{System uczący się:} Pokazanie dynamicznej interakcji człowieka z systemem wyszukiwania. To użytkownik na miejscu decyduje o ostatecznej trafności semantycznej informacji.
+\end{itemize}
+
+\section{Podsumowanie etapu czwartego}
+
+\subsection*{1. O czym pisać (Podsumowanie)}
+\begin{itemize}
+    \item \textbf{Przejście na poziom wiedzy:} Podsumowanie, jak z surowych sygnałów napięciowych czujników powstał inteligentny system semantycznego wyszukiwania.
+    \item \textbf{Weryfikacja z użytkownikami:} Rzetelna analiza testów użyteczności przeprowadzonych na grupie studentów MiNI PW.
+    \item \textbf{Perspektywy:} Propozycja integracji z planem zajęć w systemie USOS celem predykcji przyszłego obłożenia sal.
+\end{itemize}
+
+\subsection*{2. Na czym się skupić (Kluczowe uwagi Profesora)}
+\begin{itemize}
+    \item \textbf{Obiektywna ocena i ograniczenia:} Podkreślenie rzeczywistych słabości systemu i rzetelna naukowa dyskusja na temat przypadków brzegowych.
+\end{itemize}
+
+\section*{Podział prac}
+\begin{itemize}
+    \item Rozdział 1 (Konfrontacja z odbiorcą) -- Imię Nazwisko
+    \item Rozdział 2 (Modele Odbiorcy i Ankieta) -- Imię Nazwisko
+    \item Rozdział 3 (Deskryptory i Indeks) -- Imię Nazwisko
+    \item Rozdział 4 (Algorytmy Wyszukiwania) -- Imię Nazwisko
+    \item Rozdział 5 (Sprzężenie Zwrotne) -- Imię Nazwisko
+    \item Rozdział 6 (Weryfikacja i Podsumowanie) -- Imię Nazwisko
+    \item Redakcja techniczna i kompilacja LaTeX -- Imię Nazwisko
+\end{itemize}
+
+\end{document}
