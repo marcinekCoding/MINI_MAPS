@@ -104,7 +104,25 @@ Niniejsza sekcja stanowi podsumowanie i przełożenie uwag zebranych podczas kon
 W tradycyjnych systemach informacji przestrzennej (takich jak systemy monitoringu zajętości sal) użytkownik jest konfrontowany jedynie z surowymi wskaźnikami liczbowymi. W kontekście rzeczywistego użytkowania przestrzeni akademickiej, informacja ta jest jednak niewystarczająca i pozbawiona znaczenia poznawczego. Kluczem do semantycznej interpretacji danych jest modelowanie odbiorcy. W projekcie MiniInfo wdrożono warstwę profilowania użytkownika za pomocą dynamicznej ankiety oczekiwań, która pozwala na spersonalizowaną fuzję danych sensorycznych w oparciu o subiektywne i zróżnicowane potrzeby studentów.
 
 \subsection{Koncepcja ankiety w interfejsie aplikacji}
-Przed przystąpieniem do wyszukania optymalnego miejsca do nauki lub pracy, użytkownik uruchamia w aplikacji mobilnej MiniInfo krótką, interaktywną ankietę składającą się z trzech pytań. Ankieta ta nie obciąża użytkownika nadmierną liczbą kroków, a jednocześnie precyzyjnie identyfikuje jego bieżące cele oraz progi tolerancji na czynniki środowiskowe. Studenci mają do wyboru następujące opcje:
+Przed przystąpieniem do wyszukania optymalnego miejsca do nauki lub pracy, użytkownik uruchamia w aplikacji przeglądarkowej MiniInfo krótką, interaktywną ankietę składającą się z trzech pytań. Ankieta ta nie obciąża użytkownika nadmierną liczbą kroków, a jednocześnie precyzyjnie identyfikuje jego bieżące cele oraz progi tolerancji na czynniki środowiskowe.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{r2/quiz.png}
+        \caption{Główny interfejs -- ankieta profilująca}
+        \label{fig:app_ankieta}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{r2/wynik.png}
+        \caption{Wyniki wyszukiwania i profilowania}
+        \label{fig:app_wynik}
+    \end{minipage}
+\end{figure}
+
+Studenci mają do wyboru następujące opcje:
 
 \begin{enumerate}
     \item \textbf{Pytanie 1: Jaki jest główny cel Twojej wizyty w sali?}
@@ -161,21 +179,21 @@ Ruch: [C] Wysoki akceptowalny & Dynamika ($D$) & $0.1$ & $0.8$ \\ \hline
 Na bazie najczęstszych kombinacji odpowiedzi, system automatycznie definiuje trzy standardowe profile użytkowników (Modele Odbiorców), które mogą być również wybrane jednym kliknięciem jako gotowe szablony:
 
 \begin{itemize}
-    \item \textbf{Model I: „Cichy Badacz” (Silent Researcher)} \\
+    \item \textbf{Model I: „Cicha nauka”} \\
     Dedykowany do cichej pracy indywidualnej. System dąży do zminimalizowania wszelkich zakłóceń. Wagi i wartości docelowe:
     \begin{equation}
     \vec{w}_{\text{badacz}} = \begin{bmatrix} 0.8 \\ 1.0 \\ 0.7 \end{bmatrix}, \quad \vec{q}_{\text{badacz}} = \begin{bmatrix} 0.1 \\ 0.0 \\ 0.1 \end{bmatrix}
     \end{equation}
     System wyszukuje salę o niemal zerowym poziomie szumu środowiskowego, znikomym ruchu i niskim obłożeniu.
     
-    \item \textbf{Model II: „Głośny Projektant” (Loud Designer)} \\
+    \item \textbf{Model II: „Praca w grupie”} \\
     Dedykowany dla grup projektowych realizujących wspólne zadania. Student potrzebuje przestrzeni, w której dyskusja nie będzie przeszkadzać innym, a tło akustyczne sali zamaskuje ich własne rozmowy.
     \begin{equation}
     \vec{w}_{\text{projektant}} = \begin{bmatrix} 0.3 \\ 0.8 \\ 0.4 \end{bmatrix}, \quad \vec{q}_{\text{projektant}} = \begin{bmatrix} 0.5 \\ 0.6 \\ 0.5 \end{bmatrix}
     \end{equation}
     System celowo rekomenduje sale o umiarkowanym obłożeniu i wyższym poziomie szumu tła (np. salki pracy wspólnej), eliminując z rekomendacji strefy cichej nauki.
     
-    \item \textbf{Model III: „Szybki Konsultant” (Quick Consultant)} \\
+    \item \textbf{Model III: „Relax”} \\
     Dla studentów potrzebujących miejsca na krótkie spotkanie lub szybkie zsynchronizowanie zadań. Kluczowa jest bliskość fizyczna i natychmiastowa dostępność, a tolerancja na warunki akustyczne i ruch jest wysoka.
     \begin{equation}
     \vec{w}_{\text{konsultant}} = \begin{bmatrix} 0.5 \\ 0.3 \\ 0.5 \end{bmatrix}, \quad \vec{q}_{\text{konsultant}} = \begin{bmatrix} 0.4 \\ 0.4 \\ 0.4 \end{bmatrix}
@@ -198,51 +216,10 @@ Zgodnie z zaleceniami profesora, w celu weryfikacji przydatności modeli przepro
 
 Porównanie subiektywnych ocen ludzkich z obiektywnymi wartościami pomiarowymi pozwoliło na przeprowadzenie nieliniowej kalibracji wag i funkcji normalizujących w bazie danych. Wykazano m.in., że ludzka percepcja hałasu w salach wykazuje charakterystykę logarytmiczną, co zostało bezpośrednio uwzględnione przy konstrukcji deskryptorów hybrydowych (por. Rozdział 3). Dzięki temu dopasowanie wyników wyszukiwania do realnych oczekiwań studentów wzrosło o ponad 28\% w stosunku do bazowego modelu liniowego.
 
-\subsection{Rzeczywiste wyniki ankiety oczekiwań (Sekcja do uzupełnienia)}
+\subsection{Przeprowadzenie ankiety i zbieranie danych}
+Nasza ankieta została udostępniona w formie przeglądarkowej i wypełniona przez grupę studentów Wydziału MiNI PW. Dzięki temu mogliśmy sprawdzić, jak nasze pomysły działają w praktyce i poznać prawdziwe preferencje użytkowników.
 
-\begin{minipage}{\textwidth}
-\centering
-\definecolor{warncolor}{HTML}{FFEBEE}
-\definecolor{warnborder}{HTML}{D32F2F}
-\setlength{\fboxrule}{1.5pt}
-\fcolorbox{warnborder}{warncolor}{
-\begin{minipage}{0.95\textwidth}
-\vspace{0.2cm}
-\centering
-\textbf{\color{warnborder}[!] UWAGA: SEKCJA DO UZUPEŁNIENIA PRZEZ ZESPÓŁ [!]} \\
-\vspace{0.1cm}
-\color{black}\small
-Poniższy szablon należy uzupełnić rzeczywistymi danymi liczbowymi po przeprowadzeniu ankiety wśród studentów Wydziału MiNI PW. Wpiszcie zgromadzone dane w miejsce znaków zapytania (?).
-\vspace{0.2cm}
-\end{minipage}
-}
-\end{minipage}
-
-\vspace{0.4cm}
-
-\begin{table}[H]
-\centering
-\caption{Zbiorcze wyniki ankiety oczekiwań przeprowadzonej wśród studentów ($N = \text{?}$ osób).}
-\label{tab:survey_results}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|l|c|c|}
-\hline
-\textbf{Pytanie ankietowe} & \textbf{Opcja odpowiedzi} & \textbf{Liczba wskazań} & \textbf{Procentowy udział} \\ \hline
-\hline
-& [A] Cicha nauka indywidualna & ? & ?\% \\ \cline{2-4}
-\textbf{Cel wizyty} & [B] Zespołowa praca projektowa & ? & ?\% \\ \cline{2-4}
-& [C] Odpoczynek i oczekiwanie & ? & ?\% \\ \hline
-\hline
-& [A] Wysoka (wymagana cisza) & ? & ?\% \\ \cline{2-4}
-\textbf{Wrażliwość na hałas} & [B] Średnia (umiarkowany szum) & ? & ?\% \\ \cline{2-4}
-& [C] Niska (hałas nie przeszkadza) & ? & ?\% \\ \hline
-\hline
-& [A] Niski (ruch rozprasza) & ? & ?\% \\ \cline{2-4}
-\textbf{Tolerancja na ruch} & [B] Średni (umiarkowany ruch) & ? & ?\% \\ \cline{2-4}
-& [C] Wysoki (ruch obojętny) & ? & ?\% \\ \hline
-\end{tabular}%
-}
-\end{table}
+Dokładne wyniki tego badania -- w tym to, jak odpowiedzi studentów przekładają się na konkretne liczby i parametry wyszukiwania sal -- opisaliśmy szczegółowo w następnym rozdziale tego raportu.
 
 \section{Hybrydowe deskryptory przestrzeni i konstrukcja indeksu}
 
@@ -284,7 +261,7 @@ Poniższy szablon należy uzupełnić rzeczywistymi danymi liczbowymi po przepro
 
 \subsection*{2. O czym pisać (Wskazówki merytoryczne)}
 \begin{itemize}
-    \item \textbf{Wektor zapytania:} Konwersja profilu użytkownika na wektor zapytania $\vec{q} = [q_O, q_S, q_D]^T$ (np. profil „Cichy Badacz” $\rightarrow \vec{q} = [0.1, 0.0, 0.1]^T$).
+    \item \textbf{Wektor zapytania:} Konwersja profilu użytkownika na wektor zapytania $\vec{q} = [q_O, q_S, q_D]^T$ (np. profil „Cicha nauka” $\rightarrow \vec{q} = [0.1, 0.0, 0.1]^T$).
     \item \textbf{Ważona odległość Euklidesowa:}
     \begin{equation}
     d_W(\vec{q}, \vec{v}_i) = \sqrt{w_O(q_O - O_i)^2 + w_S(q_S - S_i)^2 + w_D(q_D - D_i)^2}
