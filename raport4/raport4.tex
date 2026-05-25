@@ -227,110 +227,89 @@ Dokładne wyniki tego badania -- w tym to, jak odpowiedzi studentów przekładaj
 
 \section{Hybrydowe deskryptory przestrzeni i konstrukcja indeksu}
 
-\subsection*{1. Co należy zebrać / pomierzyć (Dane wejściowe)}
+\subsection*{1. Co musimy przygotować (Dane)}
 \begin{itemize}
-    \item \textbf{Struktura deskryptora:} Dokładne zdefiniowanie wektora cech sali na podstawie fuzji sensorycznej.
-    \item \textbf{Tabela testowa:} Tabela zawierająca realne pomiary środowiskowe dla kilku znanych sal na MiNI PW (np. 107, 329, salki w bibliotece).
+    \item \textbf{Cechy sali:} Zdefiniowanie, z czego składa się opis sali (zajętość, hałas, ruch).
+    \item \textbf{Przykładowe dane:} Tabelka z prawdziwymi pomiarami z kilku sal na MiNI (np. 107, 329, salki w bibliotece).
 \end{itemize}
 
-\subsection*{2. O czym pisać (Wskazówki merytoryczne)}
+\subsection*{2. O czym napisać (Treść rozdziału)}
 \begin{itemize}
-    \item \textbf{Fuzja sensoryczna (mmWave + Mikrofon):} Jak radar mmWave (wykrywanie mikroruchów klatki piersiowej, obecności, dynamiki wejść/wyjść) łączy się z mikrofonem środowiskowym (poziom dB, spektrum częstotliwości ludzkiej mowy).
-    \item \textbf{Wyprowadzenie matematyczne deskryptora:}
-    Wektor cech sali $\vec{v}_i$ definiujemy jako:
+    \item \textbf{Połączenie czujników:} Opisać, jak łączymy dane z radaru (ruch, obecność) z mikrofonem (poziom hałasu).
+    \item \textbf{Wzór na opis sali:} Podać wzór matematyczny na tzw. wektor sali:
     \begin{equation}
     \vec{v}_i = \begin{bmatrix} O_i \\ S_i \\ D_i \end{bmatrix}
     \end{equation}
-    gdzie:
-    \begin{itemize}
-        \item $O_i \in [0, 1]$ -- znormalizowane obłożenie sali (liczba osób / pojemność maksymalna).
-        \item $S_i \in [0, 1]$ -- znormalizowany poziom hałasu (np. zmierzony w dB i zmapowany funkcją logarytmiczną).
-        \item $D_i \in [0, 1]$ -- dynamika ruchu wykryta przez radar mmWave w oknie czasowym.
-    \end{itemize}
-    \item \textbf{Konstrukcja indeksu:} Opis struktur danych w pamięci RAM lub bazie wektorowej, oszacowanie narzutu pamięciowego (dla kilkudziesięciu sal) oraz czasu dostępu i aktualizacji indeksu (np. interwał 30-sekundowy).
+    gdzie: $O_i$ to zajętość sali, $S_i$ to poziom hałasu, a $D_i$ to dynamika ruchu. Wszystkie wartości są w przedziale od 0 do 1.
+    \item \textbf{Baza danych:} Krótko opisać, jak i gdzie będziemy przechowywać te dane, żeby można było szybko je przeszukiwać.
 \end{itemize}
 
-\subsection*{3. Na czym się skupić (Kluczowe uwagi Pana Profesora)}
+\subsection*{3. O czym pamiętać (Uwagi Profesora)}
 \begin{itemize}
-    \item \textbf{Unikanie sztuczności:} Pan Profesor kładł nacisk na to, by deskryptory miały bezpośrednie odzwierciedlenie w fizycznych czujnikach. Każda składowa wektora musi mieć jasną interpretację poznawczą.
+    \item \textbf{Brak sztuczności:} Wszystkie liczby w naszym wektorze muszą mieć sens i pochodzić z prawdziwych czujników. Nie możemy wymyślać danych z kosmosu.
 \end{itemize}
 
 \section{Procedury odpytywania i mechanizmy wyszukiwania}
 
-\subsection*{1. Co należy zebrać / pomierzyć (Dane wejściowe)}
+\subsection*{1. Co musimy przygotować (Dane)}
 \begin{itemize}
-    \item \textbf{Zapytanie użytkownika:} Przykładowe wartości wektora zapytania $\vec{q}$.
-    \item \textbf{Przykładowe obliczenie:} Krok po kroku obliczona odległość dla jednej z sal, pokazująca działanie algorytmu.
+    \item \textbf{Zapytanie:} Przykładowe liczby, których szuka student w aplikacji.
+    \item \textbf{Przykład obliczeń:} Pokazać krok po kroku, jak system liczy matematyczną odległość między wymaganiami studenta a konkretną salą.
 \end{itemize}
 
-\subsection*{2. O czym pisać (Wskazówki merytoryczne)}
+\subsection*{2. O czym napisać (Treść rozdziału)}
 \begin{itemize}
-<<<<<<< HEAD
-    \item \textbf{Wektor zapytania:} Konwersja profilu użytkownika na wektor zapytania $\vec{q} = [q_O, q_S, q_D]^T$ (np. profil „Cicha nauka” $\rightarrow \vec{q} = [0.1, 0.0, 0.1]^T$).
-    \item \textbf{Ważona odległość Euklidesowa:}
-=======
-    \item \textbf{Wektor zapytania:} Konwersja profilu użytkownika na wektor zapytania $\vec{q} = [q_O, q_S, q_D]^T$ (np. profil „Cichy Badacz” $\rightarrow \vec{q} = [0.1, 0.0, 0.1]^T$).
-    \item \textbf{Ważona odległość Euklidesowa}
->>>>>>> 01618c5180b4f551174320e0cd11423795a84e67
+    \item \textbf{Wybór użytkownika:} Jak zamieniamy kliknięty w aplikacji profil (np. „Cicha nauka”) na konkretne liczby, np. $\vec{q} = [0.1, 0.0, 0.1]^T$.
+    \item \textbf{Ważona odległość Euklidesowa:} Główny wzór, z którego korzystamy do obliczenia dopasowania sali do preferencji:
     \begin{equation}
     d_W(\vec{q}, \vec{v}_i) = \sqrt{w_O(q_O - O_i)^2 + w_S(q_S - S_i)^2 + w_D(q_D - D_i)^2}
     \end{equation}
-    \item \textbf{Podobieństwo Kosinusowe:}
+    \item \textbf{Podobieństwo Kosinusowe:} Inny, alternatywny sposób liczenia, o którym możemy krótko wspomnieć:
     \begin{equation}
     \text{sim}(\vec{q}, \vec{v}_i) = \frac{\vec{q} \cdot \vec{v}_i}{\|\vec{q}\| \|\vec{v}_i\|} = \frac{\sum_{k} q_k v_{i,k}}{\sqrt{\sum_{k} q_k^2} \sqrt{\sum_{k} v_{i,k}^2}}
     \end{equation}
-    \item \textbf{Wskaźniki oceny wyszukiwania (PTI):}
-    \begin{itemize}
-        \item \textbf{Precyzja (Precision):} Stosunek sal faktycznie dopasowanych do liczby rekomendowanych.
-        \item \textbf{Przywołanie (Recall):} Stosunek rekomendowanych sal do wszystkich sal realnie spełniających kryteria na wydziale.
-        \item \textbf{Stopa sukcesu (Success Rate):} Czy w top 3 wyników znalazła się przynajmniej jedna satysfakcjonująca sala.
-    \end{itemize}
+    \item \textbf{Ocena jakości:} Jak mierzymy, czy system działa dobrze (Precyzja - czy trafnie poleca, Przywołanie - czy znajduje wszystkie dobre sale, Stopa sukcesu - czy w TOP 3 wyników jest choć jedna satysfakcjonująca sala).
 \end{itemize}
 
-\subsection*{3. Na czym się skupić (Kluczowe uwagi Pana Profesora)}
+\subsection*{3. O czym pamiętać (Uwagi Profesora)}
 \begin{itemize}
-    \item \textbf{Prezentacja wyników:} Przełożenie surowych odległości matematycznych na zrozumiały dla człowieka procent dopasowania (np. $P = (1 - d_W) \cdot 100\%$).
+    \item \textbf{Wyniki przyjazne dla ludzi:} Wyniki z wzorów matematycznych muszą być ostatecznie zamieniane w aplikacji na zrozumiałe procenty (np. „85\% dopasowania do Cichej nauki”), a nie zostawiane w formie niezrozumiałych dystansów euklidesowych.
 \end{itemize}
 
 \section{Interaktywne sprzężenie zwrotne (Relevance Feedback)}
 
-\subsection*{1. Co należy zebrać / pomierzyć (Dane wejściowe)}
+\subsection*{1. Co musimy przygotować (Dane)}
 \begin{itemize}
-    \item \textbf{Scenariusz negatywny:} Zachowanie systemu, gdy student wchodzi do sali i klika w telefonie przycisk „Tu jest za głośno/tłoczno”.
+    \item \textbf{Scenariusz błędu:} Opisać konkretną sytuację -- student przychodzi do wskazanej, "cichej" sali, a tam ktoś głośno rozmawia przez telefon. Student wyciąga apkę i klika: "Tu wcale nie jest cicho!".
 \end{itemize}
 
-\subsection*{2. O czym pisać (Wskazówki merytoryczne)}
+\subsection*{2. O czym napisać (Treść rozdziału)}
 \begin{itemize}
-    \item \textbf{Adaptacja zapytania:} Modyfikacja wektora zapytania w czasie rzeczywistym.
-    \item \textbf{Uproszczony algorytm Rocchio:}
+    \item \textbf{Poprawa wyników:} Jak system uczy się na takich zgłoszeniach błędów od użytkowników na żywo.
+    \item \textbf{Uproszczony algorytm Rocchio:} Wzór matematyczny na to, jak korygujemy preferencje (odpychanie od złej sali):
     \begin{equation}
     \vec{q}_{\text{new}} = \alpha \vec{q}_{\text{old}} - \beta \vec{v}_{\text{odrzucona}}
     \end{equation}
-    gdzie:
-    \begin{itemize}
-        \item $\alpha \in [0, 1]$ -- waga pamięci pierwotnego zapytania.
-        \item $\beta \in [0, 1]$ -- waga kary za niedopasowanie (powoduje drastyczne odsuniecie zapytania od sal o parametrach zbliżonych do odrzuconej).
-    \end{itemize}
-    \item \textbf{Dynamiczny indeks:} Wpływ feedbacku na chwilową aktualizację parametrów sal w bazie (np. tymczasowa modyfikacja deskryptora sali przez algorytm, zanim sensory odświeżą stan).
+    \item \textbf{Tymczasowe zmiany:} Jak zgłoszenie studenta błyskawicznie koryguje wynik w bazie danych dla innych, zanim jeszcze mikrofony i radary same wyłapią powód hałasu.
 \end{itemize}
 
-\subsection*{3. Na czym się skupić (Kluczowe uwagi Pana Profesora)}
+\subsection*{3. O czym pamiętać (Uwagi Profesora)}
 \begin{itemize}
-    \item \textbf{System uczący się:} Pokazanie dynamicznej interakcji człowieka z systemem wyszukiwania. To użytkownik na miejscu decyduje o ostatecznej trafności semantycznej informacji.
+    \item \textbf{System, który się uczy:} Należy podkreślić, że sensory bywają zawodne i ostateczna, najważniejsza weryfikacja należy do człowieka, który fizycznie przyszedł na miejsce.
 \end{itemize}
 
 \section{Podsumowanie etapu 4}
 
-\subsection*{1. O czym pisać (Podsumowanie)}
+\subsection*{1. O czym napisać (Podsumowanie)}
 \begin{itemize}
-    \item \textbf{Przejście na poziom wiedzy:} Podsumowanie, jak z surowych sygnałów napięciowych czujników powstał inteligentny system semantycznego wyszukiwania.
-    \item \textbf{Weryfikacja z użytkownikami:} Rzetelna analiza testów użyteczności przeprowadzonych na grupie studentów MiNI PW.
-    \item \textbf{Perspektywy:} Propozycja integracji z planem zajęć w systemie USOS celem predykcji przyszłego obłożenia sal.
+    \item \textbf{Sukces projektu:} Jak udało nam się zamienić surowe kabelki i czujniki w inteligentną, rozumiejącą studenta wyszukiwarkę.
+    \item \textbf{Testy z ludźmi:} Krótkie podsumowanie wyników testów z żywymi studentami na naszym wydziale.
+    \item \textbf{Plany na przyszłość:} Propozycja, żeby w przyszłości połączyć nasz system z USOSem, co pozwoli przewidywać tłok pod salami na podstawie oficjalnego planu zajęć.
 \end{itemize}
 
-\subsection*{2. Na czym się skupić (Kluczowe uwagi Pana Profesora)}
+\subsection*{2. O czym pamiętać (Uwagi Profesora)}
 \begin{itemize}
-    \item \textbf{Obiektywna ocena i ograniczenia:} Podkreślenie rzeczywistych słabości systemu i rzetelna naukowa dyskusja na temat przypadków brzegowych.
+    \item \textbf{Bądźmy szczerzy:} Trzeba opisać też wady systemu i sytuacje brzegowe, w których on się po prostu gubi. Raport naukowy nie może być bezkrytyczną laurką dla naszego kodu.
 \end{itemize}
 
 \section*{Podział prac}
