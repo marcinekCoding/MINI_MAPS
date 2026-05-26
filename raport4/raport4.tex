@@ -225,7 +225,45 @@ Nasza ankieta została udostępniona w formie przeglądarkowej i wypełniona prz
 
 Szczegółowy protokół testów terenowych, feedback po wizycie w sali oraz tabele wyników przedstawiamy w Rozdziale~5; w niniejszym rozdziale pozostaje opis ankiety profilującej i mapowania na $\vec{q}$.
 
+\section{Dane i mechanizmy działania aplikacji}
 
+Zamiast teoretyzować o działaniu fizycznych czujników, przenieśliśmy logikę bezpośrednio do naszej aplikacji internetowej. Ten rozdział krótko opisuje, jak przechowujemy dane o salach i jak system reaguje na bieżąco na zgłoszenia od użytkowników.
+
+\subsection{Jak przechowujemy informacje o salach?}
+Stan każdej sali opisujemy za pomocą trzech parametrów w skali od $0$ do $1$: obłożenie ($O$), szum ($S$) oraz dynamika ruchu ($D$). W naszej aplikacji wszystkie te dane trzymamy w pliku \texttt{data.js} w formie prostej listy obiektów. Przykładowo, tak wygląda zapis dla jednej z sal:
+
+\begin{verbatim}
+{
+    id: "311",
+    name: "Salka informatyczna 311",
+    floor: "3",
+    capacity: 20,
+    occupancy: 0.5,
+    noise: 0.2,
+    dynamics: 0.2
+}
+\end{verbatim}
+
+Dzięki takiemu formatowi od razu wiemy, gdzie znajduje się sala (\texttt{floor}) oraz ile osób maksymalnie pomieści (\texttt{capacity}). W kodzie wpisaliśmy na stałe $7$ takich przestrzeni (m.in. salki do rozmów 432 i 433, strefę JetBrains, czy odnogę WRS), żeby móc łatwo testować nasz algorytm wyszukiwania.
+
+\subsection{Zastąpienie czujników suwakami}
+Ponieważ nasza aplikacja działa w przeglądarce i nie jest bezpośrednio podłączona do sprzętowych mikrofonów czy radarów, użyliśmy suwaków w specjalnym panelu sterowania. Pozwalają one „ręcznie” zmieniać wartości $O$, $S$ i $D$ dla dowolnej sali w czasie rzeczywistym.
+
+Za każdym razem, gdy przesuniemy suwak, wywoływana jest funkcja \texttt{onSensorChange()}. Aplikacja natychmiast aktualizuje dane w pamięci i tłumaczy „suche” ułamki na zrozumiały tekst --- na przykład wartość szumu $0.8$ zmienia się w komunikat \emph{85 dB (Hałas uciążliwy)}. Dzięki temu interfejs jest po prostu przyjazny dla ludzi.
+
+\subsection{Reakcja na zgłoszenia studentów (Algorytm Rocchio)}
+Ciekawym mechanizmem w aplikacji jest to, jak radzi sobie ona z pomyłkami. Wyobraźmy sobie, że aplikacja poleca studentowi salę do nauki, ale po wejściu okazuje się, że trwa tam głośna dyskusja. Student może wcisnąć w aplikacji przycisk zgłaszający problem. 
+
+Wtedy uruchamia się funkcja \texttt{triggerRocchioFeedback()}, która robi dwie rzeczy na raz:
+\begin{enumerate}
+    \item \textbf{Aktualizuje stan sali:} System ufa studentom, więc od razu podnosi wartość szumu w tej konkretnej sali w naszej bazie (np. o $0.3$). Omija to problem np. usterki czujnika, który mógłby podawać błędne odczyty.
+    \item \textbf{Uczy się preferencji studenta (Algorytm Rocchio):} System zauważa, że dla tego konkretnego użytkownika cisza jest bardzo ważna. Automatycznie zwiększa więc wagę parametru szumu o $0.15$ przy kolejnym wyszukiwaniu i zmniejsza akceptowalny poziom hałasu za pomocą wzoru z karą $\beta = 0.35$:
+    \begin{equation}
+        q_S \leftarrow \max(0.0,\; q_S - 0.35 \cdot S_i)
+    \end{equation}
+\end{enumerate}
+
+Po tej szybkiej korekcie, aplikacja natychmiast przelicza ranking od nowa i proponuje studentowi inną, dużo cichszą salę. To proste sprzężenie zwrotne rozwiązuje wiele problemów z niedokładnością pomiarów.
 
 \section{Procedury odpytywania i mechanizmy wyszukiwania}
 
