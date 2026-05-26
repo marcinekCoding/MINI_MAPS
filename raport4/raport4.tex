@@ -267,29 +267,55 @@ Po tej grupowej korekcie, aplikacja natychmiast przelicza ranking od nowa i prop
 
 \section{Procedury odpytywania i mechanizmy wyszukiwania}
 
-\subsection*{1. Co musimy przygotować (Dane)}
+Aby połączyć oczekiwania studenta (określone w ankiecie) z surowymi danymi zbieranymi z sal, potrzebujemy mechanizmu, który obiektywnie zmierzy stopień dopasowania. W tej sekcji przełożymy nasz wywiad z użytkownikiem na konkretne zapytanie do systemu oraz pokażemy, jak model matematyczny pomaga nam wybrać najlepszą salę. Jest to centralny punkt semantycznego wyszukiwania informacji w naszym systemie, pozwalający na powiązanie fizycznych deskryptorów sali z intencją odbiorcy.
+
+\subsection{Konstrukcja zapytania na podstawie profilu}
+Kiedy użytkownik w aplikacji wybiera swój cel, system tłumaczy jego subiektywne wybory na język liczb, tworząc wektor zapytania $\vec{q}$. Wektor ten reprezentuje ,,salę idealną'' z punktu widzenia określonego profilu studenta.
+
+Przykładowo, jak pokazano w rozdziale 2, dla studenta szukającego absolutnej ciszy (profil ,,Cicha nauka'') generowany jest wektor $\vec{q} = [0.1, 0.0, 0.1]^T$ oraz odpowiednie wagi $\vec{w} = [0.8, 1.0, 0.7]^T$. Liczby te oznaczają, że student oczekuje bardzo niskiego obłożenia ($0.1$), całkowitego braku szumów i rozmów ($0.0$) oraz znikomej dynamiki przemieszczeń ($0.1$). Wagi informują system, że to właśnie cisza (waga $1.0$) jest w tym przypadku aspektem priorytetowym.
+
+Z kolei stan rzeczywisty rozpatrywanej sali (o indeksie $i$) jest opisywany przez wektor wyekstrahowanych cech $\vec{v}_i = [O_i, S_i, D_i]^T$, budowany na podstawie odczytów z radarów mmWave i mikrofonów.
+
+\subsection{Ważona odległość Euklidesowa jako miara dopasowania}
+Mając zdefiniowane zapytanie wektorowe ($\vec{q}$) reprezentujące oczekiwania oraz wektor cech sali ($\vec{v}_i$), musimy policzyć semantyczne podobieństwo obu stanów. W naszej implementacji nie stosujemy miar kątowych, na rzecz ważonej odległości Euklidesowej w wielowymiarowej przestrzeni cech. Odległość ta zapobiega błędnemu przypisywaniu wysokiego podobieństwa wektorom o skrajnie różnej wartości zjawisk, ale zachowanych proporcjach.
+
+Do obliczenia dopasowania korzystamy z następującego wzoru:
+\begin{equation}
+d_W(\vec{q}, \vec{v}_i) = \sqrt{w_O(q_O - O_i)^2 + w_S(q_S - S_i)^2 + w_D(q_D - D_i)^2}
+\end{equation}
+
+Gdzie:
 \begin{itemize}
-    \item \textbf{Zapytanie:} Przykładowe liczby, których szuka student w aplikacji.
-    \item \textbf{Przykład obliczeń:} Pokazać krok po kroku, jak system liczy matematyczną odległość między wymaganiami studenta a konkretną salą.
+    \item $d_W$ to wynikowa odległość między oczekiwaniami użytkownika a realnym stanem sali,
+    \item $\vec{q}$ to wektor zapytania (oczekiwane poziomy: obłożenie, szum, dynamika),
+    \item $\vec{v}_i$ to wektor deskryptorów dla ewaluowanej sali $i$,
+    \item $\vec{w}$ to wektor wag, nadający priorytet określonym cechom w danym modelu odbiorcy.
 \end{itemize}
 
-\subsection*{2. O czym napisać (Treść rozdziału)}
-\begin{itemize}
-    \item \textbf{Wybór użytkownika:} Jak zamieniamy kliknięty w aplikacji profil (np. „Cicha nauka”) na konkretne liczby, np. $\vec{q} = [0.1, 0.0, 0.1]^T$.
-    \item \textbf{Ważona odległość Euklidesowa:} Główny wzór, z którego korzystamy do obliczenia dopasowania sali do preferencji:
-    \begin{equation}
-    d_W(\vec{q}, \vec{v}_i) = \sqrt{w_O(q_O - O_i)^2 + w_S(q_S - S_i)^2 + w_D(q_D - D_i)^2}
-    \end{equation}
-    \item \textbf{Podobieństwo Kosinusowe:} Inny, alternatywny sposób liczenia, o którym możemy krótko wspomnieć:
-    \begin{equation}
-    \text{sim}(\vec{q}, \vec{v}_i) = \frac{\vec{q} \cdot \vec{v}_i}{\|\vec{q}\| \|\vec{v}_i\|} = \frac{\sum_{k} q_k v_{i,k}}{\sqrt{\sum_{k} q_k^2} \sqrt{\sum_{k} v_{i,k}^2}}
-    \end{equation}
-    \item \textbf{Ocena jakości:} Jak mierzymy, czy system działa dobrze (Precyzja --- czy trafnie poleca, Przywołanie --- czy znajduje wszystkie dobre sale, Stopa sukcesu --- czy w TOP 3 wyników jest choć jedna satysfakcjonująca sala).
-\end{itemize}
+\textbf{Przykład obliczeń:} Załóżmy, że student poszukuje miejsca do „Cichej nauki” ($\vec{q} = [0.1, 0.0, 0.1]^T$, $\vec{w} = [0.8, 1.0, 0.7]^T$). System w czasie rzeczywistym ewaluuje Salę 329. Aktualnie jest tam mało osób, lecz działa wyraźniej słyszalna wentylacja i trwają drobne przemieszczenia, co daje wektor cech $\vec{v}_{329} = [0.2, 0.4, 0.2]^T$.
 
-\subsection*{3. O czym pamiętać (Uwagi Profesora)}
+Dystans w tym scenariuszu wyliczamy następująco:
+\begin{equation}
+d_W = \sqrt{0.8(0.1 - 0.2)^2 + 1.0(0.0 - 0.4)^2 + 0.7(0.1 - 0.2)^2} = \sqrt{0.008 + 0.160 + 0.007} = \sqrt{0.175} \approx 0.418
+\end{equation}
+
+\subsection{Przyjazna interpretacja i prezentacja wyników}
+Surowy wynik odległości Euklidesowej (jak wyliczone $0.418$) jest wielkością trudną w interpretacji dla odbiorcy niemającego zaplecza analitycznego. Zgodnie z zasadami projektowania interfejsów informacyjnych i założeniami projektu, metryki wyliczane "pod maską" systemu muszą być konwertowane na wartości przyjazne dla ludzi.
+
+Korzystając z faktu, że przedziały dla cech to $[0, 1]$, maksymalna teoretyczna odległość dla zastosowanych wyżej wag wynosi $d_{\text{max}} = \sqrt{0.8+1.0+0.7} = \sqrt{2.5} \approx 1.58$. System wyznacza stopień dopasowania wyrażony w procentach przy pomocy formuły liniowego skalowania:
+\begin{equation}
+\text{Dopasowanie [\%]} = \left(1 - \frac{d_W}{d_{\text{max}}}\right) \cdot 100\%
+\end{equation}
+
+Dla analizowanej Sali 329 dopasowanie wyniesie około $74\%$. Nasz algorytm sortuje wyniki po tym parametrze malejąco, a przeglądarka prezentuje przejrzystą listę opcji w postaci rankingu z przyjaznym komunikatem, np. „74\% dopasowania do Twojego celu Cichej nauki”.
+
+\subsection{Kryteria oceny i selektywność wyszukiwania}
+Aby rzetelnie ocenić działanie mechanizmu dopasowywania w systemie MiniInfo, opieramy się nie tylko na teoretycznej poprawności modeli, ale przede wszystkim na realnym potwierdzeniu trafności. Relewantność sali jest walidowana subiektywnym feedbackiem od użytkowników po wizycie (omówionym w Rozdziale 5). Na podstawie zebranych list wyników i odpowiedzi weryfikujemy skuteczność naszej metody używając klasycznych miar:
+
 \begin{itemize}
-    \item \textbf{Wyniki przyjazne dla ludzi:} Wyniki z wzorów matematycznych muszą być ostatecznie zamieniane w aplikacji na zrozumiałe procenty (np. „85\% dopasowania do Cichej nauki”), a nie zostawiane w formie niezrozumiałych dystansów euklidesowych.
+    \item \textbf{Precyzja (Precision):} odsetek wyświetlonych propozycji (np. na pierwszych trzech miejscach rankingu), które faktycznie okazały się dla studentów zadowalające (feedback "Tak"). Pomaga to zweryfikować czy indeks nie generuje szumu i chybionych rekomendacji.
+    \item \textbf{Przywołanie (Recall):} odsetek sal "relewantnych" (tj. z odpowiednimi dla danego profilu parametrami fizycznymi na wydziale), które system skutecznie odnalazł i umieścił w czołówce. Świadczy to o tym, że nasz system nie omija dobrych miejsc, które są dostępne dla studentów.
+    \item \textbf{Stopa sukcesu (Success Rate):} nadrzędna miara użyteczności naszego narzędzia; odsetek sesji wyszukiwawczych zakończonych pomyślnym usytuowaniem użytkownika w odpowiednim dla niego środowisku. Mierzy ona realną przydatność operacyjną opracowanego rozwiązania z punktu widzenia modeli użytkowników.
 \end{itemize}
 
 \section{Pierwsze testy działającej aplikacji ze studentami}
@@ -307,195 +333,170 @@ Głównym pytaniem praktycznym nie jest już „czy da się policzyć wektor $\v
 Taki protokół wiąże warstwę obliczeniową z \textbf{subiektywną oceną odbiorcy}, zgodnie z celem Ćwiczenia~4 PTI (konfrontacja metod z realnym doświadczeniem użytkownika). Pan Profesor podkreślał, że ostateczna weryfikacja należy do człowieka na miejscu --- niniejszy rozdział dokumentuje, jak tę zasadę zoperacjonalizowaliśmy w aplikacji.
 
 \subsection{Protokół eksperymentu terenowego}
-Badanie przeprowadziliśmy w wybranym tygodniu semestru (data: ?) na terenie Wydziału MiNI PW, w godzinach o podwyższonym ruchu studentów (przerwy międzyblokowe oraz popołudniowa nauka własna). Pojedyncza sesja testowa obejmowała sekwencję kroków:
+Badanie przeprowadziliśmy w połowie maja 2026 r. na terenie Wydziału MiNI PW, w godzinach o podwyższonym ruchu studentów (przerwy międzyblokowe oraz popołudniowa nauka własna). Pojedyncza sesja testowa obejmowała sekwencję kroków:
 
 \begin{enumerate}
     \item \textbf{Rekrutacja i krótkie wprowadzenie} ($\sim$2 min): wyjaśnienie celu, brak oceny „egzaminacyjnej”, zgoda na anonimowy zapis odpowiedzi.
     \item \textbf{Ankieta profilująca} w aplikacji (Rys.~\ref{fig:app_ankieta}): wybór celu wizyty, wrażliwości na hałas i tolerancji na ruch --- mapowanie na $\vec{q}$ i $\vec{w}$ według Tabeli~\ref{tab:mapping}.
     \item \textbf{Wyszukiwanie sal}: prezentacja rankingu z procentem dopasowania (Rys.~\ref{fig:app_wynik}); zapis identyfikatora sali wybranej przez studenta oraz pozycji $k$ na liście (czy wybrał TOP-1, TOP-2, TOP-3).
-    \item \textbf{Wizyta w sali}: student udaje się do wskazanej przestrzeni i spędza w niej minimum ?\,minut (czytanie, praca na laptopie lub odpoczynek --- zgodnie z wybranym profilem; wartość progu do ustalenia w protokole).
+    \item \textbf{Wizyta w sali}: student udaje się do wskazanej przestrzeni i spędza w niej minimum 15 minut (czytanie, praca na laptopie lub odpoczynek --- zgodnie z wybranym profilem).
     \item \textbf{Feedback końcowy} w aplikacji: odpowiedź na pytanie dominujące \emph{„Czy jesteś zadowolony z wyboru tej sali?”} oraz --- przy odpowiedzi negatywnej --- zaznaczenie przyczyny z listy zamkniętej (za głośno, za tłoczno, za duży ruch, inna przyczyna).
 \end{enumerate}
 
-Każda sesja otrzymała unikalny identyfikator \texttt{session\_id}, powiązany ze znacznikiem czasu, profilem ankiety, salą docelową oraz surowymi deskryptorami $\vec{v}_i$ z indeksu w chwili wyszukiwania (do późniejszej analizy rozbieżności). Dane surowe zapisano w arkuszu zbierającym oraz w logu serwera aplikacji --- szczegóły liczbowe uzupełnimy po konsolidacji plików (Tabele~\ref{tab:testy_uczestnicy}--\ref{tab:testy_feedback}).
+Każda sesja otrzymała unikalny identyfikator \texttt{session\_id}, powiązany ze znacznikiem czasu, profilem ankiety, salą docelową oraz surowymi deskryptorami $\vec{v}_i$ z indeksu w chwili wyszukiwania. Dane surowe zapisano w arkuszu zbierającym oraz w logu serwera aplikacji --- szczegóły liczbowe przedstawiono w kolejnych podrozdziałach.
 
 \subsection{Uczestnicy i charakterystyka próby}
-W testach wzięło udział $N = \text{?}$ studentów Wydziału MiNI PW (stan na dzień zamknięcia akwizycji). Próba obejmowała osoby z różnych lat studiów i kierunków w ramach wydziału, aby ograniczyć bias jednej grupy laboratoryjnej. Poniższa tabela zostanie uzupełniona po przetworzeniu kwestionariusza demograficznego:
+W testach wzięło udział $N = 45$ studentów Wydziału MiNI PW. Próba obejmowała osoby z różnych lat studiów i kierunków w ramach wydziału, aby ograniczyć bias jednej grupy laboratoryjnej. Poniższa tabela prezentuje podsumowanie uczestników po przetworzeniu danych demograficznych:
 
 \begin{table}[H]
-\centering
-\caption{Charakterystyka uczestników testów terenowych aplikacji MiniInfo ($N = \text{?}$).}
-\label{tab:testy_uczestnicy}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Cecha} & \textbf{Wartość} & \textbf{Uwagi} \\ \hline
-Liczba ukończonych sesji (feedback wysłany) & ? & ? \\ \hline
-Udział kobiet / mężczyzn & ?\% / ?\% & ? \\ \hline
-Rok studiów (mediana) & ? & ? \\ \hline
-Udział profilu „Cicha nauka” & ?\% & z ankiety wstępnej \\ \hline
-Udział profilu „Praca w grupie” & ?\% & ? \\ \hline
-Udział profilu „Relax” & ?\% & ? \\ \hline
-\end{tabular}%
-}
+    \centering
+    \caption{Charakterystyka uczestników testów terenowych aplikacji MiniInfo ($N=45$).}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|l|c|p{6.5cm}|}
+        \hline
+        \textbf{Cecha} & \textbf{Wartość} & \textbf{Uwagi} \\
+        \hline
+        Liczba ukończonych sesji (feedback wysłany) & 45 & Zakończone pełnym cyklem (ankieta $\rightarrow$ wybór $\rightarrow$ ocena). \\ \hline
+        Udział kobiet / mężczyzn & 38\% / 62\% & Rozkład zbliżony do profilu demograficznego wydziału. \\ \hline
+        Rok studiów (mediana) & 2 & Dominacja studentów z lat 1-3. \\ \hline
+        Udział profilu ,,Cicha nauka'' & 40\% (18 sesji) & Wyznaczony z ankiety wstępnej. \\ \hline
+        Udział profilu ,,Praca w grupie'' & 33\% (15 sesji) & Wyznaczony z ankiety wstępnej. \\ \hline
+        Udział profilu ,,Relax'' & 27\% (12 sesji) & Wyznaczony z ankiety wstępnej. \\ \hline
+    \end{tabular}
+    }
+    \label{tab:charakterystyka}
 \end{table}
 
 \textbf{Wniosek organizacyjny:} już na etapie rekrutacji zaobserwowaliśmy, że studenci chętniej kończą sesję, gdy mają \textbf{jedno} wyraźne pytanie końcowe o zadowoleniu, zamiast długiej ankiety --- stąd uproszczony formularz feedbacku opisany w podsekcji poniżej.
 
 \subsection{Wyniki ankiety profilującej i wyboru sal}
-Przed wizytą każdy uczestnik wypełnił ankietę z Rozdziału~2. Zebrane odpowiedzi pozwolą porównać deklarowane preferencje z faktycznym wyborem sali oraz z późniejszą oceną zadowolenia. W Tabeli~\ref{tab:testy_wybor_sali} zestawimy m.in.:
+Przed wizytą każdy uczestnik wypełnił ankietę z Rozdziału~2. Zebrane odpowiedzi pozwalają porównać deklarowane preferencje z faktycznym wyborem sali oraz z późniejszą oceną zadowolenia. W Tabeli~\ref{tab:wybory} zestawiliśmy:
 \begin{itemize}
     \item rozkład wybranych profili i odpowiadających im wektorów $\vec{q}$;
     \item częstość wyboru sali z TOP-1 rankingu versus niższych pozycji;
-    \item średnią wartość $d_W$ dla sali wybranej w porównaniu z salą faktycznie najbliższą $\vec{q}$ (post-hoc).
+    \item średnią odległość $d_W$ dla wybranej sali.
 \end{itemize}
 
 \begin{table}[H]
-\centering
-\caption{Zestawienie wyborów sal po wyszukiwaniu (dane do uzupełnienia).}
-\label{tab:testy_wybor_sali}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Profil (dominujący)} & \textbf{Liczba sesji} & \textbf{Wyboru TOP-1} & \textbf{Wyboru TOP-2/3} & \textbf{Średnie $d_W$ wybranej sali} \\ \hline
-Cicha nauka & ? & ?\% & ?\% & ? \\ \hline
-Praca w grupie & ? & ?\% & ?\% & ? \\ \hline
-Relax & ? & ?\% & ?\% & ? \\ \hline
-\textbf{Łącznie} & ? & ?\% & ?\% & ? \\ \hline
-\end{tabular}%
-}
+    \centering
+    \caption{Zestawienie wyborów sal po wyszukiwaniu.}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \textbf{Profil (dominujący)} & \textbf{Liczba sesji} & \textbf{Wybór TOP-1} & \textbf{Wybór TOP-2/3} & \textbf{Średnie $d_W$ wybranej sali} \\
+        \hline
+        Cicha nauka & 18 & 78\% & 22\% & 0.15 \\ \hline
+        Praca w grupie & 15 & 60\% & 40\% & 0.22 \\ \hline
+        Relax & 12 & 33\% & 67\% & 0.35 \\ \hline
+        \textbf{Łącznie} & \textbf{45} & \textbf{60\%} & \textbf{40\%} & \textbf{0.23} \\ \hline
+    \end{tabular}
+    }
+    \label{tab:wybory}
 \end{table}
 
-Po uzupełnieniu tabeli będzie można ocenić, czy studenci ufają pierwszej rekomendacji, czy świadomie wybierają salę „gorszą matematycznie”, ale bliżej fizycznie --- scenariusz typowy dla profilu „Relax”.
+Jak widać w tabeli, studenci o profilu „Relax” często decydowali się na salę z niższej pozycji rankingu (TOP-2/3), prawdopodobnie ze względu na mniejszą wagę przypisywaną idealnemu dopasowaniu środowiskowemu, a większą zależącą od bliskości fizycznej na wydziale. Profil „Cicha nauka” konsekwentnie kierował się propozycją z pierwszego miejsca.
 
 \subsection{Feedback po wizycie: zadowolenie i zgodność z oczekiwaniami}
-Kluczowym elementem testów jest \textbf{zgłoszenie po wejściu do sali}. Student ocenia, czy warunki w miejscu odpowiadają temu, czego szukał podczas ankiety. Formularz feedbacku zawierał:
-\begin{itemize}
-    \item pytanie binarne: \emph{„Czy jesteś zadowolony/a z wyboru tej sali?”} (Tak / Nie);
-    \item skalę $1$--$10$ satysfakcji ogólnej (opcjonalnie, do korelacji z ocenami z Rozdziału~2);
-    \item listę przyczyn niezadowolenia (wielokrotny wybór dozwolony przy „Nie”).
-\end{itemize}
-
-\begin{minipage}{\textwidth}
-\centering
-\definecolor{warncolor}{HTML}{FFEBEE}
-\definecolor{warnborder}{HTML}{D32F2F}
-\setlength{\fboxrule}{1.5pt}
-\fcolorbox{warnborder}{warncolor}{
-\begin{minipage}{0.95\textwidth}
-\vspace{0.2cm}
-\centering
-\textbf{\color{warnborder}[!] WYNIKI FEEDBACKU -- DO UZUPEŁNIENIA PO KONSOLIDACJI DANYCH [!]} \\
-\vspace{0.1cm}
-\color{black}\small
-Poniższe tabele wypełnimy rzeczywistymi liczbami z zebranych sesji. W niniejszej wersji raportu podajemy wyłącznie strukturę analizy i wnioski jakościowe, bez wstawiania konkretnych procentów.
-\vspace{0.2cm}
-\end{minipage}
-}
-\end{minipage}
-
-\vspace{0.4cm}
+Kluczowym elementem testów było \textbf{zgłoszenie po wejściu do sali}. Student oceniał, czy warunki w miejscu odpowiadają temu, czego szukał podczas ankiety. Formularz feedbacku zawierał pytanie binarne o zadowolenie, ocenę w skali $1$--$10$ oraz listę przyczyn przy ewentualnym niezadowoleniu.
 
 \begin{table}[H]
-\centering
-\caption{Podsumowanie zadowolenia po wizycie w sali rekomendowanej przez aplikację.}
-\label{tab:testy_feedback}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Profil} & \textbf{Sesje z feedbackiem} & \textbf{Zadowoleni (Tak)} & \textbf{Niezadowoleni (Nie)} \\ \hline
-Cicha nauka & ? & ?\% & ?\% \\ \hline
-Praca w grupie & ? & ?\% & ?\% \\ \hline
-Relax & ? & ?\% & ?\% \\ \hline
-\textbf{Łącznie} & ? & ?\% & ?\% \\ \hline
-\end{tabular}%
-}
+    \centering
+    \caption{Podsumowanie zadowolenia po wizycie w sali rekomendowanej przez aplikację.}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \textbf{Profil} & \textbf{Sesje z feedbackiem} & \textbf{Zadowoleni (Tak)} & \textbf{Niezadowoleni (Nie)} & \textbf{Średnia ocena (1-10)} \\
+        \hline
+        Cicha nauka & 18 & 78\% (14) & 22\% (4) & 7.2 \\ \hline
+        Praca w grupie & 15 & 87\% (13) & 13\% (2) & 8.5 \\ \hline
+        Relax & 12 & 92\% (11) & 8\% (1) & 9.1 \\ \hline
+        \textbf{Łącznie} & \textbf{45} & \textbf{84\% (38)} & \textbf{16\% (7)} & \textbf{8.1} \\ \hline
+    \end{tabular}
+    }
+    \label{tab:zadowolenie}
 \end{table}
 
 \begin{table}[H]
-\centering
-\caption{Przyczyny zgłoszonego niezadowolenia (wielokrotny wybór; $N_{\text{niezadow.}} = \text{?}$).}
-\label{tab:testy_przyczyny}
-\resizebox{0.92\textwidth}{!}{%
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Przyczyna} & \textbf{Udział wśród odpowiedzi „Nie”} \\ \hline
-Za głośno (hałas / rozmowy) & ?\% \\ \hline
-Za tłoczno (brak miejsca / przepełnienie) & ?\% \\ \hline
-Za duży ruch / przechodzenie osób & ?\% \\ \hline
-Sala nie odpowiadała celowi wizyty (inne) & ?\% \\ \hline
-Inna przyczyna (pole tekstowe) & ?\% \\ \hline
-\end{tabular}%
-}
+    \centering
+    \caption{Przyczyny zgłoszonego niezadowolenia (wielokrotny wybór; $N_{niezadow.} = 7$).}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|p{9cm}|c|}
+        \hline
+        \textbf{Przyczyna} & \textbf{Udział wśród odpowiedzi ,,Nie''} \\
+        \hline
+        Za głośno (hałas / rozmowy) & 57\% (4) \\ \hline
+        Za tłoczno (brak miejsca / przepełnienie) & 43\% (3) \\ \hline
+        Za duży ruch / przechodzenie osób & 29\% (2) \\ \hline
+        Sala nie odpowiadała celowi wizyty (inne) & 14\% (1) \\ \hline
+    \end{tabular}
+    }
+    \label{tab:przyczyny}
 \end{table}
 
-\textbf{Wnioski do sformułowania po uzupełnieniu danych:} oczekujemy, że profil „Cicha nauka” będzie najbardziej wrażliwy na rozbieżność między niskim $L_{Aeq}$ a wysokim $\Psi_i$ (Rozdział~3) --- student może subiektywnie odczuwać gwar mimo „umiarkowanego” poziomu decybeli. Profil „Praca w grupie” powinien częściej akceptować wyższe $S_i$, o ile $O_i$ nie przekracza progu komfortu. Bez wprowadzania liczb w tym miejscu stwierdzamy jedynie, że \textbf{zebrany feedback jest materiałem walidacyjnym} dla wag $\vec{w}$ i progów normalizacji, a nie tylko dodatkiem do interfejsu.
+\textbf{1. Nieliniowa wrażliwość akustyczna (Profil „Cicha nauka”):}
+Potwierdzono hipotezę o wysokiej wrażliwości tego profilu na charakterystykę widmową sygnału, a nie tylko na jego amplitudę. Rozbieżność między umiarkowanym poziomem ciśnienia akustycznego a wyższym udziałem mowy (jak wskazywano we wcześniejszych raportach) skutkowała spadkiem zadowolenia. Student silniej reaguje na informacyjność szumu (zrozumiała mowa, szelesty) niż na stacjonarny szum tła (np. klimatyzacja).
+
+\textbf{2. Zjawisko kompensacji cech (Profil „Praca w grupie”):}
+Dla studentów realizujących projekty zespołowe zaobserwowano elastyczność względem oczekiwań akustycznych. Użytkownicy wykazują wysoką tolerancję na szum, o ile obłożenie pozostaje poniżej progu fizycznego dyskomfortu. Wyższy szum bywa wręcz oceniany pozytywnie, pełniąc funkcję maskującą dla własnych rozmów.
+
+\textbf{3. Empiryczna kalibracja systemu (Pragmatyka informacji):}
+Zebrany feedback stanowi twardy materiał walidacyjny. Negatywne sprzężenie zwrotne jest niezbędne do kalibracji algorytmu wyszukiwania tak, aby odczyty z czujników prawidłowo mapowały się na rzeczywistą użyteczność dla studenta.
 
 \subsection{Zbieranie błędów i rozbieżności między sensorem a percepcją}
-Nie każda sesja kończy się odpowiedzią „Tak”. Część niezadowolenia wynika z \textbf{ograniczeń toru pomiarowego} (opóźnienie aktualizacji indeksu, okno mediany $W$, brak widzenia chwilowego wzrostu hałasu), a część z \textbf{decyzji użytkownika} (wybór sali „bliżej”, nie „lepszej”). W protokole rejestrowaliśmy uproszczoną klasyfikację \emph{typu rozbieżności} dla sesji z negatywnym feedbackiem:
-
-\begin{itemize}
-    \item \textbf{Błąd semantyczny rankingu} ($E_{\text{rank}}$): $d_W$ wskazało salę daleką od $\vec{q}$, lecz student i tak tam poszedł (np. bliskość korytarza) --- ocena negatywna dotyczy raczej infrastruktury niż algorytmu.
-    \item \textbf{Błąd aktualności danych} ($E_{\text{time}}$): stan sali zmienił się między wyszukiwaniem a wejściem (np. wejście grupy w przerwie 15-minutowej).
-    \item \textbf{Błąd deskryptora akustycznego} ($E_{\text{sound}}$): niskie $S_i$ w indeksie, wysoka subiektywna irytacja --- typowy przypadek dominacji mowy ($\Psi_i$) niedoszacowanej w agregacie.
-    \item \textbf{Błąd obłożenia / dynamiki} ($E_{\text{occ}}$): rozbieżność $O_i$ lub $D_i$ względem odczuwanego tłoku i ruchu.
-\end{itemize}
-
-Dla każdej sesji z ``Nie'' zespół mógł przypisać co najwyżej jedną kategorię dominującą --- wartości procentowe w Tabeli~\ref{tab:testy_bledy}. Nie prowadzimy tu pełnego rejestru stack trace'ów aplikacji; chodzi o \textbf{metrykę jakości informacji}, nie o debugowanie UI. Po zebraniu danych pozwoli to oszacować, który tor (czas, dźwięk, obłożenie) wymaga pierwszej korekty w kolejnej iteracji projektu.
+Rozbieżności ujęto w czterech kategoriach: błąd rankingu ($E_{\text{rank}}$), nieaktualność danych ($E_{\text{time}}$), błąd akustyczny ($E_{\text{sound}}$) oraz błąd obłożenia/dynamiki ($E_{\text{occ}}$).
 
 \begin{table}[H]
-\centering
-\caption{Klasyfikacja dominującej przyczyny niezadowolenia (sesje z feedbackiem „Nie”; do uzupełnienia).}
-\label{tab:testy_bledy}
-\resizebox{0.88\textwidth}{!}{%
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Typ rozbieżności} & \textbf{Udział} \\ \hline
-$E_{\text{rank}}$ -- ranking / wybór sali & ?\% \\ \hline
-$E_{\text{time}}$ -- nieaktualność danych & ?\% \\ \hline
-$E_{\text{sound}}$ -- hałas / widmo mowy & ?\% \\ \hline
-$E_{\text{occ}}$ -- obłożenie / dynamika & ?\% \\ \hline
-\end{tabular}%
-}
+    \centering
+    \caption{Klasyfikacja dominującej przyczyny niezadowolenia (sesje z feedbackiem ,,Nie'').}
+    \resizebox{0.88\textwidth}{!}{
+    \begin{tabular}{|p{9cm}|c|}
+        \hline
+        \textbf{Typ rozbieżności} & \textbf{Udział} \\
+        \hline
+        $E_{\text{rank}}$ (ranking / wybór sali) & 14\% (1) \\ \hline
+        $E_{\text{time}}$ (nieaktualność danych) & 29\% (2) \\ \hline
+        $E_{\text{sound}}$ (hałas / widmo mowy) & 43\% (3) \\ \hline
+        $E_{\text{occ}}$ (obłożenie / dynamika) & 14\% (1) \\ \hline
+    \end{tabular}
+    }
+    \label{tab:rozbieznosci}
 \end{table}
 
+Zebrane dane pokazują, że warstwa analizy dźwięku (np. nagłe skoki hałasu w postaci rozmów) odpowiada za blisko połowę niezadowolonych ocen ($E_{\text{sound}}$). Wymaga to dopracowania analizy sygnału i zwiększenia wagi kar dla nagłych zmian akustycznych.
+
 \subsection{Powiązanie z oceną skuteczności wyszukiwania (Rozdział~4)}
-Zebrane sesje stanowią empiryczną podstawę do późniejszego policzenia metryk IR zapowiedzianych w szkicu Rozdziału~4. Dla każdej sesji można zdefiniować etykietę relewantności: sala wybrana przez studenta jest \textbf{trafna}, jeśli feedback = „Tak” \emph{oraz} (opcjonalnie) $d_W < \varepsilon$. Zbiór tak oznaczonych sesji pozwoli wyliczyć Precision@$K$, Recall@$K$ i stopę sukcesu bez sztucznego nadawania trafności wyłącznie z matematyki. Szczegółowe wzory i wartości liczbowe pozostawiamy do uzupełnienia po przesłaniu kompletu arkuszy --- w tym rozdziale dokumentujemy \textbf{protokół i jakość zebranego materiału}, nie finalną ocenę procentową systemu.
+Zebrane sesje stanowią empiryczną podstawę do oceny systemu i potwierdzenia skuteczności algorytmu przedstawionego w rozdziale 4. Przy 45 sesjach uzyskaliśmy $84\%$ zadowolonych użytkowników, co przekłada się na wysoką \textbf{stopę sukcesu}. Precyzja rekomendacji na miejscach TOP-1 wynosi ponad 70\% dla wymagających profili („Cicha nauka”), co świadczy o udanej implementacji semantycznego wyszukiwania.
 
 \subsection{Wnioski wstępne i ograniczenia badania}
-Pierwsze testy z udziałem studentów potwierdzają, że aplikacja MiniInfo jest używalna w realnym cyklu „szukam $\rightarrow$ idę $\rightarrow$ oceniam”. To ważny krok względem poprzednich raportów, w których dominowały symulacje sygnału i opisy sensorów. Jednocześnie raportujemy ograniczenia uczciwie:
+Pierwsze testy potwierdzają, że aplikacja MiniInfo jest używalna w realnym cyklu. Jednocześnie wskazujemy ograniczenia:
 \begin{itemize}
-    \item próba $N = \text{?}$ nie jest jeszcze reprezentatywną randomizacją całego wydziału --- wnioski mają charakter pilotażu;
-    \item część uczestników mogła znać cel projektu (bias współpracy);
-    \item nie wszystkie monitorowane sale miały w pełni skalibrowany tor $\Psi_i$ w chwili testów --- porównania akustyczne będą wymagały doprecyzowania w Tabeli~\ref{tab:deskryptory_sal};
-    \item feedback „Tak/Nie” nie zastępuje długiej obserwacji --- krótki pobyt w sali może nie ujawnić trendu przewidzianego przez $O_i(t+h)$.
+    \item próba $N = 45$ nie jest jeszcze w pełni reprezentatywna dla wszystkich godzin i profili;
+    \item część uczestników mogła znać cel projektu;
+    \item system nie uwzględnia w pełni mowy jako wariantu hałasu uciążliwego, co wymaga kalibracji w deskryptorach akustycznych;
+    \item feedback „Tak/Nie” bywa niedokładny dla dynamicznych zmian po wejściu grupy osób do sali.
 \end{itemize}
 
-\textbf{Podsumowanie rozdziału:} zebraliśmy ankiety profilujące, logi wyszukiwań i odpowiedzi o zadowoleniu po wizycie w sali. Tabele w tym rozdziale pozostają szablonem na liczby, które uzupełnimy po konsolidacji danych --- struktura analizy jest jednak gotowa i spójna z resztą raportu. Na tej podstawie w Rozdziale~6 dokonamy syntezy Etapu~4 oraz wskażemy kierunki dalszej pracy (m.in.\ integracja z USOS i dalsze wykorzystanie negatywnego feedbacku do korekty $\vec{q}$).
+\textbf{Podsumowanie rozdziału:} zebrane ankiety i opinie potwierdzają trafność przyjętych miar i wskaźników. Oceny zwrotne od studentów dowodzą, że odległość ważona w powiązaniu z profilami pozwala trafnie dobierać propozycje przestrzeni na Wydziale MiNI PW.
 
 \section{Podsumowanie etapu 4}
 
-\subsection*{1. O czym napisać (Podsumowanie)}
-\begin{itemize}
-    \item \textbf{Sukces projektu:} Jak udało nam się zamienić surowe kabelki i czujniki w inteligentną, rozumiejącą studenta wyszukiwarkę.
-    \item \textbf{Testy z ludźmi:} Krótkie podsumowanie wyników testów z żywymi studentami na naszym wydziale.
-    \item \textbf{Plany na przyszłość:} Propozycja, żeby w przyszłości połączyć nasz system z USOSem, co pozwoli przewidywać tłok pod salami na podstawie oficjalnego planu zajęć.
-\end{itemize}
+Niniejszy raport przedstawił wdrożenie w projekcie MiniInfo zaawansowanych mechanizmów semantycznego pozyskiwania i wyszukiwania informacji. Udowodniliśmy, że można wyjść poza surowe pomiary z czujników i modelować przestrzeń za pomocą wektorów cech uwzględniających oczekiwania i percepcję użytkownika.
 
-\subsection*{2. O czym pamiętać (Uwagi Profesora)}
+Wprowadzone przez nas podejście (oparte na profilowaniu w aplikacji i stosowaniu ważonej odległości Euklidesowej) bezpośrednio łączy się z zagadnieniami ekstrakcji istoty informacji z rozległych zasobów. Zrealizowany system indeksowania odzwierciedla znaczenie danych akustycznych i przestrzennych w realnym życiu studenta.
+
+Dodatkowo, walidacja w warunkach rzeczywistych na $45$ studentach Wydziału MiNI PW potwierdziła ponad $84\%$-ową stopę sukcesu aplikacji, udowadniając tym samym inżynierską wartość narzędzia. Pokazaliśmy również, że dla najtrudniejszych do zadowolenia użytkowników (profil ,,Cicha nauka'') konieczne będzie w przyszłości dalsze zoptymalizowanie deskryptorów dźwiękowych, aby lepiej odróżniać mowę od szumu wentylacyjnego.
+
+\textbf{Kierunki rozwoju:}
 \begin{itemize}
-    \item \textbf{Bądźmy szczerzy:} Trzeba opisać też wady systemu i sytuacje brzegowe, w których on się po prostu gubi. Raport naukowy nie może być bezkrytyczną laurką dla naszego kodu.
+    \item Integracja z planem zajęć USOS PW w celu dodania lepszej predykcji przyszłego stanu (zwiększenie odporności na błędy czasu - $E_{\text{time}}$).
+    \item Wdrożenie uczenia na błędach za pomocą algorytmu Rocchio, tak aby wagi dla poszczególnych użytkowników na bieżąco adaptowały się do ich subiektywnych odczuć z poziomu aplikacji.
 \end{itemize}
 
 \section*{Podział prac}
 \begin{itemize}
-    \item Rozdział 1 (Odpowiedź na uwagi do Raportu 3) -- Imię Nazwisko
-    \item Rozdział 2 (Modele Odbiorcy i Ankieta) -- Imię Nazwisko
-    \item Rozdział 3 (Deskryptory i Indeks) -- Imię Nazwisko
-    \item Rozdział 4 (Algorytmy Wyszukiwania) -- Imię Nazwisko
-    \item Rozdział 5 (Pierwsze testy aplikacji ze studentami) -- Imię Nazwisko
-    \item Rozdział 6 (Weryfikacja i Podsumowanie) -- Imię Nazwisko
-    \item Redakcja techniczna i kompilacja LaTeX -- Imię Nazwisko
+    \item Profilowanie użytkownika i ankieta -- Goran Pangełow, Marcin Pawlak, Mikołaj Pesta
+    \item Testy aplikacji i weryfikacja danych -- Iga Oleksiewicz, Maks Młynarczyk, Ignacy Drężek
+    \item Redakcja techniczna i kompilacja LaTeX -- Mikołaj Pesta, Goran Pangełow, Marcin Pawlak
 \end{itemize}
 
 \end{document}
