@@ -252,18 +252,18 @@ Nasza aplikacja w trybie ciągłym odbiera strumienie danych z zainstalowanych w
 Za każdym razem, gdy czujnik wyśle nowy odczyt, wywoływana jest funkcja aktualizująca \texttt{onSensorChange()}. Aplikacja natychmiast odświeża dane w pamięci i tłumaczy „suche” ułamki na zrozumiały tekst --- na przykład wartość szumu $0.8$ zmienia się w komunikat \emph{85 dB (Hałas uciążliwy)}. Dzięki temu interfejs jest po prostu przyjazny dla ludzi, a jednocześnie oparty na rzetelnych pomiarach sprzętowych.
 
 \subsection{Reakcja na zgłoszenia studentów (Algorytm Rocchio)}
-Ciekawym mechanizmem w aplikacji jest to, jak radzi sobie ona z pomyłkami. Wyobraźmy sobie, że aplikacja poleca studentowi salę do nauki, ale po wejściu okazuje się, że trwa tam głośna dyskusja. Student może wcisnąć w aplikacji przycisk zgłaszający problem. 
+Ciekawym mechanizmem w aplikacji jest to, jak radzi sobie ona z pomyłkami. Wyobraźmy sobie, że aplikacja poleca grupie studentów salę do nauki, ale po wejściu okazuje się, że trwa tam głośna dyskusja. Studenci mogą wcisnąć w aplikacji przycisk zgłaszający problem. 
 
-Wtedy uruchamia się funkcja \texttt{triggerRocchioFeedback()}, która robi dwie rzeczy na raz:
+Aby zapobiec nadużyciom, reakcja systemu jest wyzwalana dopiero wtedy, gdy \textbf{grupa co najmniej 3 osób} zgłosi błąd dla tej samej sali. Po zebraniu takich zgłoszeń, system oblicza \textbf{medianę} z podanych przez nich poprawek. Dopiero ta wyliczona wartość uruchamia funkcję \texttt{triggerRocchioFeedback()}, która robi dwie rzeczy na raz:
 \begin{enumerate}
-    \item \textbf{Aktualizuje stan sali:} System ufa studentom, więc od razu podnosi wartość szumu w tej konkretnej sali w naszej bazie (np. o $0.3$). Omija to problem np. usterki czujnika, który mógłby podawać błędne odczyty.
-    \item \textbf{Uczy się preferencji studenta (Algorytm Rocchio):} System zauważa, że dla tego konkretnego użytkownika cisza jest bardzo ważna. Automatycznie zwiększa więc wagę parametru szumu o $0.15$ przy kolejnym wyszukiwaniu i zmniejsza akceptowalny poziom hałasu za pomocą wzoru z karą $\beta = 0.35$:
+    \item \textbf{Aktualizuje stan sali:} System koryguje wartość szumu w naszej bazie w oparciu o obliczoną medianę ze zgłoszeń. Omija to problem np. usterki czujnika, chroniąc jednocześnie przed fałszywymi skargami od pojedynczych osób.
+    \item \textbf{Uczy się preferencji grupy (Algorytm Rocchio):} System zauważa, że dla tych użytkowników cisza jest bardzo ważna. Automatycznie zwiększa więc wagę parametru szumu o $0.15$ przy kolejnym wyszukiwaniu i zmniejsza akceptowalny poziom hałasu za pomocą wzoru z karą $\beta = 0.35$:
     \begin{equation}
         q_S \leftarrow \max(0.0,\; q_S - 0.35 \cdot S_i)
     \end{equation}
 \end{enumerate}
 
-Po tej szybkiej korekcie, aplikacja natychmiast przelicza ranking od nowa i proponuje studentowi inną, dużo cichszą salę. To proste sprzężenie zwrotne rozwiązuje wiele problemów z niedokładnością pomiarów.
+Po tej grupowej korekcie, aplikacja natychmiast przelicza ranking od nowa i proponuje studentom inną, dużo cichszą salę. Taka weryfikacja (brama mediany) rozwiązuje wiele problemów z niedokładnością pomiarów w sposób niezawodny i odporny na "trollowanie".
 
 \section{Procedury odpytywania i mechanizmy wyszukiwania}
 
