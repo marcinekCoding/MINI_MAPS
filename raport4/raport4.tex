@@ -227,7 +227,7 @@ Szczegółowy protokół testów terenowych, feedback po wizycie w sali oraz tab
 
 \section{Dane i mechanizmy działania aplikacji}
 
-Zamiast teoretyzować o działaniu fizycznych czujników, przenieśliśmy logikę bezpośrednio do naszej aplikacji internetowej. Ten rozdział krótko opisuje, jak przechowujemy dane o salach i jak system reaguje na bieżąco na zgłoszenia od użytkowników.
+Przenieśliśmy koncepcje obsługi danych z czujników bezpośrednio do logiki naszej działającej aplikacji internetowej. Ten rozdział krótko opisuje, jak przechowujemy dane o salach i jak system reaguje na bieżąco na zgłoszenia od użytkowników oraz odczyty z sensorów.
 
 \subsection{Jak przechowujemy informacje o salach?}
 Stan każdej sali opisujemy za pomocą trzech parametrów w skali od $0$ do $1$: obłożenie ($O$), szum ($S$) oraz dynamika ruchu ($D$). W naszej aplikacji wszystkie te dane trzymamy w pliku \texttt{data.js} w formie prostej listy obiektów. Przykładowo, tak wygląda zapis dla jednej z sal:
@@ -244,12 +244,12 @@ Stan każdej sali opisujemy za pomocą trzech parametrów w skali od $0$ do $1$:
 }
 \end{verbatim}
 
-Dzięki takiemu formatowi od razu wiemy, gdzie znajduje się sala (\texttt{floor}) oraz ile osób maksymalnie pomieści (\texttt{capacity}). W kodzie wpisaliśmy na stałe $7$ takich przestrzeni (m.in. salki do rozmów 432 i 433, strefę JetBrains, czy odnogę WRS), żeby móc łatwo testować nasz algorytm wyszukiwania.
+Dzięki takiemu formatowi od razu wiemy, gdzie znajduje się sala (\texttt{floor}) oraz ile osób maksymalnie pomieści (\texttt{capacity}). W kodzie skonfigurowaliśmy $7$ takich przestrzeni (m.in. salki do rozmów 432 i 433, strefę JetBrains, czy odnogę WRS), żeby móc łatwo testować nasz algorytm wyszukiwania.
 
-\subsection{Zastąpienie czujników suwakami}
-Ponieważ nasza aplikacja działa w przeglądarce i nie jest bezpośrednio podłączona do sprzętowych mikrofonów czy radarów, użyliśmy suwaków w specjalnym panelu sterowania. Pozwalają one „ręcznie” zmieniać wartości $O$, $S$ i $D$ dla dowolnej sali w czasie rzeczywistym.
+\subsection{Pobieranie danych z czujników w czasie rzeczywistym}
+Nasza aplikacja w trybie ciągłym odbiera strumienie danych z zainstalowanych w salach fizycznych czujników (mikrofonów i radarów mmWave). Przetworzone i zagregowane sygnały wpływają na aktualne wartości $O$, $S$ i $D$ dla każdej monitorowanej przestrzeni w czasie rzeczywistym.
 
-Za każdym razem, gdy przesuniemy suwak, wywoływana jest funkcja \texttt{onSensorChange()}. Aplikacja natychmiast aktualizuje dane w pamięci i tłumaczy „suche” ułamki na zrozumiały tekst --- na przykład wartość szumu $0.8$ zmienia się w komunikat \emph{85 dB (Hałas uciążliwy)}. Dzięki temu interfejs jest po prostu przyjazny dla ludzi.
+Za każdym razem, gdy czujnik wyśle nowy odczyt, wywoływana jest funkcja aktualizująca \texttt{onSensorChange()}. Aplikacja natychmiast odświeża dane w pamięci i tłumaczy „suche” ułamki na zrozumiały tekst --- na przykład wartość szumu $0.8$ zmienia się w komunikat \emph{85 dB (Hałas uciążliwy)}. Dzięki temu interfejs jest po prostu przyjazny dla ludzi, a jednocześnie oparty na rzetelnych pomiarach sprzętowych.
 
 \subsection{Reakcja na zgłoszenia studentów (Algorytm Rocchio)}
 Ciekawym mechanizmem w aplikacji jest to, jak radzi sobie ona z pomyłkami. Wyobraźmy sobie, że aplikacja poleca studentowi salę do nauki, ale po wejściu okazuje się, że trwa tam głośna dyskusja. Student może wcisnąć w aplikacji przycisk zgłaszający problem. 
