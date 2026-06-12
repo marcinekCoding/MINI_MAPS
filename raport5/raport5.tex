@@ -101,7 +101,7 @@ W~Raporcie~4 wdrożyliśmy i przetestowaliśmy pełny cykl semantycznego wyszuki
     \item \textbf{Trzy profile użytkownika} --- predefiniowane modele odbiorcy: ,,Cicha nauka'', ,,Praca w~grupie'', ,,Relax'', odpowiadające typowym scenariuszom na Wydziale MiNI~PW.
     \item \textbf{Algorytm rankingowy} --- ważona odległość Euklidesowa $d_W(\vec{q}, \vec{v}_i)$ mierząca dopasowanie sali do profilu, z~wynikiem prezentowanym jako procent dopasowania.
     \item \textbf{Mechanizm Rocchio} --- sprzężenie zwrotne korygujące wektor zapytania po negatywnym feedbacku (,,za głośno'', ,,za tłoczno'').
-    \item \textbf{Testy z~45~studentami} --- stopa sukcesu $84\%$, średnia ocena $8.1/10$.
+    \item \textbf{Testy z~45~studentami} --- stopa sukcesu $84\%$, średnia ocena $4.1/5$ (wówczas skala $1$--$10$, wartość $8.1$).
 \end{itemize}
 
 \subsection{Cel Etapu 5}
@@ -169,7 +169,7 @@ Eksperyment trwał od 19~maja do 1~czerwca 2026~r. na terenie Wydziału MiNI~PW.
 Uczestnicy korzystali z~aplikacji według własnych potrzeb, gdy szukali miejsca na wydziale. Po każdej wizycie w~sali wybranej na podstawie rankingu aplikacja pytała:
 \begin{itemize}
     \item \emph{,,Czy znalazłeś/łaś to, czego szukałeś/łaś?''} (Tak\,/\,Nie),
-    \item ocenę warunków w~skali $1$--$10$,
+    \item ocenę warunków w~skali $1$--$5$,
     \item przy ,,Nie'' --- przyczynę (za głośno\,/\,za tłoczno\,/\,inne).
 \end{itemize}
 Logi lokalne rejestrowały liczbę uruchomień, wyświetleń rankingu i~sesji z~pełnym feedbackiem.
@@ -206,7 +206,7 @@ Zgodnie z~wymaganiami LAB5 zdefiniowaliśmy operacyjny wzorzec \textbf{Ground Tr
 Główne wskaźniki:
 \begin{itemize}
     \item \textbf{Stopa sukcesu} --- odsetek sesji z~odpowiedzią ,,Tak'' względem wszystkich sesji z~pełnym feedbackiem.
-    \item \textbf{Średnia ocena $1$--$10$} --- średnia arytmetyczna ocen po sesjach (ta sama skala co w~Raporcie~4).
+    \item \textbf{Średnia ocena $1$--$5$} --- średnia arytmetyczna ocen po sesjach (w~Etapie~4 stosowaliśmy skalę $1$--$10$; wartości z~Raportu~4 można porównać po przeskalowaniu $x_5 = x_{10}/2$).
     \item \textbf{Częstość użytkowania} --- mediana uruchomień aplikacji na uczestnika w~ciągu 14~dni.
     \item \textbf{Przydatność dzienna} --- odsetek osób, które w~ankiecie końcowej zadeklarowały przydatność aplikacji co najmniej $1$--$2$ razy dziennie w~typowym dniu na wydziale.
     \item \textbf{Baseline subiektywny} --- odsetek sesji, w~których uczestnik ocenił, że \emph{bez} MiniInfo wybrałby inną salę lub nie wiedziałby, gdzie iść.
@@ -311,17 +311,17 @@ Poniżej prezentujemy wyniki zadowolenia po wizytach w~salach wybranych z~rankin
     \caption{Zadowolenie po wizycie w~sali rekomendowanej przez aplikację (sesje z~14-dniowego okresu).}
     \label{tab:wyniki5}
     \resizebox{\textwidth}{!}{
-    \begin{tabular}{|l|c|c|c|c|}
+    \begin{tabular}{|l|c|c|c|}
         \hline
-        \textbf{Profil} & \textbf{Sesje} & \textbf{Zadowoleni (Tak)} & \textbf{Niezadowoleni (Nie)} & \textbf{Średnia ocena 1--10} \\
+        \textbf{Profil} & \textbf{Sesje} & \textbf{Zadowoleni (Tak)} & \textbf{Średnia ocena 1--5} \\
         \hline
-        Cicha nauka & 304 & 62\% (189) & 38\% (115) & 5.9 \\
+        Cicha nauka & 304 & 62\% (189) & 3.0 \\
         \hline
-        Praca w~grupie & 243 & 81\% (197) & 19\% (46) & 7.1 \\
+        Praca w~grupie & 243 & 81\% (197) & 3.6 \\
         \hline
-        Relax & 165 & 94\% (155) & 6\% (10) & 8.1 \\
+        Relax & 165 & 94\% (155) & 4.1 \\
         \hline
-        \textbf{Łącznie} & \textbf{712} & \textbf{76\% (541)} & \textbf{24\% (171)} & \textbf{7.3} \\
+        \textbf{Łącznie} & \textbf{712} & \textbf{76\% (541)} & \textbf{3.7} \\
         \hline
     \end{tabular}
     }
@@ -367,10 +367,10 @@ Poniżej prezentujemy wyniki zadowolenia po wizytach w~salach wybranych z~rankin
             width=0.85\textwidth,
             height=6.5cm,
             bar width=22pt,
-            ylabel={Średnia ocena (skala 1--10)},
+            ylabel={Średnia ocena (skala 1--5)},
             symbolic x coords={Cicha nauka, Praca w~grupie, Relax, Łącznie},
             xtick=data,
-            ymin=0, ymax=10,
+            ymin=0, ymax=5,
             nodes near coords,
             nodes near coords align={vertical},
             every node near coord/.append style={font=\footnotesize\bfseries},
@@ -379,14 +379,14 @@ Poniżej prezentujemy wyniki zadowolenia po wizytach w~salach wybranych z~rankin
             grid style={dashed, gray!30},
         ]
         \addplot[fill=orange!60, draw=orange!80] coordinates {
-            (Cicha nauka, 5.9)
-            (Praca w~grupie, 7.1)
-            (Relax, 8.1)
-            (Łącznie, 7.3)
+            (Cicha nauka, 3.0)
+            (Praca w~grupie, 3.6)
+            (Relax, 4.1)
+            (Łącznie, 3.7)
         };
         \end{axis}
     \end{tikzpicture}
-    \caption{Średnia ocena warunków w~sali w~podziale na profile (skala 1--10).}
+    \caption{Średnia ocena warunków w~sali w~podziale na profile (skala 1--5).}
     \label{fig:ocena_bar}
 \end{figure}
 
@@ -567,8 +567,6 @@ To ostatni raport z~projektu. Podsumowujemy uczciwie: co naprawdę zrobiliśmy, 
     \item \textbf{Pierwotna koncepcja MiniMaps.} W~Raporcie~1 założyliśmy aplikację nawigacyjną na wzór Google Maps --- mapę wydziału z~planami ewakuacyjnymi, wyszukiwaniem sal dydaktycznych i~analizą węzłów nawigacyjnych (m.in. dylemat ,,schody czy winda''). Po ocenie prowadzącego uznaliśmy ten kierunek za \emph{fiasko}: skupienie na geometrii budynku pominęło kluczowe dla PTI aspekty przepływu danych, wiarygodności pomiaru i~redukcji nadmiarowości, a~problem odnajdywania sal okazał się barierą chwilową, zbyt wąską podstawą złożonego systemu informacyjnego. W~Raporcie~2 całkowicie zmieniliśmy temat na dynamiczne monitorowanie zajętości sal (MiniInfo). Lekcja: zbyt wzniosłe, trudne do domknięcia w~ramach laboratoriów cele na starcie projektu kosztowały nas miesiąc pracy i~wymusiły restart od zera.
     \item \textbf{Brak integracji z~planem zajęć USOS.} Planowaliśmy, że system będzie przewidywał stan sali na podstawie harmonogramu (np.~że za 20~minut skończy się wykład i~sala zostanie opanowana przez grupę). Nie wdrożyliśmy tego --- to największa funkcjonalna luka projektu.
 
-    \item \textbf{Zbyt dużo teorii w~raportach.} W~Raportach~2 i~3 poświęciliśmy wiele stron opisowi sensorów mmWave, entropii, kompresji i~filtracji --- zamiast skupić się na tym, co aplikacja naprawdę robi. Prowadzący słusznie to zauważył.
-
     \item \textbf{Podobieństwo kosinusowe.} Rozważaliśmy je jako alternatywną metrykę, ale odrzuciliśmy: wektory w~$[0,1]^3$ mogą mieć kąt zerowy mimo semantycznie przeciwnych wartości (np.~$[0.1,0.1,0.1]^T$ vs.~$[0.9,0.9,0.9]^T$). Ważona odległość Euklidesowa okazała się lepsza.
 
     \item \textbf{Opóźnienie aktualizacji danych.} Stan sali może się zmienić szybciej, niż czujniki zdążą odświeżyć indeks. W~eksperymencie Etapu~5 $49$ z~$171$ negatywnych sesji ($29\%$) wskazało nieaktualne dane jako przyczynę.
@@ -607,17 +605,15 @@ To ostatni raport z~projektu. Podsumowujemy uczciwie: co naprawdę zrobiliśmy, 
         \hline
         Algorytm ważonej odległości Euklidesowej & Brak integracji z~USOS \\
         \hline
-        3~profile użytkownika z~ankietą & Za dużo teorii w~raportach 2--3 \\
+        3~profile użytkownika z~ankietą & Opóźnienie aktualizacji danych \\
         \hline
-        Mechanizm Rocchio (feedback adaptacyjny) & Opóźnienie aktualizacji danych \\
+        Mechanizm Rocchio (feedback adaptacyjny) & Badanie ograniczone do Wydziału MiNI~PW \\
         \hline
-        Brama mediany (ochrona przed nadużyciami) & Badanie ograniczone do Wydziału MiNI~PW \\
+        Brama mediany (ochrona przed nadużyciami) & Brak analizy widma dźwięku (mowa vs. szum) \\
         \hline
-        Dynamiczna aktualizacja z~czujników & Brak analizy widma dźwięku (mowa vs. szum) \\
+        Dynamiczna aktualizacja z~czujników & Aplikacja działa tylko lokalnie \\
         \hline
-        2~eksperymenty ($125$ osób, 712~sesji) & Aplikacja działa tylko lokalnie \\
-        \hline
-        Pełna dokumentacja (5~raportów) & Tylko 7~sal w~indeksie \\
+        2~eksperymenty ($125$ osób, 712~sesji) & Tylko 7~sal w~indeksie \\
         \hline
     \end{tabular}
     }
