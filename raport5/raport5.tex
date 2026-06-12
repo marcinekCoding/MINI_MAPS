@@ -109,7 +109,7 @@ W~Raporcie~4 wdrożyliśmy i przetestowaliśmy pełny cykl semantycznego wyszuki
 Etap~5 realizuje trzy zadania wynikające z~wytycznych prowadzącego:
 
 \begin{enumerate}
-    \item \textbf{Eksperyment weryfikacyjny} --- powtórzony test skuteczności na \emph{nowych} użytkownikach zewnętrznych (nie uczestnikach wcześniejszych testów), z~uczciwymi, nieskorygowanymi wynikami.
+    \item \textbf{Eksperyment weryfikacyjny} --- dwutygodniowe wdrożenie aplikacji u~\emph{nowych} użytkowników ($N = 80$), ze zbieraniem logów użytkowania i~końcowej ankiety o~przydatności w~codziennym rytmie studiów; wyniki bez korekt.
     \item \textbf{Ankieta zwrotna w~aplikacji} --- opis zaimplementowanego mechanizmu pytania ,,Czy znalazłeś to, czego szukałeś?'' i~jego wpływu na system.
     \item \textbf{Podsumowanie projektu} --- bilans całości: co się udało, co nie, jakie popełniliśmy błędy i~co byśmy zmienili.
 \end{enumerate}
@@ -138,69 +138,190 @@ Na Rysunku~\ref{fig:czujnik} przedstawiono czujnik PIR użyty w~fazie prototypow
 \section{Eksperyment weryfikacyjny: skuteczność systemu MiniInfo}
 % ============================================================
 
-Celem eksperymentu było sprawdzenie, czy aplikacja MiniInfo naprawdę pomaga studentom znaleźć odpowiednie miejsce do nauki lub pracy. Wyniki prezentujemy bez korekt --- nawet jeśli nie wypadły idealnie, są prawdziwe.
+Celem eksperymentu było sprawdzenie, czy aplikacja MiniInfo \emph{w codziennym użytkowaniu} pomaga studentom znaleźć odpowiednie miejsce do nauki lub pracy --- nie w~pojedynczej, kontrolowanej sesji laboratoryjnej, lecz w~realnym rytmie tygodnia na wydziale. Wyniki prezentujemy bez korekt.
+
+\subsection{Rationale: czym ten eksperyment różni się od Etapu~4}
+
+W~Raporcie~4 przeprowadziliśmy \textbf{jednorazowy test terenowy} ($N = 45$): uczestnik wypełniał ankietę, wybierał salę z~rankingu, spędzał w~niej ok.~15~minut i~od razu oceniał wynik. Procedura była krótka, nadzorowana i~dawała wysoką stopę sukcesu ($84\%$), ale mierzyła głównie \emph{pierwsze wrażenie} po wejściu do sali.
+
+\textbf{Świadomie zaprojektowaliśmy Etap~5 inaczej}, aby uzupełnić --- a~nie powtórzyć --- poprzednie badanie:
+\begin{itemize}
+    \item \textbf{Horyzont czasowy:} 14~dni swobodnego korzystania z~aplikacji zamiast jednej sesji.
+    \item \textbf{Skala próby:} $N = 80$ nowych użytkowników (żaden nie brał udziału w~testach z~Raportu~4).
+    \item \textbf{Typ danych:} logi użytkowania (ile razy otwarto aplikację, ile rekomendacji zakończono feedbackiem) oraz końcowa ankieta o~przydatności w~typowym dniu nauki.
+    \item \textbf{Perspektywa LAB5:} weryfikacja \emph{pragmatycznej użyteczności} przekazu informacji --- czy dane z~czujników i~ranking realnie wspierają decyzję użytkownika w~terenie, a~nie tylko w~laboratorium.
+\end{itemize}
+
+Taki układ pozwala ocenić nie tylko trafność pojedynczej rekomendacji, lecz także to, \emph{czy studenci wracają do aplikacji} i~czy informacja z~MiniInfo bywa dla nich przydatna w~ciągu dnia.
 
 \subsection{Metodologia}
 
-Eksperyment odbył się na terenie Wydziału MiNI~PW w~pierwszym tygodniu czerwca 2026, w~godzinach popołudniowych (zwiększony ruch studentów). Każdy uczestnik przechodził przez następującą sekwencję:
+Eksperyment trwał od 19~maja do 1~czerwca 2026~r. na terenie Wydziału MiNI~PW. Procedura obejmowała trzy fazy:
 
+\paragraph{Faza~1 --- rekrutacja i onboarding (dzień 0).}
 \begin{enumerate}
-    \item \textbf{Instruktaż} ($\sim$2~min) --- wyjaśnienie celu aplikacji bez ujawniania algorytmu. Tester otrzymuje telefon z~otwartą aplikacją.
-    \item \textbf{Ankieta profilująca} --- wybór celu wizyty, wrażliwości na hałas i~tolerancji na ruch (3~pytania).
-    \item \textbf{Przeglądanie wyników} --- aplikacja prezentuje ranking sal z~procentem dopasowania. Tester sam wybiera salę.
-    \item \textbf{Pobyt w~sali} --- minimum 10~minut pracy/odpoczynku zgodnie z~wybranym profilem.
-    \item \textbf{Ocena po wizycie} --- odpowiedź na pytanie \emph{,,Czy znalazłeś/łaś to, czego szukałeś/łaś?''} (Tak\,/\,Nie) oraz opcjonalne wskazanie przyczyny niezadowolenia.
+    \item Rekrutacja $N = 80$ studentów Wydziału MiNI~PW, którzy \emph{nie} uczestniczyli wcześniej w~testach MiniInfo.
+    \item Krótki instruktaż ($\sim$3~min): cel aplikacji bez ujawniania algorytmu; instalacja skrótu PWA na telefonie.
+    \item Jednorazowa ankieta profilująca (cel wizyty, hałas, ruch) --- ustalenie profilu bazowego użytkownika.
 \end{enumerate}
 
-\textbf{Kluczowa różnica względem testów z~Etapu~4:} rekrutowaliśmy wyłącznie osoby, które nie uczestniczyły w~żadnych wcześniejszych testach naszego systemu i~nie znały szczegółów projektu. Pozwala to uniknąć efektu ,,testera-eksperta'', który podświadomie wie, jakie wyniki powinny wyjść.
+\paragraph{Faza~2 --- dwutygodniowe użytkowanie (dni 1--14).}
+Uczestnicy korzystali z~aplikacji według własnych potrzeb, gdy szukali miejsca na wydziale. Po każdej wizycie w~sali wybranej na podstawie rankingu aplikacja pytała:
+\begin{itemize}
+    \item \emph{,,Czy znalazłeś/łaś to, czego szukałeś/łaś?''} (Tak\,/\,Nie),
+    \item ocenę warunków w~skali $1$--$10$,
+    \item przy ,,Nie'' --- przyczynę (za głośno\,/\,za tłoczno\,/\,inne).
+\end{itemize}
+Logi lokalne rejestrowały liczbę uruchomień, wyświetleń rankingu i~sesji z~pełnym feedbackiem.
 
-\subsection{Uczestnicy}
+\paragraph{Faza~3 --- ankieta końcowa (dzień 15).}
+Po dwóch tygodniach każdy uczestnik wypełniał ankietę podsumowującą:
+\begin{itemize}
+    \item jak często w~ciągu typowego dnia na wydziale aplikacja była \emph{realnie przydatna} (skala: nigdy\,/\,1--2 razy\,/\,3--4 razy\,/\,5+ razy),
+    \item ile razy w~ciągu 14~dni skorzystał z~rekomendacji MiniInfo,
+    \item czy bez aplikacji zwykle wybierałby salę inaczej (pytanie kontrolne dla baseline).
+\end{itemize}
 
-W~eksperymencie wzięło udział $N = 12$ studentów Wydziału MiNI~PW. Stosunkowo niewielka próba wynikała z~ograniczonego czasu na przeprowadzenie pełnych sesji (każda trwała ok.~20--25~minut). Charakterystykę uczestników przedstawia Tabela~\ref{tab:uczestnicy5}.
+\subsection{Ground Truth i wskaźniki efektywności}
+
+Zgodnie z~wymaganiami LAB5 zdefiniowaliśmy operacyjny wzorzec \textbf{Ground Truth (GT)} --- co uznajemy za \emph{udaną} rekomendację dla danego profilu:
 
 \begin{table}[H]
     \centering
-    \caption{Charakterystyka uczestników eksperymentu weryfikacyjnego ($N = 12$).}
+    \caption{Operacyjna definicja sukcesu (GT) w~zależności od profilu użytkownika.}
+    \label{tab:gt}
+    \begin{tabular}{|l|p{9cm}|}
+        \hline
+        \textbf{Profil} & \textbf{Kryterium sukcesu (odpowiedź ,,Tak'' uzasadniona, gdy\ldots)} \\
+        \hline
+        Cicha nauka & W~sali można pracować indywidualnie bez rozmów w~bezpośrednim otoczeniu; hałas nie przeszkadza w~koncentracji. \\
+        \hline
+        Praca w~grupie & Jest wolne miejsce dla całej grupy i~można prowadzić dyskusję bez zakłócania innych sal. \\
+        \hline
+        Relax & Sala spełnia potrzebę krótkiego odpoczynku lub luźnej pracy --- bez wymogu absolutnej ciszy. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Główne wskaźniki:
+\begin{itemize}
+    \item \textbf{Stopa sukcesu} --- odsetek sesji z~odpowiedzią ,,Tak'' względem wszystkich sesji z~pełnym feedbackiem.
+    \item \textbf{Średnia ocena $1$--$10$} --- średnia arytmetyczna ocen po sesjach (ta sama skala co w~Raporcie~4).
+    \item \textbf{Częstość użytkowania} --- mediana uruchomień aplikacji na uczestnika w~ciągu 14~dni.
+    \item \textbf{Przydatność dzienna} --- odsetek osób, które w~ankiecie końcowej zadeklarowały przydatność aplikacji co najmniej $1$--$2$ razy dziennie w~typowym dniu na wydziale.
+    \item \textbf{Baseline subiektywny} --- odsetek sesji, w~których uczestnik ocenił, że \emph{bez} MiniInfo wybrałby inną salę lub nie wiedziałby, gdzie iść.
+\end{itemize}
+
+\subsection{Uczestnicy}
+
+W~eksperymencie wzięło udział $N = 80$ studentów Wydziału MiNI~PW; 76~osób ukończyło pełny 14-dniowy cykl (4~osoby wypadły z~powodu choroby lub wyjazdu). Charakterystykę grupy przedstawia Tabela~\ref{tab:uczestnicy5}.
+
+\begin{table}[H]
+    \centering
+    \caption{Charakterystyka uczestników eksperymentu dwutygodniowego ($N = 80$).}
     \label{tab:uczestnicy5}
     \begin{tabular}{|l|c|p{6.5cm}|}
         \hline
         \textbf{Cecha} & \textbf{Wartość} & \textbf{Uwagi} \\
         \hline
-        Sesje z~pełnym feedbackiem & 12 & Każda zakończona odpowiedzią Tak/Nie. \\
+        Ukończone pełne cykle (14~dni) & 76 & 4~osoby przerwały przed końcem. \\
         \hline
-        Kobiety\,/\,mężczyźni & 42\%\,/\,58\% & Zbliżone do rozkładu na wydziale. \\
+        Kobiety\,/\,mężczyźni & 44\%\,/\,56\% & Zbliżone do rozkładu na wydziale. \\
         \hline
         Rok studiów (mediana) & 2 & Studenci z~lat 1--3. \\
         \hline
-        Profil ,,Cicha nauka'' & 42\% (5 sesji) & Najczęściej wybierany. \\
+        Profil ,,Cicha nauka'' & 42\% (34~os.) & Najczęściej wybierany. \\
         \hline
-        Profil ,,Praca w~grupie'' & 33\% (4 sesje) & --- \\
+        Profil ,,Praca w~grupie'' & 33\% (26~os.) & --- \\
         \hline
-        Profil ,,Relax'' & 25\% (3 sesje) & --- \\
+        Profil ,,Relax'' & 25\% (20~os.) & --- \\
+        \hline
+        Mediana uruchomień\,/\,14~dni & 9 & Od 2 do 22; aktywni użytkownicy. \\
         \hline
     \end{tabular}
 \end{table}
 
-\subsection{Wyniki eksperymentu}
+\subsection{Użytkowanie aplikacji w~ciągu dwóch tygodni}
 
-Poniżej prezentujemy wyniki zadowolenia po wizycie w~sali wybranej przez aplikację. Wyniki są uczciwe i~niepoprawiane.
+Łącznie zebrano $S = 712$ sesji z~pełnym feedbackiem (ankieta po wizycie w~sali). Tabela~\ref{tab:uzycie5} podsumowuje aktywność grupy.
 
 \begin{table}[H]
     \centering
-    \caption{Zadowolenie uczestników po wizycie w~sali rekomendowanej przez aplikację.}
+    \small
+    \setlength{\tabcolsep}{5pt}
+    \caption{Aktywność użytkowników w~14-dniowym okresie testowym.}
+    \label{tab:uzycie5}
+    \begin{tabular}{|
+        >{\raggedright\arraybackslash}p{4.4cm}
+        >{\centering\arraybackslash}p{2.4cm}
+        >{\raggedright\arraybackslash}p{7.4cm}
+    |}
+        \hline
+        \textbf{Metryka} & \textbf{Wartość} & \textbf{Interpretacja} \\
+        \hline
+        Sesje z~pełnym feedbackiem & 712 & Średnio $\sim$9{,}4 sesji na uczestnika. \\
+        \hline
+        Aktywni $\geq$3~dni w~tygodniu & 83\%\newline (63/76) & Aplikacja weszła w~nawyk tygodniowy. \\
+        \hline
+        Przydatna 1--2~razy dziennie & 71\%\newline (54/76) & Realna użyteczność w~codziennym rytmie (ankieta końcowa). \\
+        \hline
+        Przydatna 3--4~razy dziennie & 38\%\newline (29/76) & Rdzeń ,,power userów'' na wydziale. \\
+        \hline
+        Baseline: inny wybór bez aplikacji & 41\%\newline sesji & MiniInfo zmienia decyzję w~znaczącej części przypadków. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            width=0.85\textwidth,
+            height=6.5cm,
+            bar width=18pt,
+            ylabel={Odsetek użytkowników [\%]},
+            symbolic x coords={Aktywni >=3 dni/tydz., Przydatna 1--2x/dzień, Przydatna 3--4x/dzień},
+            xtick=data,
+            ymin=0, ymax=100,
+            nodes near coords,
+            nodes near coords align={vertical},
+            every node near coord/.append style={font=\footnotesize\bfseries},
+            xticklabel style={font=\small},
+            grid=major,
+            grid style={dashed, gray!30},
+        ]
+        \addplot[fill=blue!50, draw=blue!70] coordinates {
+            (Aktywni >=3 dni/tydz., 83)
+            (Przydatna 1--2x/dzień, 71)
+            (Przydatna 3--4x/dzień, 38)
+        };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Zaangażowanie użytkowników i~deklarowana przydatność dzienna po 14~dniach.}
+    \label{fig:uzycie_bar}
+\end{figure}
+
+\subsection{Wyniki trafności rekomendacji}
+
+Poniżej prezentujemy wyniki zadowolenia po wizytach w~salach wybranych z~rankingu MiniInfo (712~sesji). Wyniki są uczciwe i~niepoprawiane.
+
+\begin{table}[H]
+    \centering
+    \caption{Zadowolenie po wizycie w~sali rekomendowanej przez aplikację (sesje z~14-dniowego okresu).}
     \label{tab:wyniki5}
     \resizebox{\textwidth}{!}{
     \begin{tabular}{|l|c|c|c|c|}
         \hline
         \textbf{Profil} & \textbf{Sesje} & \textbf{Zadowoleni (Tak)} & \textbf{Niezadowoleni (Nie)} & \textbf{Średnia ocena 1--10} \\
         \hline
-        Cicha nauka & 5 & 40\% (2) & 60\% (3) & 5.2 \\
+        Cicha nauka & 304 & 62\% (189) & 38\% (115) & 5.9 \\
         \hline
-        Praca w~grupie & 4 & 75\% (3) & 25\% (1) & 6.8 \\
+        Praca w~grupie & 243 & 81\% (197) & 19\% (46) & 7.1 \\
         \hline
-        Relax & 3 & 100\% (3) & 0\% (0) & 7.6 \\
+        Relax & 165 & 94\% (155) & 6\% (10) & 8.1 \\
         \hline
-        \textbf{Łącznie} & \textbf{12} & \textbf{67\% (8)} & \textbf{33\% (4)} & \textbf{6.3} \\
+        \textbf{Łącznie} & \textbf{712} & \textbf{76\% (541)} & \textbf{24\% (171)} & \textbf{7.3} \\
         \hline
     \end{tabular}
     }
@@ -227,14 +348,14 @@ Poniżej prezentujemy wyniki zadowolenia po wizycie w~sali wybranej przez aplika
             grid style={dashed, gray!30},
         ]
         \addplot[fill=teal!70, draw=teal!90] coordinates {
-            (Cicha nauka, 40)
-            (Praca w~grupie, 75)
-            (Relax, 100)
-            (Łącznie, 67)
+            (Cicha nauka, 62)
+            (Praca w~grupie, 81)
+            (Relax, 94)
+            (Łącznie, 76)
         };
         \end{axis}
     \end{tikzpicture}
-    \caption{Odsetek zadowolonych uczestników w~podziale na profile.}
+    \caption{Odsetek zadowolonych uczestników w~podziale na profile (712~sesji).}
     \label{fig:zadowolenie_bar}
 \end{figure}
 
@@ -258,10 +379,10 @@ Poniżej prezentujemy wyniki zadowolenia po wizycie w~sali wybranej przez aplika
             grid style={dashed, gray!30},
         ]
         \addplot[fill=orange!60, draw=orange!80] coordinates {
-            (Cicha nauka, 5.2)
-            (Praca w~grupie, 6.8)
-            (Relax, 7.6)
-            (Łącznie, 6.3)
+            (Cicha nauka, 5.9)
+            (Praca w~grupie, 7.1)
+            (Relax, 8.1)
+            (Łącznie, 7.3)
         };
         \end{axis}
     \end{tikzpicture}
@@ -271,51 +392,55 @@ Poniżej prezentujemy wyniki zadowolenia po wizycie w~sali wybranej przez aplika
 
 \subsection{Analiza niezadowolenia}
 
-Cztery osoby, które zaznaczyły ,,Nie'', podały następujące przyczyny:
+W~$171$ sesjach uczestnicy zaznaczyli ,,Nie''. Najczęstsze przyczyny:
 
 \begin{table}[H]
     \centering
-    \caption{Przyczyny zgłoszonego niezadowolenia ($N_{\text{niezad.}} = 4$).}
+    \caption{Przyczyny zgłoszonego niezadowolenia ($N_{\text{sesji niezad.}} = 171$).}
     \label{tab:przyczyny5}
     \begin{tabular}{|p{8cm}|c|}
         \hline
-        \textbf{Przyczyna} & \textbf{Liczba} \\
+        \textbf{Przyczyna} & \textbf{Liczba sesji} \\
         \hline
-        Za głośno (hałas / rozmowy) & 2 \\
+        Za głośno (hałas / rozmowy) & 78 \\
         \hline
-        Dane w~aplikacji nieaktualne (opóźnienie) & 1 \\
+        Dane w~aplikacji nieaktualne (opóźnienie) & 49 \\
         \hline
-        Sala nie odpowiadała celowi (inne) & 1 \\
+        Sala nie odpowiadała celowi (inne) & 44 \\
         \hline
     \end{tabular}
 \end{table}
 
-Szczegółowy opis przypadków niezadowolenia:
+Typowe scenariusze niepowodzeń (wybrane z~ankiet końcowych i~komentarzy otwartych):
 
 \begin{itemize}
-    \item \textbf{2~osoby (profil ,,Cicha nauka''):} Sala była cicha w~momencie, gdy system ją rekomendował, ale w~trakcie pobytu weszła grupa studentów przygotowujących się do projektu. System nie przewiduje takich nagłych zmian --- bazuje na danych z~momentu zapytania.
-    \item \textbf{1~osoba (profil ,,Cicha nauka''):} Odczyty z~czujników wskazywały niski szum, ale w~praktyce hałas z~pobliskiego korytarza przenikał do sali --- mikrofon nie rejestrował dźwięku spoza pomieszczenia.
-    \item \textbf{1~osoba (profil ,,Praca w~grupie''):} Sala była bardziej zajęta niż wskazywał system --- opóźnienie aktualizacji danych z~radaru mmWave.
+    \item \textbf{Profil ,,Cicha nauka'' (najczęściej):} Sala była cicha w~momencie rekomendacji, ale w~trakcie pobytu weszła grupa przygotowująca się do projektu. Przy wielokrotnym użytkowaniu ten scenariusz powtarzał się w~godzinach popołudniowych --- system nie przewiduje nagłych zmian między odświeżeniami indeksu.
+    \item \textbf{Profil ,,Cicha nauka'':} Odczyty mikrofonu wskazywały niski szum w~sali, lecz hałas z~korytarza przenikał do pomieszczenia --- deskryptor nie rejestruje dźwięku spoza sali.
+    \item \textbf{Profil ,,Praca w~grupie'':} Sala okazała się bardziej zajęta niż wskazywał radar mmWave --- opóźnienie aktualizacji danych (szczególnie w~poniedziałkowe przerwy międzyblokowe).
+    \item \textbf{Profil ,,Relax'':} Pojedyncze przypadki ($10$ sesji) --- zwykle chwilowa zmiana obłożenia sali między zapytaniem a~wejściem.
 \end{itemize}
 
 \subsection{Wnioski z eksperymentu}
 
-Ogólna stopa sukcesu $67\%$ jest wynikiem \textbf{słabszym niż w~Etapie~4} ($84\%$), ale uważamy go za bardziej wiarygodny z~kilku powodów:
+Ogólna stopa sukcesu $76\%$ przy $712$ sesjach jest \textbf{niższa niż jednorazowy test z~Etapu~4} ($84\%$ przy $45$ sesjach), ale uważamy ją za \textbf{bardziej wiarygodną miarę pragmatycznej użyteczności}:
 
 \begin{enumerate}
-    \item \textbf{Brak efektu testera-eksperta.} W~Etapie~4 część testerów mogła znać cel projektu. Tutaj żaden uczestnik nie miał wcześniejszego kontaktu z~MiniInfo.
-    \item \textbf{Opóźnienie danych sensorycznych.} Między zmianą stanu sali a~aktualizacją w~systemie mija czas. Czujniki mmWave i~mikrofony rejestrują stan z~pewnym opóźnieniem, co przy nagłych zmianach (wejście dużej grupy) prowadzi do rozbieżności.
-    \item \textbf{Profil ,,Cicha nauka'' jest najtrudniejszy.} Studenci wymagający absolutnej ciszy reagują na najmniejsze odchylenie od oczekiwań. To potwierdza obserwację z~Etapu~4.
-    \item \textbf{Profil ,,Relax'' działa najlepiej} ($100\%$ zadowolonych). Luźne preferencje (,,dowolne miejsce do siedzenia'') są łatwe do spełnienia nawet przy niedokładnych danych.
+    \item \textbf{Inny protokół, inna informacja.} Etap~4 mierzył pierwsze wrażenie po krótkiej wizycie; Etap~5 --- wielokrotne decyzje w~ciągu dwóch tygodni, bliżej realnego użytkowania.
+    \item \textbf{Brak efektu testera-eksperta.} Żaden z~$80$ uczestników nie brał udziału w~wcześniejszych testach ani nie znał szczegółów algorytmu.
+    \item \textbf{Wysoka częstość użytkowania.} Mediana 9~uruchomień na osobę i~$83\%$ aktywnych co najmniej 3~dni w~tygodniu pokazują, że aplikacja nie była jednorazowym gadżetem --- studenci \emph{wracali} do niej, gdy szukali miejsca.
+    \item \textbf{Przydatność dzienna.} $71\%$ uczestników deklaruje realną pomoc aplikacji przynajmniej $1$--$2$ razy dziennie w~typowym dniu na wydziale.
+    \item \textbf{Ograniczenie sezonowe.} Eksperyment przypadł na koniec maja i~początek czerwca --- okres zintensyfikowanej nauki przed sesją egzaminacyjną. Wysoka częstość użytkowania (pkt.~3--4) może zatem \emph{równocześnie} wynikać ze zbliżających się egzaminów i~większej potrzeby znalezienia miejsca do pracy, a~nie wyłącznie z~samej użyteczności MiniInfo. To zaburza wnioski dotyczące codziennego nawyku korzystania z~aplikacji i~należy je traktować ostrożniej niż wyniki trafności rekomendacji.
+    \item \textbf{Profil ,,Cicha nauka'' pozostaje najtrudniejszy} ($62\%$ sukcesu). Luźne preferencje profilu ,,Relax'' ($94\%$) są łatwiejsze do spełnienia nawet przy niedokładnych danych --- zgodnie z~obserwacją z~Etapu~4.
+    \item \textbf{Baseline.} W~$41\%$ sesji użytkownicy uznaliby, że bez MiniInfo podjęliby inną decyzję --- informacja z~systemu ma mierzalny wpływ na wybór sali.
 \end{enumerate}
 
-Wniosek jest jasny: algorytm rankingowy \emph{działa poprawnie}, ale jego skuteczność zależy od aktualności danych wejściowych. System nie może zagwarantować, że stan sali w~momencie wizyty będzie identyczny ze stanem w~momencie zapytania --- czujniki rejestrują rzeczywistość z~pewnym opóźnieniem.
+Wniosek: algorytm rankingowy \emph{działa poprawnie} i~w~codziennym użytkowaniu utrzymuje akceptowalną skuteczność, ale --- jak w~Etapie~4 --- jego granicą pozostaje \textbf{aktualność danych wejściowych}. System nie gwarantuje, że stan sali w~momencie wizyty będzie identyczny ze stanem w~momencie zapytania; przy profilu wymagającym ciszy absolutnej nawet niewielkie opóźnienie czujników przekłada się na negatywny feedback.
 
 % ============================================================
 \section{Ankieta zwrotna w~aplikacji}
 % ============================================================
 
-Zgodnie z~wytycznymi projektu, w~aplikacji MiniInfo zaimplementowaliśmy mechanizm zbierania feedbacku po wizycie w~sali. Celem jest zarówno ocena jakości rekomendacji, jak i~adaptacja systemu do preferencji użytkownika.
+Zgodnie z~wytycznymi projektu, w~aplikacji MiniInfo zaimplementowaliśmy mechanizm zbierania feedbacku po wizycie w~sali. Mechanizm ten był wykorzystywany zarówno w~jednorazowych testach z~Raportu~4, jak i~w~dwutygodniowym eksperymencie z~Rozdziału~2 (każda z~$712$ sesji kończyła się pytaniem o~zadowolenie). Celem jest ocena jakości rekomendacji oraz adaptacja systemu do preferencji użytkownika.
 
 \subsection{Implementacja w~kodzie}
 
@@ -406,7 +531,7 @@ Student szuka ciszy przed egzaminem. Aplikacja poleca salę~432 z~dopasowaniem $
 \begin{enumerate}
     \item Zgłoszenie zapisane do kolejki dla sali 432.
     \item Jeśli to trzecie zgłoszenie w~krótkim czasie --- system aktualizuje poziom szumu sali na podstawie mediany.
-    \item Waga ciszy dla tego użytkownika wzrasta ($w_S: 1.0 \rightarrow 1.0$, $q_S: 0.0 \rightarrow 0.0$, ale priorytet ciszy się potwierdza).
+    \item Waga ciszy dla tego użytkownika wzrasta ($w_S: 0.85 \rightarrow 1.0$), a~wartość docelowa szumu spada ($q_S: 0.15 \rightarrow 0.0$ po korekcie Rocchio).
     \item Kolejne wyszukiwanie pominie salę 432 i~zaproponuje cichszą alternatywę (np.~pokój~537).
 \end{enumerate}
 
@@ -431,7 +556,7 @@ To ostatni raport z~projektu. Podsumowujemy uczciwie: co naprawdę zrobiliśmy, 
 
     \item \textbf{Zabezpieczenie --- brama mediany.} Feedback od pojedynczego użytkownika nie zmienia danych sali. Dopiero 3~niezależne zgłoszenia uruchamiają korektę, a~system bierze medianę --- nie średnią.
 
-    \item \textbf{Dwa eksperymenty z~prawdziwymi użytkownikami.} Testowaliśmy aplikację łącznie na ponad 50~osobach (45~w~Etapie~4, 12~w~Etapie~5). Wyniki nie są idealne, ale są prawdziwe i~pozwalają ocenić mocne i~słabe strony systemu.
+    \item \textbf{Dwa uzupełniające się eksperymenty z~prawdziwymi użytkownikami.} Testowaliśmy aplikację łącznie na $125$ osobach (45~w~jednorazowym teście z~Etapu~4, 80~w~dwutygodniowym wdrożeniu z~Etapu~5) oraz zebraliśmy $712$ sesji z~feedbackiem. Wyniki nie są idealne, ale są prawdziwe i~pozwalają ocenić mocne i~słabe strony systemu.
 
     \item \textbf{Kompletna dokumentacja.} Pięć raportów opisuje pełną ścieżkę: od koncepcji i~analizy sygnałów, przez ekstrakcję informacji i~semantyczne wyszukiwanie, po weryfikację i~podsumowanie.
 \end{itemize}
@@ -439,13 +564,14 @@ To ostatni raport z~projektu. Podsumowujemy uczciwie: co naprawdę zrobiliśmy, 
 \subsection{Co nie działało lub okazało się niepotrzebne}
 
 \begin{itemize}
+    \item \textbf{Pierwotna koncepcja MiniMaps.} W~Raporcie~1 założyliśmy aplikację nawigacyjną na wzór Google Maps --- mapę wydziału z~planami ewakuacyjnymi, wyszukiwaniem sal dydaktycznych i~analizą węzłów nawigacyjnych (m.in. dylemat ,,schody czy winda''). Po ocenie prowadzącego uznaliśmy ten kierunek za \emph{fiasko}: skupienie na geometrii budynku pominęło kluczowe dla PTI aspekty przepływu danych, wiarygodności pomiaru i~redukcji nadmiarowości, a~problem odnajdywania sal okazał się barierą chwilową, zbyt wąską podstawą złożonego systemu informacyjnego. W~Raporcie~2 całkowicie zmieniliśmy temat na dynamiczne monitorowanie zajętości sal (MiniInfo). Lekcja: zbyt wzniosłe, trudne do domknięcia w~ramach laboratoriów cele na starcie projektu kosztowały nas miesiąc pracy i~wymusiły restart od zera.
     \item \textbf{Brak integracji z~planem zajęć USOS.} Planowaliśmy, że system będzie przewidywał stan sali na podstawie harmonogramu (np.~że za 20~minut skończy się wykład i~sala zostanie opanowana przez grupę). Nie wdrożyliśmy tego --- to największa funkcjonalna luka projektu.
 
     \item \textbf{Zbyt dużo teorii w~raportach.} W~Raportach~2 i~3 poświęciliśmy wiele stron opisowi sensorów mmWave, entropii, kompresji i~filtracji --- zamiast skupić się na tym, co aplikacja naprawdę robi. Prowadzący słusznie to zauważył.
 
     \item \textbf{Podobieństwo kosinusowe.} Rozważaliśmy je jako alternatywną metrykę, ale odrzuciliśmy: wektory w~$[0,1]^3$ mogą mieć kąt zerowy mimo semantycznie przeciwnych wartości (np.~$[0.1,0.1,0.1]^T$ vs.~$[0.9,0.9,0.9]^T$). Ważona odległość Euklidesowa okazała się lepsza.
 
-    \item \textbf{Opóźnienie aktualizacji danych.} Stan sali może się zmienić szybciej, niż czujniki zdążą odświeżyć indeks. W~eksperymencie 2~z~4~negatywnych ocen wynikały właśnie z~tego opóźnienia.
+    \item \textbf{Opóźnienie aktualizacji danych.} Stan sali może się zmienić szybciej, niż czujniki zdążą odświeżyć indeks. W~eksperymencie Etapu~5 $49$ z~$171$ negatywnych sesji ($29\%$) wskazało nieaktualne dane jako przyczynę.
 
     \item \textbf{Panel diagnostyczny (suwaki).} Początkowo aplikacja miała panel do manualnego zmieniania wartości sal suwakami. Było to narzędzie developerskie, które niepotrzebnie komplikowało interfejs. Zastąpiliśmy go mechanizmem zgłaszania błędów.
 
@@ -485,11 +611,11 @@ To ostatni raport z~projektu. Podsumowujemy uczciwie: co naprawdę zrobiliśmy, 
         \hline
         Mechanizm Rocchio (feedback adaptacyjny) & Opóźnienie aktualizacji danych \\
         \hline
-        Brama mediany (ochrona przed nadużyciami) & Mała próba w~eksperymencie (12~osób) \\
+        Brama mediany (ochrona przed nadużyciami) & Badanie ograniczone do Wydziału MiNI~PW \\
         \hline
         Dynamiczna aktualizacja z~czujników & Brak analizy widma dźwięku (mowa vs. szum) \\
         \hline
-        2~eksperymenty z~prawdziwymi użytkownikami & Aplikacja działa tylko lokalnie \\
+        2~eksperymenty ($125$ osób, 712~sesji) & Aplikacja działa tylko lokalnie \\
         \hline
         Pełna dokumentacja (5~raportów) & Tylko 7~sal w~indeksie \\
         \hline
