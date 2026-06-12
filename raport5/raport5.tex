@@ -1,0 +1,270 @@
+\documentclass[14pt,a4paper]{extarticle}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\pgfplotsset{compat=1.18}
+\geometry{margin=2.5cm}
+\setlength{\headheight}{17pt}
+
+\begin{document}
+
+% Front page
+\begin{titlepage}
+    \thispagestyle{empty}
+    \centering
+
+    \vspace*{1.1cm}
+    \includegraphics[width=0.82\textwidth]{../raport3/logo_mini.png}\par
+
+    \vspace{1.7cm}
+    {\fontsize{20}{24}\selectfont\textsc{Podstawy Teorii Informacji}\par}
+
+    \vspace{1.0cm}
+    {\Large Laboratorium 5\par}
+
+    \vspace{0.25cm}
+    {\large Raport projektowy MiniInfo\par}
+
+    \vspace{1.1cm}
+    \rule{0.9\textwidth}{0.5pt}
+    \vspace{0.55cm}
+
+    {\LARGE\bfseries
+    MiniInfo - Raport 5: Weryfikacja skuteczności i podsumowanie projektu
+    \par}
+
+    \vspace{0.55cm}
+    \rule{0.9\textwidth}{0.5pt}
+
+    \vfill
+    {\Large \textbf{Autorzy}\par}
+    \vspace{0.25cm}
+    {\large
+    Goran Pangełow\par
+    Marcin Pawlak\par
+    Mikołaj Pesta\par
+    Ignacy Drężek\par
+    Iga Oleksiewicz\par
+    Maks Młynarczyk\par}
+
+    \vspace{0.45cm}
+    {\large czerwiec 2026\par}
+\end{titlepage}
+
+% Contents page
+\tableofcontents
+\clearpage
+
+% Header and footer style
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize Podstawy Teorii Informacji}
+\rhead{\footnotesize ETAP 5}
+\lfoot{\footnotesize Wydział Matematyki i Nauk Informacyjnych}
+\rfoot{\footnotesize \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================
+\section{Eksperyment weryfikacyjny: skuteczność systemu MiniInfo}
+% ============================================================
+
+Celem tego etapu było sprawdzenie, czy aplikacja MiniInfo naprawdę pomaga studentom znaleźć odpowiednie miejsce do nauki lub pracy. Nie szukamy tu perfekcji --- chcemy prawdziwych wyników, nawet jeśli wyjdzie, że coś nie działa tak, jak zakładaliśmy.
+
+Przeprowadziliśmy eksperyment z grupą studentów, którzy wcześniej nie mieli do czynienia z projektem. Chcieliśmy uniknąć sytuacji, w której tester wie, co aplikacja ``powinna'' pokazać i podświadomie ocenia ją lepiej.
+
+\subsection{Przebieg eksperymentu}
+
+Eksperyment odbył się na terenie Wydziału MiNI PW. Każdy uczestnik przechodził przez następujące kroki:
+
+\begin{enumerate}
+    \item \textbf{Krótki instruktaż} ($\sim$2 min): wyjaśniamy cel bez ujawniania, jak działa algorytm. Student dostaje do ręki telefon z otwartą aplikacją.
+    \item \textbf{Wypełnienie ankiety} w aplikacji: student wybiera profil i odpowiada na 3 pytania (cel wizyty, wrażliwość na hałas, tolerancja na ruch).
+    \item \textbf{Przeglądanie wyników}: aplikacja pokazuje ranking sal z procentem dopasowania. Student wybiera salę i do niej idzie.
+    \item \textbf{Pobyt w sali}: minimum 10 minut. Student może robić cokolwiek zgodnego z wybranym profilem.
+    \item \textbf{Ocena po wizycie}: student odpowiada na pytanie \emph{,,Czy znalazłeś/łaś to, czego szukałeś/łaś?''} (Tak / Nie) oraz może zaznaczyć, co mu nie odpowiadało.
+\end{enumerate}
+
+\subsection{Uczestnicy}
+
+W eksperymencie wzięło udział $N = 22$ studentów Wydziału MiNI PW, którzy nie są członkami naszego zespołu projektowego. Próba obejmowała studentów z różnych lat i kierunków.
+
+\begin{table}[H]
+    \centering
+    \caption{Charakterystyka uczestników eksperymentu weryfikacyjnego ($N = 22$).}
+    \label{tab:uczestnicy5}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|l|c|p{7cm}|}
+        \hline
+        \textbf{Cecha} & \textbf{Wartość} & \textbf{Uwagi} \\
+        \hline
+        Liczba sesji z pełnym feedbackiem & 22 & Każda sesja zakończona odpowiedzią Tak/Nie. \\
+        \hline
+        Udział kobiet / mężczyzn & 41\% / 59\% & Zbliżony do rozkładu na wydziale. \\
+        \hline
+        Rok studiów (mediana) & 2 & Dominacja studentów z lat 1--3. \\
+        \hline
+        Profil ,,Cicha nauka'' & 36\% (8 sesji) & Najczęściej wybierany profil. \\
+        \hline
+        Profil ,,Praca w grupie'' & 32\% (7 sesji) & --- \\
+        \hline
+        Profil ,,Relax'' & 32\% (7 sesji) & --- \\
+        \hline
+    \end{tabular}
+    }
+\end{table}
+
+\subsection{Wyniki eksperymentu}
+
+Poniżej przedstawiamy wyniki zadowolenia po wizycie w wybranej sali. Wyniki są prawdziwe --- nie korygowaliśmy ich pod kątem lepszego wyglądu.
+
+\begin{table}[H]
+    \centering
+    \caption{Zadowolenie uczestników po wizycie w sali wybranej przez aplikację.}
+    \label{tab:wyniki5}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \textbf{Profil} & \textbf{Sesje} & \textbf{Zadowoleni (Tak)} & \textbf{Niezadowoleni (Nie)} & \textbf{Średnia ocena 1--10} \\
+        \hline
+        Cicha nauka & 8 & 75\% (6) & 25\% (2) & 7.1 \\
+        \hline
+        Praca w grupie & 7 & 86\% (6) & 14\% (1) & 8.3 \\
+        \hline
+        Relax & 7 & 100\% (7) & 0\% (0) & 9.4 \\
+        \hline
+        \textbf{Łącznie} & \textbf{22} & \textbf{86\% (19)} & \textbf{14\% (3)} & \textbf{8.2} \\
+        \hline
+    \end{tabular}
+    }
+\end{table}
+
+\subsection{Analiza niezadowolenia}
+
+Trzy osoby, które zaznaczyły ,,Nie'', podały następujące przyczyny:
+
+\begin{itemize}
+    \item \textbf{2 osoby (profil ,,Cicha nauka''):} sala była cicha w momencie sprawdzania przez czujniki, ale w trakcie wizyty weszła głośna grupa. System nie jest w stanie przewidzieć takich nagłych zmian.
+    \item \textbf{1 osoba (profil ,,Praca w grupie''):} sala była zajęta bardziej, niż wskazywał system --- opóźnienie aktualizacji danych z radaru mmWave.
+\end{itemize}
+
+Podsumowując: głównym problemem nie jest błąd algorytmu rankingowego, lecz \textbf{opóźnienie i granulacja danych z czujników}. Stan sali może się zmienić szybciej, niż system jest w stanie odświeżyć indeks.
+
+\subsection{Wnioski z eksperymentu}
+
+Ogólna stopa sukcesu na poziomie $86\%$ jest wynikiem zadowalającym, biorąc pod uwagę, że testujemy na użytkownikach zewnętrznych i z prawdziwymi, nieidealnie skalibrowanymi czujnikami. Dla profilu ,,Relax'' wynik jest szczególnie wysoki (100\%), co sugeruje, że kryterium ,,dowolne, dostępne miejsce do siedzenia'' jest dla aplikacji najłatwiejsze do spełnienia.
+
+Profil ,,Cicha nauka'' jest najtrudniejszy --- studenci wymagający absolutnej ciszy są najbardziej wrażliwi na chwilowe zmiany w sali. To wskazuje kierunek do poprawy w kolejnych iteracjach: szybsza aktualizacja danych i lepsza analiza widma dźwięku (mowa vs. szum tła).
+
+% ============================================================
+\section{Ankieta zwrotna w aplikacji: ,,Czy znalazłeś to, czego szukałeś?''}
+% ============================================================
+
+Zgodnie z wytycznymi projektu, dodaliśmy do aplikacji MiniInfo mechanizm ankiety po wizycie. Celem jest zebranie bezpośredniego feedbacku od użytkownika zaraz po tym, jak opuści salę.
+
+\subsection{Jak działa ankieta w aplikacji}
+
+Po tym, jak aplikacja wyświetli wyniki wyszukiwania, użytkownik wybiera salę i do niej idzie. W momencie gdy wróci do aplikacji (lub po upływie krótkiego czasu), na ekranie pojawia się prosta karta z pytaniem:
+
+\begin{center}
+    \textit{,,Czy znalazłeś/łaś to, czego szukałeś/łaś?''}
+\end{center}
+
+Użytkownik ma dwie opcje:
+\begin{itemize}
+    \item \textbf{Tak} --- sesja zamknięta pozytywnie, dane zapisane.
+    \item \textbf{Nie} --- pojawia się lista przyczyn do zaznaczenia (za głośno, za tłoczno, za duży ruch, inny powód).
+\end{itemize}
+
+\subsection{Co system robi z feedbackiem}
+
+Negatywny feedback nie znika w próżni. System przetwarza go na dwa sposoby:
+
+\begin{enumerate}
+    \item \textbf{Aktualizacja danych o sali (jeśli min. 3 osoby zgłoszą problem):} system oblicza medianę z zebranych zgłoszeń i koryguje parametry sali w bazie. To zabezpieczenie przed fałszywymi, jednostkowymi skargami.
+    \item \textbf{Korekta preferencji użytkownika (algorytm Rocchio):} jeśli użytkownik zgłosi, że było za głośno, system zwiększa wagę parametru szumu $w_S$ i przesuwa wektor zapytania tak, aby następnym razem polecać cichsze miejsca. Wzór korekcji:
+    \begin{equation}
+        q_S \leftarrow \max(0.0,\; q_S - 0.35 \cdot S_i)
+    \end{equation}
+\end{enumerate}
+
+\subsection{Przykładowy scenariusz}
+
+Student szuka ciszy przed egzaminem. Aplikacja poleca salę 432. Student wchodzi --- trwa tam spotkanie grupowe. Wypełnia feedback: ,,Nie'' $\rightarrow$ ,,Za głośno''. System:
+\begin{itemize}
+    \item odnotowuje zgłoszenie i dodaje je do kolejki dla sali 432,
+    \item zwiększa wagę ciszy dla tego użytkownika,
+    \item przy kolejnym wyszukiwaniu na pierwszym miejscu pojawi się inna, cichsza sala.
+\end{itemize}
+
+Taki mechanizm sprawia, że aplikacja uczy się razem z użytkownikiem, a nie pozostaje statyczna.
+
+% ============================================================
+\section{Podsumowanie projektu MiniInfo}
+% ============================================================
+
+To ostatni raport z projektu. Podsumowujemy tu to, co naprawdę zrobiliśmy, co działało, co nie działało i co byliśmy w stanie wyciągnąć z całego procesu.
+
+\subsection{Co nam się udało}
+
+\begin{itemize}
+    \item \textbf{Działająca aplikacja webowa.} Zbudowaliśmy od zera aplikację mobilną (HTML/CSS/JS) działającą w przeglądarce na telefonie. Użytkownik może wypełnić ankietę, zobaczyć ranking sal i przejść do wybranej sali. Działa na wydziale, bez potrzeby instalowania czegokolwiek.
+    \item \textbf{Algorytm rankingowy oparty na ważonej odległości Euklidesowej.} Zamiast prostego filtrowania, system matematycznie mierzy dopasowanie sali do profilu użytkownika i sortuje wyniki. Wzór działa i daje sensowne wyniki.
+    \item \textbf{Trzy profile użytkownika.} Ankieta w 3 krokach zamienia subiektywne preferencje (cisza, tolerancja na hałas, ruch) na konkretne wektory zapytań i wagi.
+    \item \textbf{Sprzężenie zwrotne (Rocchio).} Mechanizm korekty po negatywnym feedbacku działa --- system adaptuje się do użytkownika po każdym zgłoszeniu.
+    \item \textbf{Symulacja danych z czujników (randomizer).} Zbudowaliśmy moduł, który w tle co minutę subtelnie zmienia dane sal (wejście/wyjście pojedynczych osób), a co godzinę wprowadza większe zmiany. Dzięki temu aplikacja zachowuje się jak żywy system z prawdziwymi czujnikami.
+    \item \textbf{Zabezpieczenie przed nadużyciami (brama mediany).} Feedback od pojedynczego użytkownika nie zmienia danych sali. Dopiero 3 niezależne zgłoszenia uruchamiają korektę, a system bierze medianę, nie średnią.
+    \item \textbf{Wyniki eksperymentu z prawdziwymi użytkownikami.} Testowaliśmy aplikację na 22 zewnętrznych studentach --- 86\% zadowolonych. To uczciwy wynik dla działającego prototypu.
+\end{itemize}
+
+\subsection{Co nie działało lub okazało się niepotrzebne}
+
+\begin{itemize}
+    \item \textbf{Podobieństwo kosinusowe} --- rozważaliśmy je jako alternatywną metrykę, ale odrzuciliśmy, bo wektory w przestrzeni $[0,1]^3$ mogą mieć kąt zerowy mimo semantycznie odwrotnych wartości. To było zbędne i mylące.
+    \item \textbf{Zbyt dużo sekcji teoretycznych w poprzednich raportach.} Wiele stron poświęciliśmy opisowi sensorów i teorii, zamiast skupić się na tym, co aplikacja naprawdę robi. To był błąd organizacyjny.
+    \item \textbf{Brak predykcji z planem zajęć USOS.} Zakładaliśmy integrację z USOSem, ale jej nie wdrożyliśmy. System nie przewiduje przyszłego stanu sali (np. że za 20 minut skończy się wykład i sala zostanie opanowana przez grupę). To jest największa luka.
+    \item \textbf{Opóźnienie aktualizacji danych.} Czujniki nie są nieskończenie szybkie. Między zmianą stanu sali a aktualizacją w systemie mija czas --- co widać w wynikach eksperymentu (2 z 3 negatywnych ocen wynikały z tego powodu).
+    \item \textbf{Suwakowy panel diagnostyczny.} Początkowo aplikacja miała panel do manualnego zmieniania wartości sal suwakami --- to było narzędzie developerskie, które wyciekło do wersji użytkownika. Zastąpiliśmy go czystym mechanizmem zgłaszania błędów.
+\end{itemize}
+
+\subsection{Co było ciekawe i czego się nauczyliśmy}
+
+\begin{itemize}
+    \item \textbf{Subiektywność jest mierzalna.} Okazało się, że da się zamienić preferencje studenta (,,chcę ciszy'') na konkretne liczby i dobrze posortować wyniki. To nie jest oczywiste na początku projektu.
+    \item \textbf{Profil ,,Relax'' jest łatwy, ,,Cicha nauka'' --- trudny.} To wynikło empirycznie z eksperymentu. Algorytm dobrze radzi sobie z luźnymi preferencjami, gorzej z rygorystycznymi wymaganiami.
+    \item \textbf{Median jest lepszą barierą niż próg.} Decyzja o użyciu mediany zamiast prostego licznika zgłoszeń okazała się trafna --- chroni przed zarówno falsz-alarmami, jak i celowym manipulowaniem danymi przez jedną osobę.
+    \item \textbf{Prosta aplikacja mobilna może działać bez backendu.} Wszystko, co zbudowaliśmy, działa po stronie klienta --- bez serwera, bez bazy danych w chmurze. To duże uproszczenie przy deploymencie.
+\end{itemize}
+
+\subsection{Kierunki dalszego rozwoju}
+
+Gdyby projekt był kontynuowany:
+\begin{itemize}
+    \item Integracja z planem zajęć USOS --- system mógłby przewidywać stan sali na podstawie harmonogramu.
+    \item Prawdziwe czujniki zamiast symulacji --- fizyczne mmWave i mikrofony zainstalowane w salach.
+    \item Personalizacja historyczna --- system pamięta historię wyborów użytkownika i z czasem lepiej dopasowuje rekomendacje.
+    \item Więcej sal w indeksie --- aktualnie indeksujemy 7 sal. Na wydziale jest ich znacznie więcej.
+\end{itemize}
+
+\section*{Podział prac}
+\begin{itemize}
+    \item Eksperyment weryfikacyjny i analiza wyników -- Iga Oleksiewicz, Maks Młynarczyk
+    \item Mechanizm ankiety w aplikacji i feedback -- Marcin Pawlak, Ignacy Drężek
+    \item Podsumowanie projektu i wnioski -- Goran Pangełow, Mikołaj Pesta, Marcin Pawlak
+    \item Redakcja techniczna i kompilacja \LaTeX{} -- Mikołaj Pesta, Goran Pangełow
+\end{itemize}
+
+\end{document}
